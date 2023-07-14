@@ -8,7 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { LoginCompanyDto } from './dto/login-company.dto';
 import { CompanyService } from 'src/company/company.service';
 import { RegisterCompanyDto } from './dto/register-company.dto';
-import { CompanyUser } from 'src/entity/CompanyUser.entity';
+import { CompanyUser } from 'src/company/entity/CompanyUser.entity';
 import { ForgetPasswordDto } from 'src/auth/dto/forget-password.dto';
 import { SendMailDto } from 'src/mail/dto/send-mail.dto';
 import { MailService } from 'src/mail/mail.service';

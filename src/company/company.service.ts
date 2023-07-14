@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CompanyProfile } from 'src/entity/CompanyProfile.entity';
-import { CompanyUser } from 'src/entity/CompanyUser.entity';
+import { CompanyProfile } from './entity/CompanyProfile.entity';
+import { CompanyUser } from './entity/CompanyUser.entity';
 import { Repository } from 'typeorm';
 import { CreateCompanyProfileDto } from './dto/create-company-profile.dto';
 
