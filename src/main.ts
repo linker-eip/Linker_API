@@ -7,7 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = new DocumentBuilder()
     .setTitle('Linker API')
-    .setDescription('Linker Swagger API')
+    .setDescription('Linker API')
     .setVersion('1.0')
     .addTag('Linker')
     .addBearerAuth()
@@ -17,6 +17,6 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.enableCors();
-  await app.listen(process.env.APP_PORT);
+  await app.listen(process.env.APP_PORT || 8080);
 }
 bootstrap();

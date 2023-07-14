@@ -8,13 +8,13 @@ import * as bcrypt from 'bcrypt';
 import { LoginCompanyDto } from './dto/login-company.dto';
 import { CompanyService } from 'src/company/company.service';
 import { RegisterCompanyDto } from './dto/register-company.dto';
-import { CompanyUser } from 'src/entity/CompanyUser.entity';
+import { CompanyUser } from 'src/company/entity/CompanyUser.entity';
 import { ForgetPasswordDto } from 'src/auth/dto/forget-password.dto';
 import { SendMailDto } from 'src/mail/dto/send-mail.dto';
 import { MailService } from 'src/mail/mail.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { GoogleLoginDto } from './dto/google-login.dto';
-import { google } from 'googleapis'
+import { google } from 'googleapis';
 import { env } from 'process';
 import axios from 'axios';
 import { oauth2 } from 'googleapis/build/src/apis/oauth2';
@@ -61,6 +61,20 @@ export class AuthService {
 
     const token = jwt.sign({ email: savedUser.email }, process.env.JWT_SECRET);
 
+    await this.studentService.updateStudentProfile(
+      {
+        name: savedUser.firstName + ' ' + savedUser.lastName,
+        description: '',
+        email: savedUser.email,
+        phone: '',
+        location: '',
+        studies: '',
+        skills: '',
+        website: '',
+      },
+      savedUser.email,
+    );
+
     return { token };
   }
 
@@ -84,6 +98,23 @@ export class AuthService {
     const savedUser = await this.companyService.save(newUser);
 
     const token = jwt.sign({ email: savedUser.email }, process.env.JWT_SECRET);
+
+    await this.companyService.updateCompanyProfile(
+      {
+        name: savedUser.companyName,
+        description: '',
+        email: savedUser.email,
+        phone: savedUser.phoneNumber,
+        address: '',
+        size: 0,
+        location: '',
+        activity: '',
+        speciality: '',
+        website: '',
+      },
+      savedUser.email,
+    );
+
 
     return { token };
   }
@@ -134,7 +165,9 @@ export class AuthService {
       .join('');
     company.resetPasswordToken = randomString;
     const emailBody =
-      'Voici votre clé pour réinitialiser votre mot de passe : ' + randomString + '.\n Vous pouvez le réinitialiser sur https://linker-app.fr/company/reset-password';
+      'Voici votre clé pour réinitialiser votre mot de passe : ' +
+      randomString +
+      '.\n Vous pouvez le réinitialiser sur https://linker-app.fr/company/reset-password';
     const emailSubject = 'Réinitialisation de mot de passe';
 
     const sendMailDto = new SendMailDto();
@@ -172,7 +205,9 @@ export class AuthService {
       .join('');
     student.resetPasswordToken = randomString;
     const emailBody =
-      'Voici votre clé pour réinitialiser votre mot de passe : ' + randomString + '.\n Vous pouvez le réinitialiser sur https://linker-app.fr/student/reset-password';
+      'Voici votre clé pour réinitialiser votre mot de passe : ' +
+      randomString +
+      '.\n Vous pouvez le réinitialiser sur https://linker-app.fr/student/reset-password';
     const emailSubject = 'Réinitialisation de mot de passe';
 
     const sendMailDto = new SendMailDto();
@@ -201,35 +236,42 @@ export class AuthService {
     const oauth2Client = new google.auth.OAuth2(
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
-      "https://localhost:8080/test"
-    )
-  
-// Generate Oauth2 Link (Keeping for later use)
-   // const scopes = [
-   //   "https://www.googleapis.com/auth/userinfo.email",
-   //   "https://www.googleapis.com/auth/userinfo.profile"
-   // ]
-   // const authorizationUrl = oauth2Client.generateAuthUrl({
-   //   access_type: 'offline',
-   //   scope: scopes,
-   //   include_granted_scopes: true
-   // });
-   // console.log(authorizationUrl)
+      'https://localhost:8080/test',
+    );
 
-    let tokens
+    // Generate Oauth2 Link (Keeping for later use)
+    // const scopes = [
+    //   "https://www.googleapis.com/auth/userinfo.email",
+    //   "https://www.googleapis.com/auth/userinfo.profile"
+    // ]
+    // const authorizationUrl = oauth2Client.generateAuthUrl({
+    //   access_type: 'offline',
+    //   scope: scopes,
+    //   include_granted_scopes: true
+    // });
+    // console.log(authorizationUrl)
+
+    let tokens;
     try {
-      tokens = await oauth2Client.getToken(googleLoginDto.code)
+      tokens = await oauth2Client.getToken(googleLoginDto.code);
     } catch (e) {
-      return {error: "Invalid token"}
+      return { error: 'Invalid token' };
     }
-    const userinfos = await axios.get("https://oauth2.googleapis.com/tokeninfo?id_token=" +  tokens.tokens.id_token)
-    const existingUser = await this.studentService.findOne(userinfos.data.email);
+    const userinfos = await axios.get(
+      'https://oauth2.googleapis.com/tokeninfo?id_token=' +
+        tokens.tokens.id_token,
+    );
+    const existingUser = await this.studentService.findOne(
+      userinfos.data.email,
+    );
 
     if (existingUser) {
-      const token = jwt.sign({ email: existingUser.email }, process.env.JWT_SECRET);
+      const token = jwt.sign(
+        { email: existingUser.email },
+        process.env.JWT_SECRET,
+      );
       return { token };
     } else {
-
       const newUser = new StudentUser();
       newUser.email = userinfos.data.email;
       newUser.password = await this.hashPassword(tokens.id_token);
@@ -238,7 +280,10 @@ export class AuthService {
 
       const savedUser = await this.studentService.save(newUser);
 
-      const token = jwt.sign({ email: savedUser.email }, process.env.JWT_SECRET);
+      const token = jwt.sign(
+        { email: savedUser.email },
+        process.env.JWT_SECRET,
+      );
 
       return { token };
     }
