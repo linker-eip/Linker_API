@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { StudentModule } from './student/student.module';
 import { CompanyModule } from './company/company.module';
 import { MailModule } from './mail/mail.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { MailModule } from './mail/mail.module';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     CompanyModule,
     MailModule,
+    AdminModule,
   ],
   controllers: [],
   providers: [JwtStrategy],
