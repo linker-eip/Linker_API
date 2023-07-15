@@ -128,4 +128,32 @@ export class UserAdminService {
     studentProfile.website = CreateStudentProfile.website;
     return this.studentProfileRepository.save(studentProfile);
   }
+
+  async findOneStudentById(studentId: number): Promise<StudentUser> {
+    const student = await this.studentUserRepository.findOne({
+      where: { id: studentId },
+    });
+    return student;
+  }
+
+  async updateStudent(
+    student: StudentUser,
+    body: RegisterStudentAdminDto,
+  ): Promise<StudentUser> {
+    const update: Partial<StudentUser> = {};
+
+    const studentWithSameEmail = await this.findOneStudent(body.email);
+
+    if (studentWithSameEmail)
+      throw new ConflictException('Student already exists');
+
+    if (body.email) update.email = body.email;
+    if (body.password) update.password = await hashPassword(body.password);
+    if (body.firstName) update.firstName = body.firstName;
+    if (body.lastName) update.lastName = body.lastName;
+
+    return this.studentUserRepository.update(student.id, update).then(() => {
+      return this.findOneStudentById(student.id);
+    });
+  }
 }
