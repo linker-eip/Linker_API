@@ -8,6 +8,12 @@ import { StudentProfile } from '../../student/entity/StudentProfile.entity';
 import { hashPassword } from '../utils/utils';
 import { RegisterStudentAdminDto } from './dto/register-student-admin.dto';
 import { UpdateStudentAdminDto } from './dto/update-student-admin.dto';
+import { CompanySearchOptionAdminDto } from './dto/company-search-option-admin.dto';
+import { CompanyUser } from '../../company/entity/CompanyUser.entity';
+import { CompanyProfile } from '../../company/entity/CompanyProfile.entity';
+import { RegisterCompanyAdminDto } from './dto/register-company-admin.dto';
+import { CreateCompanyProfileDto } from '../../company/dto/create-company-profile.dto';
+import { UpdateCompanyAdminDto } from './dto/update-company-admin.dto';
 
 @Injectable()
 export class UserAdminService {
@@ -16,8 +22,13 @@ export class UserAdminService {
     private readonly studentUserRepository: Repository<StudentUser>,
     @InjectRepository(StudentProfile)
     private readonly studentProfileRepository: Repository<StudentProfile>,
+    @InjectRepository(CompanyUser)
+    private readonly companyUserRepository: Repository<CompanyUser>,
+    @InjectRepository(CompanyProfile)
+    private readonly companyProfileRepository: Repository<CompanyProfile>,
   ) {}
 
+  //STUDENTS
   async findAllStudents(
     searchOption: StudentSearchOptionAdminDto,
   ): Promise<StudentUser[]> {
@@ -162,5 +173,156 @@ export class UserAdminService {
 
   async deleteStudent(student: StudentUser) {
     return this.studentUserRepository.delete(student.id);
+  }
+
+  //COMPANIES
+
+  async findAllCompanies(
+    searchOption: CompanySearchOptionAdminDto,
+  ): Promise<CompanyUser[]> {
+    const { searchString } = searchOption;
+
+    let companiesQuery: SelectQueryBuilder<CompanyUser> =
+      this.companyUserRepository.createQueryBuilder('companyUser');
+
+    companiesQuery = companiesQuery.andWhere(
+      new Brackets((qb) => {
+        if (searchString && searchString.trim().length > 0) {
+          const searchParams = searchString
+            .trim()
+            .split(',')
+            .map((elem) => elem.trim());
+
+          searchParams.forEach((searchParam, index) => {
+            const emailSearch = `emailSearch${index}`;
+            const companyName = `companyName${index}`;
+
+            qb.orWhere(`companyUser.email LIKE :${emailSearch}`, {
+              [emailSearch]: `%${searchParam}%`,
+            });
+            qb.orWhere(`companyUser.companyName LIKE :${companyName}`, {
+              [companyName]: `%${searchParam}%`,
+            });
+          });
+        }
+        if (searchOption.isActive) {
+          qb.andWhere('companyUser.isActive = :isActive', {
+            isActive: searchOption.isActive,
+          });
+        }
+      }),
+    );
+
+    const companies = await companiesQuery.getMany();
+    return companies;
+  }
+
+  async findOneCompany(email: string): Promise<CompanyUser> {
+    const company = await this.companyUserRepository.findOne({
+      where: { email },
+    });
+    return company;
+  }
+
+  async saveCompany(company: CompanyUser): Promise<CompanyUser> {
+    return this.companyUserRepository.save(company);
+  }
+
+  async updateCompanyProfile(
+    CreateCompanyProfile: CreateCompanyProfileDto,
+    req: any,
+  ) {
+    const user = await this.companyUserRepository.findOne({
+      where: { email: req.email },
+    });
+    if (!user) throw new Error(`Could not find company profile`);
+    let companyProfile = await this.companyProfileRepository.findOne({
+      where: { email: req.email },
+    });
+    if (!companyProfile) {
+      companyProfile = new CompanyProfile();
+    }
+    companyProfile.companyId = user.id;
+    companyProfile.name = CreateCompanyProfile.name;
+    companyProfile.description = CreateCompanyProfile.description;
+    companyProfile.email = user.email;
+    companyProfile.phone = CreateCompanyProfile.phone;
+    companyProfile.address = CreateCompanyProfile.address;
+    companyProfile.size = CreateCompanyProfile.size;
+    companyProfile.location = CreateCompanyProfile.location;
+    companyProfile.activity = CreateCompanyProfile.activity;
+    companyProfile.speciality = CreateCompanyProfile.speciality;
+    companyProfile.website = CreateCompanyProfile.website;
+    return this.companyProfileRepository.save(companyProfile);
+  }
+
+  async createCompany(body: RegisterCompanyAdminDto): Promise<CompanyUser> {
+    const { email, password, companyName, phoneNumber } = body;
+
+    const existingUser = await this.findOneCompany(email);
+
+    if (existingUser) throw new ConflictException('Company already exists');
+
+    const newUser = new CompanyUser();
+    newUser.email = email;
+    newUser.password = await hashPassword(password);
+    newUser.companyName = companyName;
+    newUser.phoneNumber = phoneNumber;
+
+    const savedUser = await this.saveCompany(newUser);
+
+    await this.updateCompanyProfile(
+      {
+        name: savedUser.companyName,
+        description: '',
+        email: savedUser.email,
+        phone: savedUser.phoneNumber,
+        address: '',
+        size: 0,
+        location: '',
+        activity: '',
+        speciality: '',
+        website: '',
+      },
+      savedUser.email,
+    );
+
+    return savedUser;
+  }
+
+  async findOneCompanyById(companyId: number): Promise<CompanyUser> {
+    const company = await this.companyUserRepository.findOne({
+      where: { id: companyId },
+    });
+    return company;
+  }
+
+  async updateCompany(
+    company: CompanyUser,
+    body: UpdateCompanyAdminDto,
+  ): Promise<CompanyUser> {
+    if (body.email) {
+      const companyWithSameEmail = await this.findOneCompany(body.email);
+      if (companyWithSameEmail)
+        throw new ConflictException('Company already exists');
+    }
+    const update: Partial<CompanyUser> = {};
+
+    if (body.email) update.email = body.email;
+    if (body.password) update.password = await hashPassword(body.password);
+    if (body.companyName) update.companyName = body.companyName;
+    if (body.isActive) update.isActive = body.isActive;
+    if (body.phoneNumber) update.phoneNumber = body.phoneNumber;
+    if (body.picture) update.picture = body.picture;
+    if (body.companyPicture) update.companyPicture = body.companyPicture;
+
+
+    return this.companyUserRepository.update(company.id, update).then(() => {
+      return this.findOneCompanyById(company.id);
+    });
+  }
+
+  async deleteCompany(company: CompanyUser) {
+    return this.companyUserRepository.delete(company.id);
   }
 }
