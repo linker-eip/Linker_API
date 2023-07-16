@@ -6,11 +6,11 @@ import { UserAdminService } from '../user-admin.service';
 export class CompanyUserByIdPipe implements PipeTransform {
   constructor(private readonly userAdminService: UserAdminService) {}
 
-  async transform(studentId: string) {
-    const studentUser = await this.userAdminService.findOneCompanyById(
-      parseInt(studentId),
+  async transform(companyId: string) {
+    const companyUser = await this.userAdminService.findOneCompanyById(
+      parseInt(companyId),
     );
-    if (studentUser) return studentUser;
+    if (companyUser) return companyUser;
     else throw new NotFoundException('COMPANY_USER_NOT_FOUND');
   }
 }

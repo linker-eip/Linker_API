@@ -13,7 +13,7 @@ import {
 import { UserAdminService } from './user-admin.service';
 import { StudentAdminResponseDto } from './dto/students-admin-response.dto';
 import { formatToStudentAdminResponseDto } from './dto/students-admin-response.dto';
-import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { StudentSearchOptionAdminDto } from './dto/student-search-option-admin.dto';
 import { RegisterStudentAdminDto } from './dto/register-student-admin.dto';
 import { StudentUserByIdPipe } from './pipes/student.user.pipe';
@@ -27,6 +27,8 @@ import { CompanyUserByIdPipe } from './pipes/company.user.pipe';
 import { UpdateCompanyAdminDto } from './dto/update-company-admin.dto';
 import { RegisterCompanyAdminDto } from './dto/register-company-admin.dto';
 
+@ApiBearerAuth()
+@ApiTags('Admin')
 @Controller('api/admin/users')
 @UseGuards(AdminGuard)
 export class UserAdminController {
@@ -34,7 +36,6 @@ export class UserAdminController {
 
 
   //STUDENTS
-
   @Get('students')
   @ApiOperation({
     description: 'Get all students',
