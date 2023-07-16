@@ -2,11 +2,12 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { StudentSearchOptionAdminDto } from './dto/student-search-option-admin.dto';
 import { StudentUser } from '../../student/entity/StudentUser.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Brackets } from 'typeorm';
+import { Repository, Brackets, SelectQueryBuilder } from 'typeorm';
 import { CreateStudentProfileDto } from '../../student/dto/create-student-profile.dto';
 import { StudentProfile } from '../../student/entity/StudentProfile.entity';
 import { hashPassword } from '../utils/utils';
 import { RegisterStudentAdminDto } from './dto/register-student-admin.dto';
+import { UpdateStudentAdminDto } from './dto/update-student-admin.dto';
 
 @Injectable()
 export class UserAdminService {
@@ -22,39 +23,40 @@ export class UserAdminService {
   ): Promise<StudentUser[]> {
     const { searchString } = searchOption;
 
-    let studentsQuery = this.studentUserRepository
-      .createQueryBuilder('studentUser')
-      .where(
-        new Brackets((qb) => {
-          if (searchString && searchString.trim().length > 0) {
-            const searchParams = searchString
-              .trim()
-              .split(',')
-              .map((elem) => elem.trim());
+    let studentsQuery: SelectQueryBuilder<StudentUser> =
+      this.studentUserRepository.createQueryBuilder('studentUser');
 
-            searchParams.forEach((searchParam, index) => {
-              const emailSearch = `emailSearch${index}`;
-              const firstNameSearch = `firstNameSearch${index}`;
-              const lastNameSearch = `lastNameSearch${index}`;
+    studentsQuery = studentsQuery.andWhere(
+      new Brackets((qb) => {
+        if (searchString && searchString.trim().length > 0) {
+          const searchParams = searchString
+            .trim()
+            .split(',')
+            .map((elem) => elem.trim());
 
-              qb.orWhere(`studentUser.email LIKE :${emailSearch}`, {
-                [emailSearch]: `%${searchParam}%`,
-              });
-              qb.orWhere(`studentUser.firstName LIKE :${firstNameSearch}`, {
-                [firstNameSearch]: `%${searchParam}%`,
-              });
-              qb.orWhere(`studentUser.lastName LIKE :${lastNameSearch}`, {
-                [lastNameSearch]: `%${searchParam}%`,
-              });
+          searchParams.forEach((searchParam, index) => {
+            const emailSearch = `emailSearch${index}`;
+            const firstNameSearch = `firstNameSearch${index}`;
+            const lastNameSearch = `lastNameSearch${index}`;
+
+            qb.orWhere(`studentUser.email LIKE :${emailSearch}`, {
+              [emailSearch]: `%${searchParam}%`,
             });
-          }
-          if (searchOption.isActive) {
-            qb.andWhere('studentUser.isActive = :isActive', {
-              isActive: searchOption.isActive,
+            qb.orWhere(`studentUser.firstName LIKE :${firstNameSearch}`, {
+              [firstNameSearch]: `%${searchParam}%`,
             });
-          }
-        }),
-      );
+            qb.orWhere(`studentUser.lastName LIKE :${lastNameSearch}`, {
+              [lastNameSearch]: `%${searchParam}%`,
+            });
+          });
+        }
+        if (searchOption.isActive) {
+          qb.andWhere('studentUser.isActive = :isActive', {
+            isActive: searchOption.isActive,
+          });
+        }
+      }),
+    );
 
     const students = await studentsQuery.getMany();
     return students;
@@ -138,22 +140,27 @@ export class UserAdminService {
 
   async updateStudent(
     student: StudentUser,
-    body: RegisterStudentAdminDto,
+    body: UpdateStudentAdminDto,
   ): Promise<StudentUser> {
+    if (body.email) {
+      const studentWithSameEmail = await this.findOneStudent(body.email);
+      if (studentWithSameEmail)
+        throw new ConflictException('Student already exists');
+    }
     const update: Partial<StudentUser> = {};
-
-    const studentWithSameEmail = await this.findOneStudent(body.email);
-
-    if (studentWithSameEmail)
-      throw new ConflictException('Student already exists');
 
     if (body.email) update.email = body.email;
     if (body.password) update.password = await hashPassword(body.password);
     if (body.firstName) update.firstName = body.firstName;
     if (body.lastName) update.lastName = body.lastName;
+    if (body.isActive) update.isActive = body.isActive;
 
     return this.studentUserRepository.update(student.id, update).then(() => {
       return this.findOneStudentById(student.id);
     });
+  }
+
+  async deleteStudent(student: StudentUser) {
+    return this.studentUserRepository.delete(student.id);
   }
 }

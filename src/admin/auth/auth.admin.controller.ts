@@ -4,7 +4,7 @@ import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { LoginAdminResponseDto } from './dto/login-admin-response.dto';
 import { LoginAminDto } from './dto/login-admin.dto';
 
-@Controller('admin/auth')
+@Controller('api/admin/auth')
 export class AuthAdminController {
   constructor(private readonly authAdminService: AuthAdminService) {}
 
