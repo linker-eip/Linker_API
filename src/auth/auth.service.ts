@@ -20,6 +20,7 @@ import axios from 'axios';
 import { oauth2 } from 'googleapis/build/src/apis/oauth2';
 import { StudentUser } from 'src/student/entity/StudentUser.entity';
 import { GoogleApiService } from './services/google-api-services';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -59,6 +60,9 @@ export class AuthService {
     newUser.firstName = firstName;
     newUser.lastName = lastName;
 
+    const randomBytes = crypto.randomBytes(Math.ceil(32 / 2));
+    newUser.verificationKey = randomBytes.toString('hex').slice(0, 32);
+
     const savedUser = await this.studentService.save(newUser);
 
     const token = jwt.sign({ email: savedUser.email, userType: "USER_STUDENT" }, process.env.JWT_SECRET);
@@ -80,6 +84,12 @@ export class AuthService {
       },
       savedUser
     );
+
+    const sendMailDto = new SendMailDto();
+    sendMailDto.to = savedUser.email
+    sendMailDto.subject = 'Verification de compte Linker'
+    sendMailDto.text = 'Veuillez vérifier votre compte Linker : ' + process.env.BASE_URL + '/auth/verify/' + savedUser.verificationKey
+    this.mailService.sendMail(sendMailDto)
 
     return { token };
   }

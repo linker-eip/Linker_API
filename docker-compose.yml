@@ -31,6 +31,7 @@ services:
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      BASE_URL: ${BASE_URL}
     depends_on:
       - db
     networks:
