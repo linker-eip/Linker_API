@@ -10,4 +10,16 @@ export class StudentSearchOptionAdminDto {
   @ApiPropertyOptional()
   @IsOptional()
   isActive?: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  email?: string;
+  
+  @ApiPropertyOptional()
+  @IsOptional()
+  firstName?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  lastName?: string;
 }

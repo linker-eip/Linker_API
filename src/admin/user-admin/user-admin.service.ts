@@ -66,6 +66,24 @@ export class UserAdminService {
             isActive: searchOption.isActive,
           });
         }
+
+        if (searchOption.lastName) {
+          qb.andWhere('studentUser.lastName = :lastName', {
+            lastName: searchOption.lastName,
+          });
+        }
+
+        if (searchOption.firstName) {
+          qb.andWhere('studentUser.firstName = :firstName', {
+            firstName: searchOption.firstName,
+          });
+        }
+
+        if (searchOption.email) {
+          qb.andWhere('studentUser.email = :email', {
+            email: searchOption.email,
+          });
+        }
       }),
     );
 
@@ -210,6 +228,23 @@ export class UserAdminService {
             isActive: searchOption.isActive,
           });
         }
+        if (searchOption.email) {
+          qb.andWhere('companyUser.email = :email', {
+            email: searchOption.email,
+          });
+        }
+
+        if (searchOption.companyName) {
+          qb.andWhere('companyUser.companyName = :companyName', {
+            companyName: searchOption.companyName,
+          });
+        }
+
+        if (searchOption.phoneNumber) {
+          qb.andWhere('companyUser.phoneNumber = :phoneNumber', {
+            phoneNumber: searchOption.phoneNumber,
+          });
+        }
       }),
     );
 
@@ -315,7 +350,6 @@ export class UserAdminService {
     if (body.phoneNumber) update.phoneNumber = body.phoneNumber;
     if (body.picture) update.picture = body.picture;
     if (body.companyPicture) update.companyPicture = body.companyPicture;
-
 
     return this.companyUserRepository.update(company.id, update).then(() => {
       return this.findOneCompanyById(company.id);

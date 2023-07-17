@@ -10,4 +10,16 @@ export class CompanySearchOptionAdminDto {
   @ApiPropertyOptional()
   @IsOptional()
   isActive?: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  email?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  companyName?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  phoneNumber?: string;
 }
