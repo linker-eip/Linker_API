@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CompanyUser } from '../../../company/entity/CompanyUser.entity';
-import { IsDate, IsNumber, IsString } from 'class-validator';
+import { IsDate, IsEmail, IsNumber, IsString } from 'class-validator';
 
 export class CompanyAdminResponseDto {
   @ApiProperty()
@@ -9,6 +9,7 @@ export class CompanyAdminResponseDto {
 
   @ApiProperty()
   @IsString()
+  @IsEmail()
   email: string;
 
   @ApiProperty()

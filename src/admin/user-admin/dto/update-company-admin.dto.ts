@@ -1,10 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsOptional, IsString } from 'class-validator';
 
 export class UpdateCompanyAdminDto {
   @ApiProperty()
   @IsString()
   @IsOptional()
+  @IsEmail()
   email?: string;
 
   @ApiProperty()

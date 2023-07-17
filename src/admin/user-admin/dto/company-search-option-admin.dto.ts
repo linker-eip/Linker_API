@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsOptional, IsString } from 'class-validator';
 
 export class CompanySearchOptionAdminDto {
   @ApiPropertyOptional()
@@ -13,6 +13,7 @@ export class CompanySearchOptionAdminDto {
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsEmail()
   email?: string;
 
   @ApiPropertyOptional()
