@@ -10,6 +10,10 @@ import { StudentModule } from './student/student.module';
 import { CompanyModule } from './company/company.module';
 import { MailModule } from './mail/mail.module';
 import { AdminModule } from './admin/admin.module';
+import { FileModule } from './filesystem/file.module';
+import { FileController } from './filesystem/file.controller';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path'
 
 @Module({
   imports: [
@@ -21,14 +25,18 @@ import { AdminModule } from './admin/admin.module';
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '1d' },
     }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', '..', 'linker_external'),
+    }),
     AuthModule,
     StudentModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     CompanyModule,
     MailModule,
     AdminModule,
+    FileModule,
   ],
-  controllers: [],
+  controllers: [FileController],
   providers: [JwtStrategy],
 })
 export class AppModule {}
