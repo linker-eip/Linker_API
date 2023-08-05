@@ -43,7 +43,6 @@ export class StudentService {
 
     async updateStudentProfile(CreateStudentProfile: CreateStudentProfileDto, req: any) {
         const user = await this.studentRepository.findOne({where: {email: req.email}})
-        console.log(user);
         if (!user) throw new Error (`Could not find student profile`);
         let studentProfile = await this.studentProfileRepository.findOne({where: {email: req.email}});
         if (!studentProfile) {
@@ -59,7 +58,6 @@ export class StudentService {
         studentProfile.skills = CreateStudentProfile.skills;
         studentProfile.website = CreateStudentProfile.website;
 
-        console.log(studentProfile);
         return this.studentProfileRepository.save(studentProfile);
     }
 }
