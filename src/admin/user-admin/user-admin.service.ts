@@ -139,11 +139,11 @@ export class UserAdminService {
     req: any,
   ) {
     const user = await this.studentUserRepository.findOne({
-      where: { email: req }
+      where: { email: req.email },
     });
     if (!user) throw new Error(`Could not find student profile`);
     let studentProfile = await this.studentProfileRepository.findOne({
-      where: { email: req },
+      where: { email: req.email },
     });
     if (!studentProfile) {
       studentProfile = new StudentProfile();
@@ -268,11 +268,11 @@ export class UserAdminService {
     req: any,
   ) {
     const user = await this.companyUserRepository.findOne({
-      where: { email: req },
+      where: { email: req.email },
     });
     if (!user) throw new Error(`Could not find company profile`);
     let companyProfile = await this.companyProfileRepository.findOne({
-      where: { email: req },
+      where: { email: req.email },
     });
     if (!companyProfile) {
       companyProfile = new CompanyProfile();

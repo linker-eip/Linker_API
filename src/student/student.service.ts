@@ -42,9 +42,9 @@ export class StudentService {
     }
 
     async updateStudentProfile(CreateStudentProfile: CreateStudentProfileDto, req: any) {
-        const user = await this.studentRepository.findOne({where: {email: req.user.email}})
+        const user = await this.studentRepository.findOne({where: {email: req.email}})
         if (!user) throw new Error (`Could not find student profile`);
-        let studentProfile = await this.studentProfileRepository.findOne({where: {email: req.user.email}});
+        let studentProfile = await this.studentProfileRepository.findOne({where: {email: req.email}});
         if (!studentProfile) {
             studentProfile = new StudentProfile();
         }
