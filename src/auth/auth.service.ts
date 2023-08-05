@@ -72,7 +72,7 @@ export class AuthService {
         skills: '',
         website: '',
       },
-      savedUser.email,
+      savedUser
     );
 
     return { token };
@@ -112,7 +112,7 @@ export class AuthService {
         speciality: '',
         website: '',
       },
-      savedUser.email,
+      savedUser,
     );
 
 

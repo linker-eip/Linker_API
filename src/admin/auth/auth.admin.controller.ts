@@ -1,10 +1,11 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthAdminService } from './auth.admin.service';
-import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { LoginAdminResponseDto } from './dto/login-admin-response.dto';
 import { LoginAminDto } from './dto/login-admin.dto';
 
 @Controller('api/admin/auth')
+@ApiBearerAuth()
 export class AuthAdminController {
   constructor(private readonly authAdminService: AuthAdminService) {}
 

@@ -1,7 +1,7 @@
 import { Body, Controller, Put, Req, UseGuards } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { Get } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateStudentProfileDto } from './dto/create-student-profile.dto';
 import { StudentProfileResponseDto } from './dto/student-profile-response.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -9,6 +9,7 @@ import { AuthGuard } from '@nestjs/passport';
 @Controller('api/student')
 @UseGuards(AuthGuard('jwt'))
 @ApiTags('Student')
+@ApiBearerAuth()
 export class StudentController {
     constructor(private readonly studentService: StudentService) {}
 
@@ -23,7 +24,7 @@ export class StudentController {
       type: StudentProfileResponseDto,
     })
     async getStudentProfile(@Req() req) {
-      return this.studentService.findStudentProfile(req.email);
+      return this.studentService.findStudentProfile(req.user.email);
     }
 
     @Put('profile')

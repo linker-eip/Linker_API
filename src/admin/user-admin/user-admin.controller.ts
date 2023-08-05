@@ -31,6 +31,7 @@ import { RegisterCompanyAdminDto } from './dto/register-company-admin.dto';
 @ApiTags('Admin')
 @Controller('api/admin/users')
 @UseGuards(AdminGuard)
+@ApiBearerAuth()
 export class UserAdminController {
   constructor(private readonly userAdminService: UserAdminService) {}
 

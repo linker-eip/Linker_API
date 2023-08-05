@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginStudentDto } from './dto/login-student.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginStudentResponseDto } from './dto/login-student-response.dto';
 import { RegisterStudentDto } from './dto/register-student.dto';
 import { LoginCompanyDto } from './dto/login-company.dto';
@@ -23,6 +23,7 @@ import { GoogleLoginDto } from './dto/google-login.dto';
 
 @Controller('api/auth')
 @ApiTags('AUTH')
+@ApiBearerAuth()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
