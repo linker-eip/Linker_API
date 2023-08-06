@@ -38,11 +38,7 @@ export class AuthController {
     type: LoginStudentResponseDto,
   })
   async registerStudent(@Body() registerStudentDto: RegisterStudentDto) {
-    const res = await this.authService.registerStudent(registerStudentDto);
-    if (!res.token) {
-      throw new HttpException('Invalid informations', HttpStatus.UNAUTHORIZED);
-    }
-    return res;
+    return await this.authService.registerStudent(registerStudentDto);
   }
 
   @Post('company/register')
@@ -56,11 +52,7 @@ export class AuthController {
     type: RegisterCompanyResponseDto,
   })
   async registerCompany(@Body() registerCompanyDto: RegisterCompanyDto) {
-    const res = await this.authService.registerCompany(registerCompanyDto);
-    if (!res.token) {
-      throw new HttpException('Invalid informations', HttpStatus.UNAUTHORIZED);
-    }
-    return res;
+    return await this.authService.registerCompany(registerCompanyDto);
   }
 
   @Post('student/login')

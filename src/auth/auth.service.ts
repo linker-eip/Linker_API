@@ -1,4 +1,4 @@
-import { HttpCode, Injectable } from '@nestjs/common';
+import { HttpCode, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { LoginStudentDto } from './dto/login-student.dto';
 import { RegisterStudentDto } from './dto/register-student.dto';
 import { StudentService } from 'src/student/student.service';
@@ -48,7 +48,7 @@ export class AuthService {
     const existingUser = await this.studentService.findOne(email);
 
     if (existingUser) {
-      return { error: 'User with email ' + email + ' already exists' };
+      throw new HttpException('Email already registered', HttpStatus.UNAUTHORIZED)
     }
 
     const newUser = new StudentUser();
@@ -82,11 +82,11 @@ export class AuthService {
     const { email, password, name, phoneNumber } = registerCompanyDto;
 
     if (await this.companyService.findOne(email)) {
-      return { error: 'User with email ' + email + ' already exists' };
+      throw new HttpException('Email already registered', HttpStatus.UNAUTHORIZED)
     }
 
     if (await this.companyService.findOneByPhoneNumber(phoneNumber)) {
-      return { error: 'User with number ' + phoneNumber + ' already exists' };
+      throw new HttpException('Phone number already registered', HttpStatus.UNAUTHORIZED)
     }
 
     const newUser = new CompanyUser();

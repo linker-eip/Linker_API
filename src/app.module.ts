@@ -4,7 +4,7 @@ import { dataSourceOptions } from 'db/data-source';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './passport/jwt.strategy';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { StudentModule } from './student/student.module';
 import { CompanyModule } from './company/company.module';
@@ -19,7 +19,19 @@ import { join } from 'path'
   imports: [
     ConfigModule.forRoot(),
     TypeOrmModule.forRootAsync({
-      useFactory: () => dataSourceOptions,
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get<string>('POSTGRES_HOST'),
+        port: configService.get<number>('POSTGRES_PORT'),
+        username: configService.get<string>('POSTGRES_USER'),
+        password: configService.get<string>('POSTGRES_PASSWORD'),
+        database: configService.get<string>('POSTGRES_DB'),
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        synchronize: true,
+        migrations: [__dirname + '/db/migrations/*{.ts,.js}'],
+      }),
+      inject: [ConfigService],
     }),
     JwtModule.register({
       secret: process.env.JWT_SECRET,
