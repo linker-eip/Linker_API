@@ -29,35 +29,68 @@ export class StudentService {
       where: { resetPasswordToken: token },
     });
   }
-    async save(student: StudentUser): Promise<StudentUser> {
-        return this.studentRepository.save(student);
+  async save(student: StudentUser): Promise<StudentUser> {
+    return this.studentRepository.save(student);
+  }
+
+  async findStudentProfile(email: string): Promise<StudentProfile> {
+    const profile = this.studentProfileRepository.findOne({ where: { email } });
+    if (profile) return profile;
+    throw new Error(`Could not find student profile`);
+  }
+
+  async updateStudentProfile(
+    CreateStudentProfile: CreateStudentProfileDto,
+    req: any,
+  ) {
+    const user = await this.studentRepository.findOne({
+      where: { email: req.email },
+    });
+
+    if (!user) {
+      throw new Error(`Could not find student profile`);
     }
 
-    async findStudentProfile(email: string): Promise<StudentProfile>
-    {
-        const profile = this.studentProfileRepository.findOne({where: {email}});
-        if (profile)
-            return profile;
-        throw new Error (`Could not find student profile`)
+    let studentProfile = await this.studentProfileRepository.findOne({
+      where: { email: req.email },
+    });
+
+    if (!studentProfile) {
+      studentProfile = new StudentProfile();
+      studentProfile.studentId = user.id;
+      studentProfile.email = user.email;
     }
 
-    async updateStudentProfile(CreateStudentProfile: CreateStudentProfileDto, req: any) {
-        const user = await this.studentRepository.findOne({where: {email: req.email}})
-        if (!user) throw new Error (`Could not find student profile`);
-        let studentProfile = await this.studentProfileRepository.findOne({where: {email: req.email}});
-        if (!studentProfile) {
-            studentProfile = new StudentProfile();
-        }
-        studentProfile.studentId = user.id
-        studentProfile.name = CreateStudentProfile.name;
-        studentProfile.description = CreateStudentProfile.description;
-        studentProfile.email = user.email;
-        studentProfile.phone = CreateStudentProfile.phone;
-        studentProfile.location = CreateStudentProfile.location;
-        studentProfile.studies = CreateStudentProfile.studies;
-        studentProfile.skills = CreateStudentProfile.skills;
-        studentProfile.website = CreateStudentProfile.website;
-
-        return this.studentProfileRepository.save(studentProfile);
+    if (CreateStudentProfile.name !== null) {
+      studentProfile.name = CreateStudentProfile.name;
     }
+
+    if (CreateStudentProfile.description !== null) {
+      studentProfile.description = CreateStudentProfile.description;
+    }
+
+    if (CreateStudentProfile.phone !== null) {
+      studentProfile.phone = CreateStudentProfile.phone;
+    }
+
+    if (CreateStudentProfile.location !== null) {
+      studentProfile.location = CreateStudentProfile.location;
+    }
+
+    if (CreateStudentProfile.studies !== null) {
+      studentProfile.studies = CreateStudentProfile.studies;
+    }
+
+    if (CreateStudentProfile.skills !== null) {
+      studentProfile.skills = CreateStudentProfile.skills;
+    }
+
+    if (CreateStudentProfile.website !== null) {
+      studentProfile.website = CreateStudentProfile.website;
+    }
+
+    await this.studentProfileRepository.save(studentProfile);
+
+    return studentProfile;
+  }
 }
