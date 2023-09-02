@@ -4,6 +4,10 @@ import { Repository } from 'typeorm';
 import { StudentUser } from './entity/StudentUser.entity';
 import { StudentProfile } from './entity/StudentProfile.entity';
 import { CreateStudentProfileDto } from './dto/create-student-profile.dto';
+import { SkillsService } from './skills/skills.service';
+import { StudentProfileResponseDto } from './dto/student-profile-response.dto';
+import { JobsService } from './jobs/jobs.service';
+import { StudiesService } from './studies/studies.service';
 
 @Injectable()
 export class StudentService {
@@ -12,6 +16,9 @@ export class StudentService {
     private studentRepository: Repository<StudentUser>,
     @InjectRepository(StudentProfile)
     private studentProfileRepository: Repository<StudentProfile>,
+    private readonly skillsService: SkillsService,
+    private readonly jobsservice: JobsService,
+    private readonly studiesService: StudiesService
   ) {}
 
   async findAll(): Promise<StudentUser[]> {
@@ -33,10 +40,24 @@ export class StudentService {
     return this.studentRepository.save(student);
   }
 
-  async findStudentProfile(email: string): Promise<StudentProfile> {
-    const profile = this.studentProfileRepository.findOne({ where: { email } });
-    if (profile) return profile;
-    throw new Error(`Could not find student profile`);
+  async findStudentProfile(email: string) {
+    const profile = await this.studentProfileRepository.findOne({ where: { email } });
+    if (!profile) throw new Error(`Could not find student profile`);
+    const skills = await this.skillsService.findSkills(profile.id);
+    const jobs = await this.jobsservice.findJobs(profile.id);
+    const studies = await this.studiesService.findStudies(profile.id);
+    return {
+      name: profile.name,
+      description: profile.description,
+      email: profile.email,
+      phone: profile.phone,
+      location: profile.location,
+      studies: studies,
+      skills: skills,
+      jobs: jobs,
+      website: profile.website,
+    };
+    
   }
 
   async updateStudentProfile(
@@ -78,11 +99,28 @@ export class StudentService {
     }
 
     if (CreateStudentProfile.studies !== null) {
-      studentProfile.studies = CreateStudentProfile.studies;
+      for (let i = 0; i < CreateStudentProfile?.studies?.length; i++) {
+        await this.studiesService.addStudie(
+          studentProfile,
+          CreateStudentProfile.studies[i],
+        );
+      }
     }
 
     if (CreateStudentProfile.skills !== null) {
-      studentProfile.skills = CreateStudentProfile.skills;
+      for (let i = 0; i < CreateStudentProfile?.skills?.length; i++) {
+        await this.skillsService.addSkill(
+          studentProfile,
+          CreateStudentProfile.skills[i],
+        );
+      }
+    }
+
+    console.log(CreateStudentProfile)
+    if (CreateStudentProfile.jobs !== null) {
+      for (let i = 0; i < CreateStudentProfile?.jobs?.length; i++) {
+        await this.jobsservice.addJob(studentProfile, CreateStudentProfile.jobs[i]);
+      }
     }
 
     if (CreateStudentProfile.website !== null) {
