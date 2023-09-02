@@ -116,7 +116,6 @@ export class StudentService {
       }
     }
 
-    console.log(CreateStudentProfile)
     if (CreateStudentProfile.jobs !== null) {
       for (let i = 0; i < CreateStudentProfile?.jobs?.length; i++) {
         await this.jobsservice.addJob(studentProfile, CreateStudentProfile.jobs[i]);
