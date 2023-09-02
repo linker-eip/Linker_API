@@ -1,5 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNumber, IsOptional, IsString } from "class-validator";
+import { Studies } from "../studies/entity/studies.entity";
+import { Skills } from "../skills/entity/skills.entity";
+import { Jobs } from "../jobs/entity/jobs.entity";
 
 export class CreateStudentProfileDto {
   @ApiProperty()
@@ -28,14 +31,16 @@ export class CreateStudentProfileDto {
   location: string;
 
   @ApiProperty()
-  @IsString()
   @IsOptional()
-  studies: string;
+  studies?: Studies[];
 
   @ApiProperty()
-  @IsString()
   @IsOptional()
-  skills: string;
+  skills?: Skills[];
+
+  @ApiProperty()
+  @IsOptional()
+  jobs?: Jobs[];
 
   @ApiProperty()
   @IsString()
