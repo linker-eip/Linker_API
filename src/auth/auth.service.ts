@@ -68,8 +68,9 @@ export class AuthService {
         email: savedUser.email,
         phone: '',
         location: '',
-        studies: '',
-        skills: '',
+        studies: [],
+        skills: [],
+        jobs: [],
         website: '',
       },
       savedUser
