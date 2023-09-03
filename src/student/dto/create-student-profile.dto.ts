@@ -3,12 +3,20 @@ import { IsNumber, IsOptional, IsString } from "class-validator";
 import { Studies } from "../studies/entity/studies.entity";
 import { Skills } from "../skills/entity/skills.entity";
 import { Jobs } from "../jobs/entity/jobs.entity";
+import { StudiesDto } from "../studies/dto/studies.dto";
+import { SkillsDto } from "../skills/dto/skills.dto";
+import { JobsDto } from "../jobs/dto/jobs.dto";
 
 export class CreateStudentProfileDto {
   @ApiProperty()
   @IsString()
   @IsOptional()
-  name: string;
+  firstName: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  lastName: string;
 
   @ApiProperty()
   @IsString()
@@ -31,14 +39,19 @@ export class CreateStudentProfileDto {
   location: string;
 
   @ApiProperty()
+  @IsString()
+  @IsOptional()
+  picture: string;
+
+  @ApiProperty({type : StudiesDto, isArray : true})
   @IsOptional()
   studies?: Studies[];
 
-  @ApiProperty()
+  @ApiProperty({type : SkillsDto, isArray : true})
   @IsOptional()
   skills?: Skills[];
 
-  @ApiProperty()
+  @ApiProperty({type : JobsDto, isArray : true})
   @IsOptional()
   jobs?: Jobs[];
 

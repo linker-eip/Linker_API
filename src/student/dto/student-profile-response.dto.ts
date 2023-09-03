@@ -2,13 +2,19 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Studies } from '../studies/entity/studies.entity';
 import { Skills } from '../skills/entity/skills.entity';
 import { Jobs } from '../jobs/entity/jobs.entity';
+import { StudiesDto } from '../studies/dto/studies.dto';
+import { SkillsDto } from '../skills/dto/skills.dto';
+import { JobsDto } from '../jobs/dto/jobs.dto';
 
 export class StudentProfileResponseDto {
   @ApiProperty()
   id: number;
 
   @ApiProperty()
-  name: string;
+  firstName: string;
+
+  @ApiProperty()
+  lastName: string;
 
   @ApiProperty()
   description: string;
@@ -23,12 +29,15 @@ export class StudentProfileResponseDto {
   location: string;
 
   @ApiProperty()
+  picture: string;
+
+  @ApiProperty({type : StudiesDto, isArray : true})
   studies: Studies[];
 
-  @ApiProperty()
+  @ApiProperty({type : SkillsDto, isArray : true})
   skills: Skills[];
 
-  @ApiProperty()
+  @ApiProperty({type : JobsDto, isArray : true})
   jobs: Jobs[];
 
   @ApiProperty()
@@ -38,7 +47,8 @@ export class StudentProfileResponseDto {
 export function studentProfileResponseDto(studentProfileResponse : StudentProfileResponseDto) {
   const dto = new StudentProfileResponseDto();
   dto.id = studentProfileResponse.id;
-  dto.name = studentProfileResponse.name;
+  dto.firstName = studentProfileResponse.firstName;
+  dto.lastName = studentProfileResponse.lastName;
   dto.description = studentProfileResponse.description;
   dto.email = studentProfileResponse.email;
   dto.phone = studentProfileResponse.phone;

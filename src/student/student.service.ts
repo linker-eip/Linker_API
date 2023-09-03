@@ -47,11 +47,13 @@ export class StudentService {
     const jobs = await this.jobsservice.findJobs(profile.id);
     const studies = await this.studiesService.findStudies(profile.id);
     return {
-      name: profile.name,
+      lastName : profile.lastName,
+      firstName : profile.firstName,
       description: profile.description,
       email: profile.email,
       phone: profile.phone,
       location: profile.location,
+      picture: profile.picture,
       studies: studies,
       skills: skills,
       jobs: jobs,
@@ -82,8 +84,8 @@ export class StudentService {
       studentProfile.email = user.email;
     }
 
-    if (CreateStudentProfile.name !== null) {
-      studentProfile.name = CreateStudentProfile.name;
+    if (CreateStudentProfile.firstName !== null) {
+      studentProfile.firstName = CreateStudentProfile.firstName;
     }
 
     if (CreateStudentProfile.description !== null) {
@@ -96,6 +98,10 @@ export class StudentService {
 
     if (CreateStudentProfile.location !== null) {
       studentProfile.location = CreateStudentProfile.location;
+    }
+
+    if (CreateStudentProfile.picture !== null) {
+      studentProfile.picture = CreateStudentProfile.picture;
     }
 
     if (CreateStudentProfile.studies !== null) {

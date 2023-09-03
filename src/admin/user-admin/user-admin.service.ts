@@ -119,11 +119,13 @@ export class UserAdminService {
 
     await this.updateStudentProfile(
       {
-        name: savedUser.firstName + ' ' + savedUser.lastName,
+        firstName: savedUser.firstName,
+        lastName: savedUser.lastName,
         description: '',
         email: savedUser.email,
         phone: '',
         location: '',
+        picture: '',
         studies: [],
         skills: [],
         jobs: [],
@@ -150,7 +152,8 @@ export class UserAdminService {
       studentProfile = new StudentProfile();
     }
     studentProfile.studentId = user.id;
-    studentProfile.name = CreateStudentProfile.name;
+    studentProfile.firstName = CreateStudentProfile.firstName;
+    studentProfile.lastName = CreateStudentProfile.lastName;
     studentProfile.description = CreateStudentProfile.description;
     studentProfile.email = user.email;
     studentProfile.phone = CreateStudentProfile.phone;

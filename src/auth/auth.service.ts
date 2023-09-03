@@ -63,11 +63,13 @@ export class AuthService {
 
     await this.studentService.updateStudentProfile(
       {
-        name: savedUser.firstName + ' ' + savedUser.lastName,
+        firstName: savedUser.firstName,
+        lastName: savedUser.lastName,
         description: '',
         email: savedUser.email,
         phone: '',
         location: '',
+        picture: '',
         studies: [],
         skills: [],
         jobs: [],

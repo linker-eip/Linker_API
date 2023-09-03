@@ -14,7 +14,10 @@ export class StudentProfile {
   studentId: number;
 
   @Column({ nullable: true })
-  name: string;
+  firstName: string;
+
+  @Column({ nullable: true })
+  lastName: string;
 
   @Column({ nullable: true })
   description: string;
@@ -27,6 +30,9 @@ export class StudentProfile {
 
   @Column({ nullable: true })
   location: string;
+
+  @Column({ nullable: true })
+  picture: string;
 
   @OneToMany(() => Studies, (studies) => studies.studentProfile)
   studies: Studies[];
