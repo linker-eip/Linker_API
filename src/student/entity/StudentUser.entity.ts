@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Missions } from "../../mission/entity/missions.entity";
 
 @Entity()
 
@@ -32,4 +33,7 @@ export class StudentUser {
 
     @Column({ type: 'varchar', nullable: true})
     resetPasswordToken: string;
+
+    @ManyToMany(() => Missions, missions => missions.students)
+    missions: Missions[];
 }
