@@ -88,6 +88,10 @@ export class StudentService {
       studentProfile.firstName = CreateStudentProfile.firstName;
     }
 
+    if (CreateStudentProfile.lastName !== null) {
+      studentProfile.lastName = CreateStudentProfile.lastName;
+    }
+
     if (CreateStudentProfile.description !== null) {
       studentProfile.description = CreateStudentProfile.description;
     }
