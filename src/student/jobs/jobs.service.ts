@@ -14,6 +14,7 @@ export class JobsService {
   async addJob(studentProfile: StudentProfile, jobs: Jobs) {
     const job = new Jobs();
     job.name = jobs.name;
+    job.position = jobs.position;
     job.logo = jobs.logo;
     job.city = jobs.city;
     job.duration = jobs.duration;
@@ -23,6 +24,7 @@ export class JobsService {
     const existingJob = await this.jobsRepository.findOne({
       where: {
         name: job.name,
+        position: job.position,
         city: job.city,
         duration: job.duration,
         description: job.description,
