@@ -10,6 +10,9 @@ export class Studies {
   name: string;
 
   @Column()
+  position : string;
+
+  @Column()
   logo: string;
 
   @Column()

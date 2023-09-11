@@ -14,6 +14,7 @@ export class StudiesService {
   async addStudie(studentProfile: StudentProfile, studies: Studies) {
     const studie = new Studies();
     studie.name = studies.name;
+    studie.position = studies.position;
     studie.logo = studies.logo;
     studie.city = studies.city;
     studie.duration = studies.duration;
@@ -23,6 +24,7 @@ export class StudiesService {
     const existingStudie = await this.studiesRepository.findOne({
       where: {
         name: studie.name,
+        position: studie.position,
         city: studie.city,
         duration: studie.duration,
         description: studie.description,
