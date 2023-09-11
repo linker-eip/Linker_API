@@ -171,6 +171,13 @@ export class UserAdminService {
     return student;
   }
 
+  async findStudentsByIds(studentIds: number[]): Promise<StudentUser[]> {
+    const students = await Promise.all(
+      studentIds.map((studentId) => this.findOneStudentById(studentId)),
+    );
+    return students;
+  }
+
   async updateStudent(
     student: StudentUser,
     body: UpdateStudentAdminDto,

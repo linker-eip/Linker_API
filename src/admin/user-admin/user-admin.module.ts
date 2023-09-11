@@ -13,5 +13,6 @@ import { CompanyProfile } from '../../company/entity/CompanyProfile.entity';
   ],
   providers: [UserAdminService],
   controllers: [UserAdminController],
+  exports: [UserAdminService]
 })
 export class UserAdminModule {}
