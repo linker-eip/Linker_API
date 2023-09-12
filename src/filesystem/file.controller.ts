@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Res,
   UploadedFile,
@@ -29,7 +30,7 @@ export class FileController {
   }
 
   @Get('file')
-  async getFile(@Body() fileDto: any, @Res() res): Promise<any> {
-    return this.fileService.getFile(fileDto.fileName, res);
+  async getFile(@Param('fileName') fileName: string, @Res() res): Promise<any> {
+    return this.fileService.getFile(fileName, res);
   }
 }
