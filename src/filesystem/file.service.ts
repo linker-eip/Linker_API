@@ -30,7 +30,7 @@ export class FileService {
   }
 
   private getPublicUrl(fileName: string): string {
-    const baseUrl = 'localhost:8080'; // Set your base URL in configuration
+    const baseUrl = process.env.BASE_URL; // Set your base URL in configuration
     return `${baseUrl}/public/${fileName}`; // Update the path based on your file storage setup
   }
 
