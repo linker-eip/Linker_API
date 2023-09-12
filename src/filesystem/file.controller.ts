@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Res,
   UploadedFile,
   UseInterceptors,
@@ -29,8 +30,8 @@ export class FileController {
     return `File ${fileName} uploaded successfully`;
   }
 
-  @Get('file')
-  async getFile(@Param('fileName') fileName: string, @Res() res): Promise<any> {
+  @Get()
+  async getFile(@Query('fileName') fileName: string, @Res() res): Promise<any> {
     return this.fileService.getFile(fileName, res);
   }
 }
