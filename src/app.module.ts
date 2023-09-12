@@ -38,7 +38,7 @@ import { join } from 'path'
       signOptions: { expiresIn: '1d' },
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', 'linker_external'),
+      rootPath: join(__dirname, '../../' + 'linker_external'),
     }),
     AuthModule,
     StudentModule,

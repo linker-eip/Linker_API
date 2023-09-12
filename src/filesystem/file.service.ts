@@ -31,7 +31,7 @@ export class FileService {
 
   private getPublicUrl(fileName: string): string {
     const baseUrl = 'localhost:8080'; // Set your base URL in configuration
-    return `${baseUrl}/linker_external/public/${fileName}`; // Update the path based on your file storage setup
+    return `${baseUrl}/public/${fileName}`; // Update the path based on your file storage setup
   }
 
   async getFile(fileName: string, @Res() res): Promise<any> {
