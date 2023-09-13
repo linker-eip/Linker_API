@@ -69,7 +69,7 @@ export class AuthService {
         email: savedUser.email,
         phone: '',
         location: '',
-        picture: '',
+        picture: null,
         studies: [],
         skills: [],
         jobs: [],
