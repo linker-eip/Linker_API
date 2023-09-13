@@ -8,6 +8,7 @@ import { SkillsService } from './skills/skills.service';
 import { StudentProfileResponseDto } from './dto/student-profile-response.dto';
 import { JobsService } from './jobs/jobs.service';
 import { StudiesService } from './studies/studies.service';
+import { FileService } from 'src/filesystem/file.service';
 
 @Injectable()
 export class StudentService {
@@ -18,7 +19,8 @@ export class StudentService {
     private studentProfileRepository: Repository<StudentProfile>,
     private readonly skillsService: SkillsService,
     private readonly jobsservice: JobsService,
-    private readonly studiesService: StudiesService
+    private readonly studiesService: StudiesService,
+    private readonly fileService: FileService
   ) {}
 
   async findAll(): Promise<StudentUser[]> {
@@ -105,7 +107,7 @@ export class StudentService {
     }
 
     if (CreateStudentProfile.picture !== null) {
-      studentProfile.picture = CreateStudentProfile.picture;
+      studentProfile.picture = await this.fileService.storeFile(CreateStudentProfile.picture)
     }
 
     if (CreateStudentProfile.studies !== null) {

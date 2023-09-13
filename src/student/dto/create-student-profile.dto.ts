@@ -39,9 +39,8 @@ export class CreateStudentProfileDto {
   location: string;
 
   @ApiProperty()
-  @IsString()
   @IsOptional()
-  picture: string;
+  picture: Express.Multer.File;
 
   @ApiProperty({type : StudiesDto, isArray : true})
   @IsOptional()
