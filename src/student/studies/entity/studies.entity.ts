@@ -9,6 +9,9 @@ export class Studies {
   @Column()
   name: string;
 
+  @Column({nullable: true})
+  position : string;
+
   @Column()
   logo: string;
 

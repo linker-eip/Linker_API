@@ -8,6 +8,7 @@ import { SkillsService } from './skills/skills.service';
 import { StudentProfileResponseDto } from './dto/student-profile-response.dto';
 import { JobsService } from './jobs/jobs.service';
 import { StudiesService } from './studies/studies.service';
+import { FileService } from 'src/filesystem/file.service';
 
 @Injectable()
 export class StudentService {
@@ -18,7 +19,8 @@ export class StudentService {
     private studentProfileRepository: Repository<StudentProfile>,
     private readonly skillsService: SkillsService,
     private readonly jobsservice: JobsService,
-    private readonly studiesService: StudiesService
+    private readonly studiesService: StudiesService,
+    private readonly fileService: FileService
   ) {}
 
   async findAll(): Promise<StudentUser[]> {
@@ -58,11 +60,13 @@ export class StudentService {
       skills: skills,
       jobs: jobs,
       website: profile.website,
+      note: profile.note
     };
     
   }
 
   async updateStudentProfile(
+    picture,
     CreateStudentProfile: CreateStudentProfileDto,
     req: any,
   ) {
@@ -84,8 +88,13 @@ export class StudentService {
       studentProfile.email = user.email;
     }
 
+
     if (CreateStudentProfile.firstName !== null) {
       studentProfile.firstName = CreateStudentProfile.firstName;
+    }
+
+    if (CreateStudentProfile.lastName !== null) {
+      studentProfile.lastName = CreateStudentProfile.lastName;
     }
 
     if (CreateStudentProfile.description !== null) {
@@ -100,8 +109,8 @@ export class StudentService {
       studentProfile.location = CreateStudentProfile.location;
     }
 
-    if (CreateStudentProfile.picture !== null) {
-      studentProfile.picture = CreateStudentProfile.picture;
+    if (picture) {
+      studentProfile.picture = await this.fileService.storeFile(picture)
     }
 
     if (CreateStudentProfile.studies !== null) {

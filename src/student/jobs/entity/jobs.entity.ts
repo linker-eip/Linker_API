@@ -16,6 +16,9 @@ export class Jobs {
   @Column()
   name: string;
 
+  @Column({nullable: true})
+  position : string;
+
   @Column()
   logo: string;
 

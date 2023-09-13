@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { Skills } from './entity/skills.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -11,12 +11,18 @@ export class SkillsService {
     private skillsRepository: Repository<Skills>,
   ) {}
 
-  async addSkill(studentProfile : StudentProfile, skills: Skills) {
+  async addSkill(studentProfile: StudentProfile, skills: Skills) {
     const skill = new Skills();
     skill.name = skills.name;
     skill.logo = skills.logo;
     skill.studentProfile = studentProfile;
-    return this.skillsRepository.save(skill);
+
+    const existingSkill = await this.skillsRepository.findOne({
+      where: { name: skill.name, studentProfile: { id: studentProfile.id } },
+    });
+    if (!existingSkill) {
+      return this.skillsRepository.save(skill);
+    }
   }
 
   async findSkills(studentProfileId: number): Promise<Skills[]> {

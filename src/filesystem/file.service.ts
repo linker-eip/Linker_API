@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Res } from '@nestjs/common';
 import { createWriteStream } from 'fs';
 import * as fsExtra from 'fs-extra';
 import * as path from 'path';
-import { Multer } from 'multer';
+import { join } from 'path';
 
 @Injectable()
 export class FileService {
@@ -30,7 +30,13 @@ export class FileService {
   }
 
   private getPublicUrl(fileName: string): string {
-    const baseUrl = 'localhost:8080'; // Set your base URL in configuration
-    return `${baseUrl}/linker_external/public/${fileName}`; // Update the path based on your file storage setup
+    const baseUrl = process.env.BASE_URL; // Set your base URL in configuration
+    return `${baseUrl}/public/${fileName}`; // Update the path based on your file storage setup
+  }
+
+  async getFile(fileName: string, @Res() res): Promise<any> {
+    return res.sendFile(
+      join(process.cwd(), 'linker_external/public/' + fileName),
+    );
   }
 }

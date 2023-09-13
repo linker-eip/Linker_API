@@ -1,10 +1,11 @@
-import { Body, Controller, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, FileTypeValidator, ParseFilePipe, Put, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { Get } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateStudentProfileDto } from './dto/create-student-profile.dto';
 import { StudentProfileResponseDto } from './dto/student-profile-response.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('api/student')
 @UseGuards(AuthGuard('jwt'))
@@ -37,11 +38,20 @@ export class StudentController {
     description: 'Update student profile',
     type: StudentProfileResponseDto,
     })
+    @UseInterceptors(FileInterceptor('picture'))
     async updateStudentProfile(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new FileTypeValidator({ fileType: 'image/jpeg' })
+        ]
+      })
+    ) picture,
     @Req() req,
     @Body() CreateStudentProfile: CreateStudentProfileDto,
     ) {
     return this.studentService.updateStudentProfile(
+        picture,
         CreateStudentProfile,
         req.user
     );
