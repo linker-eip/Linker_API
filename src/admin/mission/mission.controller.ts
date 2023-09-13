@@ -1,0 +1,101 @@
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import { MissionService } from './mission.service';
+import { CreateMissionDto } from './dto/create-mission.dto';
+import { missionAdminResponseDto } from './dto/mission-admin-response.dto';
+import { MissionSearchOptionAdmin } from './dto/missions-search-option-admin.dto';
+import { MissionByIdPipe } from './pipes/mission.pipe';
+import { Mission } from '../../mission/entity/mission.entity';
+import { UpdateMission } from './dto/update-mission.dto';
+
+@ApiBearerAuth()
+@ApiTags('Admin')
+@Controller('api/admin/mission')
+export class MissionController {
+  constructor(private readonly missionService: MissionService) {}
+
+  @Post('')
+  @ApiOperation({
+    description: 'Create a mission',
+    summary: 'Create a mission',
+  })
+  @ApiOkResponse({
+    description: 'Create a mission',
+    type: CreateMissionDto,
+  })
+  async createMission(@Body() body: CreateMissionDto) {
+    return await this.missionService.createMission(body);
+  }
+
+  @Get('')
+  @ApiOperation({
+    description: 'Get all missions',
+    summary: 'Get all missions',
+  })
+  @ApiOkResponse({
+    description: 'Get all missions',
+    type: missionAdminResponseDto,
+  })
+  async findAllMissions(@Query() searchOption: MissionSearchOptionAdmin) {
+    const missions = await this.missionService.findAllMissions(searchOption);
+    return missions;
+  }
+
+  @Delete(':id')
+  @ApiOperation({
+    description: 'Delete a mission',
+    summary: 'Delete a mission',
+  })
+  @ApiOkResponse({
+    description: 'Delete a mission',
+    type: missionAdminResponseDto,
+  })
+  async deleteMission(@Param('id', MissionByIdPipe) mission: Mission) {
+    return await this.missionService.deleteMission(mission.id);
+  }
+
+  @Get(':id')
+  @ApiOperation({
+    description: 'Get a mission',
+    summary: 'Get a mission',
+  })
+  @ApiOkResponse({
+    description: 'Get a mission',
+    type: missionAdminResponseDto,
+  })
+  async getMission(@Param('id', MissionByIdPipe) mission: Mission) {
+    return mission;
+  }
+
+  @Put(':id')
+  @ApiOperation({
+    description: 'Update a mission',
+    summary: 'Update a mission',
+  })
+  @ApiOkResponse({
+    description: 'Update a mission',
+    type: missionAdminResponseDto,
+  })
+
+  async updateMission(
+    @Param('id', MissionByIdPipe) mission: Mission,
+    @Body() body: UpdateMission,
+  ) {
+    return await this.missionService.updateMission(mission, body);
+  }
+}
