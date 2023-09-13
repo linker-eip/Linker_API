@@ -62,6 +62,7 @@ export class AuthService {
     const token = jwt.sign({ email: savedUser.email }, process.env.JWT_SECRET);
 
     await this.studentService.updateStudentProfile(
+      null,
       {
         firstName: savedUser.firstName,
         lastName: savedUser.lastName,

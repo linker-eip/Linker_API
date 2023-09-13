@@ -65,6 +65,7 @@ export class StudentService {
   }
 
   async updateStudentProfile(
+    picture,
     CreateStudentProfile: CreateStudentProfileDto,
     req: any,
   ) {
@@ -86,6 +87,7 @@ export class StudentService {
       studentProfile.email = user.email;
     }
 
+
     if (CreateStudentProfile.firstName !== null) {
       studentProfile.firstName = CreateStudentProfile.firstName;
     }
@@ -106,8 +108,8 @@ export class StudentService {
       studentProfile.location = CreateStudentProfile.location;
     }
 
-    if (CreateStudentProfile.picture !== null) {
-      studentProfile.picture = await this.fileService.storeFile(CreateStudentProfile.picture)
+    if (picture) {
+      studentProfile.picture = await this.fileService.storeFile(picture)
     }
 
     if (CreateStudentProfile.studies !== null) {
