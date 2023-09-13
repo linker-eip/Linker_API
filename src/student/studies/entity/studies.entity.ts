@@ -9,7 +9,7 @@ export class Studies {
   @Column()
   name: string;
 
-  @Column()
+  @Column({nullable: true})
   position : string;
 
   @Column()
