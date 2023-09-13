@@ -1,4 +1,4 @@
-import { Body, Controller, Put, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, FileTypeValidator, ParseFilePipe, Put, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { Get } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -40,7 +40,13 @@ export class StudentController {
     })
     @UseInterceptors(FileInterceptor('picture'))
     async updateStudentProfile(
-    @UploadedFile() picture,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new FileTypeValidator({ fileType: 'image/jpeg' })
+        ]
+      })
+    ) picture,
     @Req() req,
     @Body() CreateStudentProfile: CreateStudentProfileDto,
     ) {
