@@ -6,6 +6,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import {
@@ -18,6 +19,9 @@ import { MissionService } from './mission.service';
 import { CreateMissionDto } from './dto/create-mission.dto';
 import { missionAdminResponseDto } from './dto/mission-admin-response.dto';
 import { MissionSearchOptionAdmin } from './dto/missions-search-option-admin.dto';
+import { MissionByIdPipe } from './pipes/mission.pipe';
+import { Mission } from '../../mission/entity/mission.entity';
+import { UpdateMission } from './dto/update-mission.dto';
 
 @ApiBearerAuth()
 @ApiTags('Admin')
@@ -61,7 +65,37 @@ export class MissionController {
     description: 'Delete a mission',
     type: missionAdminResponseDto,
   })
-  async deleteMission(@Param('id', new ParseIntPipe()) id: number) {
-    return await this.missionService.deleteMission(id);
+  async deleteMission(@Param('id', MissionByIdPipe) mission: Mission) {
+    return await this.missionService.deleteMission(mission.id);
+  }
+
+  @Get(':id')
+  @ApiOperation({
+    description: 'Get a mission',
+    summary: 'Get a mission',
+  })
+  @ApiOkResponse({
+    description: 'Get a mission',
+    type: missionAdminResponseDto,
+  })
+  async getMission(@Param('id', MissionByIdPipe) mission: Mission) {
+    return mission;
+  }
+
+  @Put(':id')
+  @ApiOperation({
+    description: 'Update a mission',
+    summary: 'Update a mission',
+  })
+  @ApiOkResponse({
+    description: 'Update a mission',
+    type: missionAdminResponseDto,
+  })
+
+  async updateMission(
+    @Param('id', MissionByIdPipe) mission: Mission,
+    @Body() body: UpdateMission,
+  ) {
+    return await this.missionService.updateMission(mission, body);
   }
 }
