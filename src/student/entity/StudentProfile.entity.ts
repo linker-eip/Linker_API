@@ -49,5 +49,7 @@ export class StudentProfile {
   @OneToOne(() => CompanyUser)
   @JoinColumn({ name: 'companyId' })
   student: StudentUser;
-}
 
+  @Column({ type: 'float', nullable: true, default: 0 })
+  note: number;
+}

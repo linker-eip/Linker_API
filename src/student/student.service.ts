@@ -60,6 +60,7 @@ export class StudentService {
       skills: skills,
       jobs: jobs,
       website: profile.website,
+      note: profile.note
     };
     
   }

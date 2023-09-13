@@ -16,7 +16,7 @@ export class Jobs {
   @Column()
   name: string;
 
-  @Column()
+  @Column({nullable: true})
   position : string;
 
   @Column()
