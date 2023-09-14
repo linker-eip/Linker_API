@@ -28,7 +28,7 @@ import { UpdateCompanyAdminDto } from './dto/update-company-admin.dto';
 import { RegisterCompanyAdminDto } from './dto/register-company-admin.dto';
 
 @ApiBearerAuth()
-@ApiTags('Admin')
+@ApiTags('Admin/Users')
 @Controller('api/admin/users')
 @UseGuards(AdminGuard)
 @ApiBearerAuth()

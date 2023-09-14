@@ -24,9 +24,10 @@ import { UploadDocumentAdminDto } from './dto/upload-document-admin.dto';
 import { DocumentSearchOptionAdminDto } from './dto/document-search-option-admin.dto';
 import { Document } from '../../documents/entity/document.entity';
 import { DocumentByIdPipe } from './pipes/document.pipe';
+import { DocumentAdminReponseDto } from './dto/document-admin-response.dto';
 
 @ApiBearerAuth()
-@ApiTags('Documents')
+@ApiTags('Admin/Documents')
 @Controller('api/admin/documents')
 export class DocumentAdminController {
   constructor(private readonly documentService: DocumentAdminService) {}
@@ -38,6 +39,7 @@ export class DocumentAdminController {
   })
   @ApiOkResponse({
     description: 'Upload document',
+    type: DocumentAdminReponseDto
   })
   @UseInterceptors(FileInterceptor('file'))
   async updateStudentProfile(
@@ -54,6 +56,7 @@ export class DocumentAdminController {
   })
   @ApiOkResponse({
     description: 'Get all documents',
+    type: DocumentAdminReponseDto
   })
   async getAllDocuments(
     @Query() searchOption: DocumentSearchOptionAdminDto,
@@ -82,6 +85,7 @@ export class DocumentAdminController {
   })
   @ApiOkResponse({
     description: 'Get a document',
+    type : DocumentAdminReponseDto
   })
   async getDocument(
     @Param('id', DocumentByIdPipe) document: Document,

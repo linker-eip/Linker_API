@@ -24,7 +24,7 @@ import { Mission } from '../../mission/entity/mission.entity';
 import { UpdateMission } from './dto/update-mission.dto';
 
 @ApiBearerAuth()
-@ApiTags('Admin')
+@ApiTags('Admin/Missions')
 @Controller('api/admin/mission')
 export class MissionController {
   constructor(private readonly missionService: MissionService) {}
