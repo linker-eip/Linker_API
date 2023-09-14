@@ -16,8 +16,6 @@ export class FileService {
     // Create the directory if it doesn't exist
     await fsExtra.ensureDir(path.dirname(filePath));
 
-    console.log('Uploaded file path:', filePath);
-
     return new Promise((resolve, reject) => {
       const writeStream = createWriteStream(filePath);
 
@@ -36,6 +34,13 @@ export class FileService {
 
   async getFile(fileName: string, @Res() res): Promise<any> {
     return res.sendFile(
+      join(process.cwd(), 'linker_external/public/' + fileName),
+    );
+  }
+
+  async deleteFile(fileName: string): Promise<any> {
+    fileName = fileName.replace(process.env.BASE_URL + '/public/', '');
+    return fsExtra.remove(
       join(process.cwd(), 'linker_external/public/' + fileName),
     );
   }

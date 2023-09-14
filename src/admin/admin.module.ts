@@ -7,6 +7,7 @@ import { AdminUser } from './entity/AdminUser.entity';
 import { APP_GUARD } from '@nestjs/core';
 import { AdminGuard } from './guards/admin/admin.guard';
 import { MissionModule } from './mission/mission.module';
+import { DocumentAdminModule } from './document/document.admin.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { MissionModule } from './mission/mission.module';
     UserAdminModule,
     AuthAdminModule,
     MissionModule,
+    DocumentAdminModule,
   ],
   providers: [AdminService],
   exports: [AdminService],
