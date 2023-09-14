@@ -86,11 +86,11 @@ export class AuthService {
     const { email, password, name, phoneNumber } = registerCompanyDto;
 
     if (await this.companyService.findOne(email)) {
-      throw new HttpException('Email already registered', HttpStatus.UNAUTHORIZED)
+      throw new HttpException('Un compte utilisant cette adresse e-mail existe déjà.', HttpStatus.UNAUTHORIZED)
     }
 
     if (await this.companyService.findOneByPhoneNumber(phoneNumber)) {
-      throw new HttpException('Phone number already registered', HttpStatus.UNAUTHORIZED)
+      throw new HttpException('Un compte utilisant ce numéro de téléphone existe déjà.', HttpStatus.UNAUTHORIZED)
     }
 
     const newUser = new CompanyUser();
@@ -128,7 +128,7 @@ export class AuthService {
 
     if (!student) {
       return {
-        error: 'User with email ' + loginStudentDto.email + ' does not exist',
+        error: "Il n'existe pas de compte associé à l'e-mail " + loginStudentDto.email
       };
     }
 
@@ -147,7 +147,7 @@ export class AuthService {
 
     if (!company) {
       return {
-        error: 'User with email ' + loginCompanyDto.email + ' does not exist',
+        error: "Il n'existe pas de compte associé à l'e-mail " + loginCompanyDto.email
       };
     }
     if (
@@ -162,7 +162,7 @@ export class AuthService {
   async generateCompanyResetPassword(body: ForgetPasswordDto) {
     const company = await this.companyService.findOne(body.email);
     if (!company) {
-      return { error: 'User with email ' + body.email + ' does not exist' };
+      return { error: "Il n'existe pas de compte associé à l'adresse e-mail " + body.email};
     }
     const randomString = [...Array(16)]
       .map(() => Math.random().toString(36)[2])
@@ -191,18 +191,18 @@ export class AuthService {
       body.token,
     );
     if (!company) {
-      return { error: 'User with token ' + body.token + ' does not exist' };
+      return { error: 'Jeton de réinitialisation invalide'};
     }
     company.password = await this.hashPassword(body.password);
     company.resetPasswordToken = null;
     this.companyService.save(company);
-    return { message: 'Password reset successfully' };
+    return { message: 'Mot de passe rénitialisé avec succès' };
   }
 
   async generateStudentResetPassword(body: ForgetPasswordDto) {
     const student = await this.studentService.findOne(body.email);
     if (!student) {
-      return { error: 'User with email ' + body.email + ' does not exist' };
+      return { error: "Il n'existe pas de compte associé à l'adresse e-mail " + body.email};
     }
     const randomString = [...Array(16)]
       .map(() => Math.random().toString(36)[2])
@@ -228,12 +228,12 @@ export class AuthService {
       body.token,
     );
     if (!student) {
-      return { error: 'User with token ' + body.token + ' does not exist' };
+      return { error: 'Jeton de réinitialisation invalide'};
     }
     student.password = await this.hashPassword(body.password);
     student.resetPasswordToken = null;
     this.studentService.save(student);
-    return { message: 'Password reset successfully' };
+    return { message: 'Mot de passe rénitialisé avec succès' };
   }
 
   async googleLogin(googleLoginDto: GoogleLoginDto) {
