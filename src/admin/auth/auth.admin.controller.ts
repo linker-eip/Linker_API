@@ -10,7 +10,7 @@ import { LoginAdminResponseDto } from './dto/login-admin-response.dto';
 import { LoginAminDto } from './dto/login-admin.dto';
 
 @ApiBearerAuth()
-@ApiTags('Admin')
+@ApiTags('Admin/Auth')
 @Controller('api/admin/auth')
 @ApiBearerAuth()
 export class AuthAdminController {
