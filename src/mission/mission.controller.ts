@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateMissionDto } from './dto/create-mission-dto';
 import { UpdateMissionDto } from './dto/update-mission-dto'
@@ -37,5 +37,14 @@ export class MissionController {
     })
     async updateMission(@Param('id') missionId: number, @Body() body: UpdateMissionDto, @Req() req) {
         return await this.missionService.updateMission(missionId, body, req)
+    }
+
+    @Get()
+    @ApiOperation({
+        description: 'Get all missions from a company',
+        summary: 'Get all missions from a company',
+    })
+    async getMissions(@Req() req) {
+        return await this.missionService.getCompanyMissions(req)
     }
 }

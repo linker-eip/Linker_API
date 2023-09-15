@@ -8,7 +8,6 @@ import { UpdateMissionDto } from './dto/update-mission-dto';
 
 @Injectable()
 export class MissionService {
-
     constructor(
         @InjectRepository(Mission)
         private readonly missionRepository: Repository<Mission>,
@@ -22,6 +21,14 @@ export class MissionService {
 
         return mission;
       }
+
+    async findAllByCompanyId(companyId: number) {
+    const missions = await this.missionRepository.find({
+        where: { companyId },
+    });
+
+    return missions;
+    }
 
     async createMission(createMissionDto: CreateMissionDto, req: any) {
         let company = null;
@@ -97,5 +104,15 @@ export class MissionService {
 
         await this.missionRepository.update(mission.id, update);
         return await this.findMissionById(missionId)
+    }
+
+    async getCompanyMissions(req: any) {
+        let company = null;
+        try {
+            company = await this.companyService.findOne(req.user.email)
+        } catch (err) {
+            throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED) 
+        }   
+        return this.findAllByCompanyId(company.id)
     }
 }
