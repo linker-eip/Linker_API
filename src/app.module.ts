@@ -14,6 +14,7 @@ import { FileModule } from './filesystem/file.module';
 import { FileController } from './filesystem/file.controller';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path'
+import { MissionModule } from './mission/mission.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { join } from 'path'
     MailModule,
     AdminModule,
     FileModule,
+    MissionModule
   ],
   controllers: [FileController],
   providers: [JwtStrategy],
