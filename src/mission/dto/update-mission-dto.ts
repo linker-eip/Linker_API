@@ -9,28 +9,29 @@ import {
 import { MissionStatus } from '../enum/mission-status.enum';
 
 export class UpdateMissionDto {
-  @ApiProperty()
+  @ApiProperty({ description: "Nom de la mission" })
+  @IsString({ message: "Le nom doit être une chaîne de caractères" })
   @IsOptional()
-  @IsString()
   name: string;
-
-  @ApiProperty()
+  
+  @ApiProperty({ description: "Description de la mission" })
+  @IsString({ message: "La description doit être une chaîne de caractères" })
   @IsOptional()
-  @IsString()
   description: string;
-
-  @ApiProperty()
+  
+  @ApiProperty({ description: "Date de début de la mission" })
+  @IsDateString(undefined, { message: "La date de début doit être au format de date valide" })
   @IsOptional()
-  @IsDateString()
   startOfMission: Date;
-
-  @ApiProperty()
+  
+  @ApiProperty({ description: "Date de fin de la mission" })
+  @IsDateString(undefined, { message: "La date de fin doit être au format de date valide" })
   @IsOptional()
-  @IsDateString()
   endOfMission: Date;
-
-  @ApiProperty()
+  
+  @ApiProperty({ description: "Montant de la mission" })
+  @IsNumber(undefined, { message: "Le montant doit être un nombre" })
   @IsOptional()
-  @IsNumber()
   amount: number;
+  
 }
