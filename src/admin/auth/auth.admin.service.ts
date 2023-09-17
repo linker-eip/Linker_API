@@ -17,7 +17,7 @@ export class AuthAdminService {
             throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
         }
         if (body.password === adminUser.password) {
-            const token = jwt.sign({ email : adminUser.email}, process.env.JWT_SECRET);
+            const token = jwt.sign({ email : adminUser.email, userType : "USER_ADMIN"}, process.env.JWT_SECRET);
             return { token };
         }
         return null;
