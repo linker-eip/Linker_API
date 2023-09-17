@@ -43,8 +43,9 @@ export class StudentController {
     @UploadedFile(
       new ParseFilePipe({
         validators: [
-          new FileTypeValidator({ fileType: 'image/jpeg' })
-        ]
+          new FileTypeValidator({ fileType: 'image/jpeg' }),
+        ],
+        fileIsRequired: false,
       })
     ) picture,
     @Req() req,
