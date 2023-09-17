@@ -1,10 +1,12 @@
 import {
   Body,
   Controller,
+  Get,
   HttpException,
   HttpStatus,
   Post,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginStudentDto } from './dto/login-student.dto';
@@ -20,12 +22,15 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgetPasswordResponseDto } from './dto/forget-password-response.dto';
 import { ResetPasswordResponseDto } from './dto/reset-password-response.dto';
 import { GoogleLoginDto } from './dto/google-login.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('api/auth')
 @ApiTags('AUTH')
 @ApiBearerAuth()
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService,
+              private readonly jwtService: JwtService) {}
 
   @Post('student/register')
   @ApiOperation({
@@ -153,5 +158,12 @@ export class AuthController {
       if (!body.code)
           throw new HttpException("code is required", HttpStatus.BAD_REQUEST)
       return this.authService.googleLogin(body);
+  }
+
+  @Get('userType')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({summary: 'Gives the type of the user'})
+  async getUserType(@Req() req) {
+    return req.user.userType
   }
 }

@@ -59,7 +59,7 @@ export class AuthService {
 
     const savedUser = await this.studentService.save(newUser);
 
-    const token = jwt.sign({ email: savedUser.email }, process.env.JWT_SECRET);
+    const token = jwt.sign({ email: savedUser.email, userType: "USER_STUDENT" }, process.env.JWT_SECRET);
 
     await this.studentService.updateStudentProfile(
       null,
@@ -101,7 +101,7 @@ export class AuthService {
 
     const savedUser = await this.companyService.save(newUser);
 
-    const token = jwt.sign({ email: savedUser.email }, process.env.JWT_SECRET);
+    const token = jwt.sign({ email: savedUser.email, userType: "USER_COMPANY" }, process.env.JWT_SECRET);
 
     await this.companyService.updateCompanyProfile(
       {
@@ -135,7 +135,7 @@ export class AuthService {
     if (
       await this.comparePassword(loginStudentDto.password, student.password)
     ) {
-      const token = jwt.sign({ email: student.email }, process.env.JWT_SECRET);
+      const token = jwt.sign({ email: student.email, userType: "USER_STUDENT" }, process.env.JWT_SECRET);
       return { token };
     }
 
@@ -153,7 +153,7 @@ export class AuthService {
     if (
       await this.comparePassword(loginCompanyDto.password, company.password)
     ) {
-      const token = jwt.sign({ email: company.email }, process.env.JWT_SECRET);
+      const token = jwt.sign({ email: company.email, userType: "USER_COMPANY" }, process.env.JWT_SECRET);
       return { token };
     }
     return null;
@@ -271,7 +271,7 @@ export class AuthService {
 
     if (existingUser) {
       const token = jwt.sign(
-        { email: existingUser.email },
+        { email: existingUser.email, userType: "USER_STUDENT" },
         process.env.JWT_SECRET,
       );
       return { token };
@@ -285,7 +285,7 @@ export class AuthService {
       const savedUser = await this.studentService.save(newUser);
 
       const token = jwt.sign(
-        { email: savedUser.email },
+        { email: savedUser.email, userType: "USER_STUDENT" },
         process.env.JWT_SECRET,
       );
 
