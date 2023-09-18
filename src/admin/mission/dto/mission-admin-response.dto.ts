@@ -53,7 +53,7 @@ export function formatToMissionAdminDto(
     company: formatToCompanyAdminResponseDto(company),
     students: students.map((student) => {
       return {
-        name: student.firstName + ' ' + student.lastName,
+        name: student?.firstName + ' ' + student?.lastName,
       };
     }),
   };
