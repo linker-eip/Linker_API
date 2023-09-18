@@ -73,7 +73,7 @@ export class AuthController {
   async loginStudent(@Body() loginStudentDto: LoginStudentDto) {
     const token = await this.authService.loginStudent(loginStudentDto);
     if (!token) {
-      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('Mot de passe incorrect', HttpStatus.UNAUTHORIZED);
     }
     return token;
   }
@@ -91,7 +91,7 @@ export class AuthController {
   async loginCompany(@Body() loginCompanyDto: LoginCompanyDto) {
     const token = await this.authService.loginCompany(loginCompanyDto);
     if (!token) {
-      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('Mot de passe incorrect.', HttpStatus.UNAUTHORIZED);
     }
     return token;
   }

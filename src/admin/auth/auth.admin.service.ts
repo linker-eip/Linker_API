@@ -14,7 +14,7 @@ export class AuthAdminService {
     async loginAdmin(body : LoginAminDto ): Promise<LoginAdminResponseDto> {
         const adminUser = await this.adminService.findOneAdminByEmail(body.email);
         if (!adminUser) {
-            throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+            throw new HttpException('Mot de passe incorrect', HttpStatus.UNAUTHORIZED);
         }
         if (body.password === adminUser.password) {
             const token = jwt.sign({ email : adminUser.email, userType : "USER_ADMIN"}, process.env.JWT_SECRET);
