@@ -15,6 +15,8 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -33,13 +35,18 @@ export class DocumentAdminController {
   constructor(private readonly documentService: DocumentAdminService) {}
 
   @Post()
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Upload document',
+    type: UploadDocumentAdminDto,
+  })
   @ApiOperation({
     description: 'Upload document',
     summary: 'Upload document',
   })
   @ApiOkResponse({
     description: 'Upload document',
-    type: DocumentAdminReponseDto
+    type: DocumentAdminReponseDto,
   })
   @UseInterceptors(FileInterceptor('file'))
   async updateStudentProfile(
@@ -56,7 +63,7 @@ export class DocumentAdminController {
   })
   @ApiOkResponse({
     description: 'Get all documents',
-    type: DocumentAdminReponseDto
+    type: DocumentAdminReponseDto,
   })
   async getAllDocuments(
     @Query() searchOption: DocumentSearchOptionAdminDto,
@@ -85,7 +92,7 @@ export class DocumentAdminController {
   })
   @ApiOkResponse({
     description: 'Get a document',
-    type : DocumentAdminReponseDto
+    type: DocumentAdminReponseDto,
   })
   async getDocument(
     @Param('id', DocumentByIdPipe) documentId: number,
@@ -105,7 +112,6 @@ export class DocumentAdminController {
     @Param('id', DocumentByIdPipe) documentId: number,
     @Res() res,
   ): Promise<any> {
-    
     return this.documentService.downloadDocument(documentId, res);
   }
 }
