@@ -11,7 +11,7 @@ export class MissionByIdPipe implements PipeTransform {
         const mission = await this.missionService.findMissionById(
             parseInt(missionId),
         );
-        if (mission) return mission;
+        if (mission) return mission.id;
         else throw new NotFoundException('MISSION_NOT_FOUND');
     }
 }

@@ -96,7 +96,10 @@ export class MissionService {
     return mission;
   }
 
-  async updateMission(mission: Mission, body: UpdateMission) {
+  async updateMission(missionId: number, body: UpdateMission) {
+
+    const mission = await this.findMissionById(missionId);
+
     const update : Partial<Mission> = {};
     if (body.name !== null) {
       update.name = body.name;

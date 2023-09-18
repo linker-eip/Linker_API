@@ -45,7 +45,7 @@ export function formatToMissionAdminDto(mission : Mission, company : CompanyUser
         endOfMission: mission.endOfMission,
         amount: mission.amount,
         createdAt: mission.createdAt,
-        numberOfStudents: mission.studentsIds.length,
+        numberOfStudents: mission.studentsIds?.length,
         company : formatToCompanyAdminResponseDto(company)
     }
 }

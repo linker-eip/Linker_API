@@ -17,7 +17,10 @@ import {
 } from '@nestjs/swagger';
 import { MissionService } from './mission.service';
 import { CreateMissionDto } from './dto/create-mission.dto';
-import { formatToMissionAdminDto, missionAdminResponseDto } from './dto/mission-admin-response.dto';
+import {
+  formatToMissionAdminDto,
+  missionAdminResponseDto,
+} from './dto/mission-admin-response.dto';
 import { MissionSearchOptionAdmin } from './dto/missions-search-option-admin.dto';
 import { MissionByIdPipe } from './pipes/mission.pipe';
 import { Mission } from '../../mission/entity/mission.entity';
@@ -28,8 +31,10 @@ import { UserAdminService } from '../user-admin/user-admin.service';
 @ApiTags('Admin/Missions')
 @Controller('api/admin/mission')
 export class MissionController {
-  constructor(private readonly missionService: MissionService,
-    private readonly userAdminService : UserAdminService) {}
+  constructor(
+    private readonly missionService: MissionService,
+    private readonly userAdminService: UserAdminService,
+  ) {}
 
   @Post('')
   @ApiOperation({
@@ -56,10 +61,14 @@ export class MissionController {
   async findAllMissions(@Query() searchOption: MissionSearchOptionAdmin) {
     const missions = await this.missionService.findAllMissions(searchOption);
     //for each mission, get the company and format the response
-    const missionsFormatted = await Promise.all(missions.map(async (mission) => {
-      const company = await this.userAdminService.findOneCompanyById(mission.companyId);
-      return formatToMissionAdminDto(mission, company);
-    }));
+    const missionsFormatted = await Promise.all(
+      missions.map(async (mission) => {
+        const company = await this.userAdminService.findOneCompanyById(
+          mission.companyId,
+        );
+        return formatToMissionAdminDto(mission, company);
+      }),
+    );
     return missionsFormatted;
   }
 
@@ -72,8 +81,8 @@ export class MissionController {
     description: 'Delete a mission',
     type: missionAdminResponseDto,
   })
-  async deleteMission(@Param('id', MissionByIdPipe) mission: Mission) {
-    return await this.missionService.deleteMission(mission.id);
+  async deleteMission(@Param('id', MissionByIdPipe) missionId: number) {
+    return await this.missionService.deleteMission(missionId);
   }
 
   @Get(':id')
@@ -85,7 +94,8 @@ export class MissionController {
     description: 'Get a mission',
     type: missionAdminResponseDto,
   })
-  async getMission(@Param('id', MissionByIdPipe) mission: Mission) {
+  async getMission(@Param('id', MissionByIdPipe) missionId: number) {
+    const mission = await this.missionService.findMissionById(missionId);
     const company = await this.userAdminService.findOneCompanyById(
       mission.companyId,
     );
@@ -102,7 +112,7 @@ export class MissionController {
     type: missionAdminResponseDto,
   })
   async updateMission(
-    @Param('id', MissionByIdPipe) mission: Mission,
+    @Param('id', MissionByIdPipe) mission: number,
     @Body() body: UpdateMission,
   ) {
     return await this.missionService.updateMission(mission, body);
