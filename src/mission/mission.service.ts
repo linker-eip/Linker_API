@@ -44,7 +44,6 @@ export class MissionService {
         mission.startOfMission = createMissionDto.startOfMission;
         mission.endOfMission = createMissionDto.endOfMission;
         mission.amount = createMissionDto.amount;
-        mission.company = company
         mission.companyId = company.id;
 
         return await this.missionRepository.save(mission);

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Mission } from '../../mission/entity/mission.entity';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
@@ -16,15 +16,21 @@ export class MissionService {
   ) {}
 
   async createMission(createMissionDto: CreateMissionDto) {
+
+    const company = await this.userAdminService.findOneCompanyById(
+      createMissionDto.companyId,
+    );
+
+    if (!company) {
+      throw new NotFoundException(`COMPANY_NOT_FOUND`);
+    }
+
     const mission = new Mission();
     mission.name = createMissionDto.name;
     mission.description = createMissionDto.description;
     mission.startOfMission = createMissionDto.startOfMission;
     mission.endOfMission = createMissionDto.endOfMission;
     mission.amount = createMissionDto.amount;
-    mission.company = await this.userAdminService.findOneCompanyById(
-      createMissionDto.companyId,
-    );
     mission.companyId = createMissionDto.companyId;
     mission.studentsIds = createMissionDto.studentsIds;
 
@@ -118,9 +124,6 @@ export class MissionService {
 
     if (body.companyId !== null) {
       update.companyId = body.companyId;
-      update.company = await this.userAdminService.findOneCompanyById(
-        body.companyId,
-      );
     }
 
     if (body.studentsIds !== null) {

@@ -44,14 +44,14 @@ export function formatToCompanyAdminResponseDto(
   companyUser: CompanyUser,
 ): CompanyAdminResponseDto {
   const companyAdminResponseDto = new CompanyAdminResponseDto();
-  companyAdminResponseDto.id = companyUser.id;
-  companyAdminResponseDto.email = companyUser.email;
-  companyAdminResponseDto.companyName = companyUser.companyName;
-  companyAdminResponseDto.phoneNumber = companyUser.phoneNumber;
-  companyAdminResponseDto.picture = companyUser.picture;
-  companyAdminResponseDto.companyPicture = companyUser.companyPicture;
-  companyAdminResponseDto.isActive = companyUser.isActive;
-  companyAdminResponseDto.lastConnectedAt = companyUser.lastConnectedAt;
-  companyAdminResponseDto.createdAt = companyUser.createdAt;
+  companyAdminResponseDto.id = companyUser?.id;
+  companyAdminResponseDto.email = companyUser?.email;
+  companyAdminResponseDto.companyName = companyUser?.companyName;
+  companyAdminResponseDto.phoneNumber = companyUser?.phoneNumber;
+  companyAdminResponseDto.picture = companyUser?.picture;
+  companyAdminResponseDto.companyPicture = companyUser?.companyPicture;
+  companyAdminResponseDto.isActive = companyUser?.isActive;
+  companyAdminResponseDto.lastConnectedAt = companyUser?.lastConnectedAt;
+  companyAdminResponseDto.createdAt = companyUser?.createdAt;
   return companyAdminResponseDto;
 }

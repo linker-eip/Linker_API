@@ -26,10 +26,6 @@ export class Mission {
   @Column({ type: 'int', nullable: true })
   companyId: number;
 
-  @ManyToOne(() => CompanyUser)
-  @JoinColumn({ name: 'companyId' })
-  company: CompanyUser;
-
   @Column('simple-array', { nullable: true })
   studentsIds: number[];
 

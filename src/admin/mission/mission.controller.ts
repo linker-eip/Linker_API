@@ -17,17 +17,19 @@ import {
 } from '@nestjs/swagger';
 import { MissionService } from './mission.service';
 import { CreateMissionDto } from './dto/create-mission.dto';
-import { missionAdminResponseDto } from './dto/mission-admin-response.dto';
+import { formatToMissionAdminDto, missionAdminResponseDto } from './dto/mission-admin-response.dto';
 import { MissionSearchOptionAdmin } from './dto/missions-search-option-admin.dto';
 import { MissionByIdPipe } from './pipes/mission.pipe';
 import { Mission } from '../../mission/entity/mission.entity';
 import { UpdateMission } from './dto/update-mission.dto';
+import { UserAdminService } from '../user-admin/user-admin.service';
 
 @ApiBearerAuth()
 @ApiTags('Admin/Missions')
 @Controller('api/admin/mission')
 export class MissionController {
-  constructor(private readonly missionService: MissionService) {}
+  constructor(private readonly missionService: MissionService,
+    private readonly userAdminService : UserAdminService) {}
 
   @Post('')
   @ApiOperation({
@@ -53,7 +55,12 @@ export class MissionController {
   })
   async findAllMissions(@Query() searchOption: MissionSearchOptionAdmin) {
     const missions = await this.missionService.findAllMissions(searchOption);
-    return missions;
+    //for each mission, get the company and format the response
+    const missionsFormatted = await Promise.all(missions.map(async (mission) => {
+      const company = await this.userAdminService.findOneCompanyById(mission.companyId);
+      return formatToMissionAdminDto(mission, company);
+    }));
+    return missionsFormatted;
   }
 
   @Delete(':id')
@@ -79,7 +86,10 @@ export class MissionController {
     type: missionAdminResponseDto,
   })
   async getMission(@Param('id', MissionByIdPipe) mission: Mission) {
-    return mission;
+    const company = await this.userAdminService.findOneCompanyById(
+      mission.companyId,
+    );
+    return formatToMissionAdminDto(mission, company);
   }
 
   @Put(':id')
@@ -91,7 +101,6 @@ export class MissionController {
     description: 'Update a mission',
     type: missionAdminResponseDto,
   })
-
   async updateMission(
     @Param('id', MissionByIdPipe) mission: Mission,
     @Body() body: UpdateMission,
