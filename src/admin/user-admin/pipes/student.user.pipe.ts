@@ -10,7 +10,7 @@ export class StudentUserByIdPipe implements PipeTransform {
     const studentUser = await this.userAdminService.findOneStudentById(
       parseInt(studentId),
     );
-    if (studentUser) return studentUser;
+    if (studentUser) return studentUser.id;
     else throw new NotFoundException('STUDENT_USER_NOT_FOUND');
   }
 }

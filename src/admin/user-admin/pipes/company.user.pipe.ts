@@ -10,7 +10,7 @@ export class CompanyUserByIdPipe implements PipeTransform {
     const companyUser = await this.userAdminService.findOneCompanyById(
       parseInt(companyId),
     );
-    if (companyUser) return companyUser;
+    if (companyUser) return companyUser.id;
     else throw new NotFoundException('COMPANY_USER_NOT_FOUND');
   }
 }

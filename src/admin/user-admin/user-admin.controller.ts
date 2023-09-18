@@ -82,8 +82,9 @@ export class UserAdminController {
   async updateStudent(
     @Body() body: UpdateStudentAdminDto,
     @Param('studentId', StudentUserByIdPipe)
-    student: StudentUser,
+    studentId: number,
   ): Promise<StudentAdminResponseDto> {
+    const student = await this.userAdminService.findOneStudentById(studentId);
     const updatedStudent = await this.userAdminService.updateStudent(
       student,
       body,
@@ -102,8 +103,9 @@ export class UserAdminController {
   })
   async getStudent(
     @Param('studentId', StudentUserByIdPipe)
-    student: StudentUser,
+    studentId: number,
   ): Promise<StudentAdminResponseDto> {
+    const student = await this.userAdminService.findOneStudentById(studentId);
     return formatToStudentAdminResponseDto(student);
   }
 
@@ -118,8 +120,9 @@ export class UserAdminController {
   })
   async deleteStudent(
     @Param('studentId', StudentUserByIdPipe)
-    student: StudentUser,
+    studentId: number,
   ) {
+    const student = await this.userAdminService.findOneStudentById(studentId);
     return this.userAdminService.deleteStudent(student);
   }
 
@@ -170,8 +173,9 @@ export class UserAdminController {
   })
   async getCompany(
     @Param('companyId', CompanyUserByIdPipe)
-    company: CompanyUser,
+    companyId: number,
   ): Promise<CompanyAdminResponseDto> {
+    const company = await this.userAdminService.findOneCompanyById(companyId);
     return formatToCompanyAdminResponseDto(company);
   }
 
@@ -186,8 +190,9 @@ export class UserAdminController {
   })
   async deleteCompany(
     @Param('companyId', CompanyUserByIdPipe)
-    company: CompanyUser,
+    companyId: number,
   ) {
+    const company = await this.userAdminService.findOneCompanyById(companyId);
     return this.userAdminService.deleteCompany(company);
   }
 
@@ -203,8 +208,9 @@ export class UserAdminController {
   async updateCompany(
     @Body() body: UpdateCompanyAdminDto,
     @Param('companyId', CompanyUserByIdPipe)
-    company: CompanyUser,
+    companyId: number,
   ): Promise<CompanyAdminResponseDto> {
+    const company = await this.userAdminService.findOneCompanyById(companyId);
     const updatedCompany = await this.userAdminService.updateCompany(
       company,
       body,
