@@ -16,13 +16,20 @@ export class MissionService {
   ) {}
 
   async createMission(createMissionDto: CreateMissionDto) {
-
     const company = await this.userAdminService.findOneCompanyById(
       createMissionDto.companyId,
     );
 
     if (!company) {
       throw new NotFoundException(`COMPANY_NOT_FOUND`);
+    }
+
+    for (const studentId of createMissionDto.studentsIds) {
+      const student = await this.userAdminService.findOneStudentById(studentId);
+
+      if (!student) {
+        throw new NotFoundException(`STUDENT_NOT_FOUND`);
+      }
     }
 
     const mission = new Mission();
@@ -88,7 +95,7 @@ export class MissionService {
     return await this.missionRepository.delete(missionId);
   }
 
-  async findMissionById(missionId: number) : Promise<Mission> {
+  async findMissionById(missionId: number): Promise<Mission> {
     const mission = await this.missionRepository.findOne({
       where: { id: missionId },
     });
@@ -97,10 +104,9 @@ export class MissionService {
   }
 
   async updateMission(missionId: number, body: UpdateMission) {
-
     const mission = await this.findMissionById(missionId);
 
-    const update : Partial<Mission> = {};
+    const update: Partial<Mission> = {};
     if (body.name !== null) {
       update.name = body.name;
     }

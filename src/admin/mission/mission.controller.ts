@@ -60,13 +60,24 @@ export class MissionController {
   })
   async findAllMissions(@Query() searchOption: MissionSearchOptionAdmin) {
     const missions = await this.missionService.findAllMissions(searchOption);
-    //for each mission, get the company and format the response
     const missionsFormatted = await Promise.all(
       missions.map(async (mission) => {
         const company = await this.userAdminService.findOneCompanyById(
           mission.companyId,
         );
-        return formatToMissionAdminDto(mission, company);
+        let students: any[] = [];
+
+        if (mission.studentsIds) {
+          students = await Promise.all(
+            mission.studentsIds.map(async (studentId) => {
+              return await this.userAdminService.findOneStudentById(studentId);
+            }),
+          );
+        } else {
+          students = [];
+        }
+
+        return formatToMissionAdminDto(mission, company, students);
       }),
     );
     return missionsFormatted;
@@ -99,7 +110,18 @@ export class MissionController {
     const company = await this.userAdminService.findOneCompanyById(
       mission.companyId,
     );
-    return formatToMissionAdminDto(mission, company);
+    let students: any[] = [];
+
+    if (mission.studentsIds) {
+      students = await Promise.all(
+        mission.studentsIds.map(async (studentId) => {
+          return await this.userAdminService.findOneStudentById(studentId);
+        }),
+      );
+    } else {
+      students = [];
+    }
+    return formatToMissionAdminDto(mission, company, students);
   }
 
   @Put(':id')

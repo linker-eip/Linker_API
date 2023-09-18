@@ -1,51 +1,60 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { CompanyUser } from "../../../company/entity/CompanyUser.entity";
-import { Mission } from "../../../mission/entity/mission.entity";
-import { formatToCompanyAdminResponseDto } from "../../user-admin/dto/company-admin-response.dto";
+import { ApiProperty } from '@nestjs/swagger';
+import { CompanyUser } from '../../../company/entity/CompanyUser.entity';
+import { Mission } from '../../../mission/entity/mission.entity';
+import { formatToCompanyAdminResponseDto } from '../../user-admin/dto/company-admin-response.dto';
+import { StudentUser } from '../../../student/entity/StudentUser.entity';
 
-export class missionAdminResponseDto{
-    @ApiProperty()
-    id: number;
-    
-    @ApiProperty()
-    name: string;
+export class missionAdminResponseDto {
+  @ApiProperty()
+  id: number;
 
-    @ApiProperty()
-    status: string;
+  @ApiProperty()
+  name: string;
 
-    @ApiProperty()
-    description: string;
+  @ApiProperty()
+  status: string;
 
-    @ApiProperty()
-    startOfMission: Date;
+  @ApiProperty()
+  description: string;
 
-    @ApiProperty()
-    endOfMission: Date;
+  @ApiProperty()
+  startOfMission: Date;
 
-    @ApiProperty()
-    amount: number;
+  @ApiProperty()
+  endOfMission: Date;
 
-    @ApiProperty()
-    numberOfStudents: number;
+  @ApiProperty()
+  amount: number;
 
-    @ApiProperty()
-    company : CompanyUser;
+  @ApiProperty()
+  numberOfStudents: number;
+
+  @ApiProperty()
+  company: CompanyUser;
 }
 
-
-export function formatToMissionAdminDto(mission : Mission, company : CompanyUser) {
-    return {
-        id: mission.id,
-        name: mission.name,
-        status: mission.status,
-        companyId: mission.companyId,
-        studentsIds: mission.studentsIds,
-        description: mission.description,
-        startOfMission: mission.startOfMission,
-        endOfMission: mission.endOfMission,
-        amount: mission.amount,
-        createdAt: mission.createdAt,
-        numberOfStudents: mission.studentsIds?.length,
-        company : formatToCompanyAdminResponseDto(company)
-    }
+export function formatToMissionAdminDto(
+  mission: Mission,
+  company: CompanyUser,
+  students: StudentUser[],
+) {
+  return {
+    id: mission.id,
+    name: mission.name,
+    status: mission.status,
+    companyId: mission.companyId,
+    studentsIds: mission.studentsIds,
+    description: mission.description,
+    startOfMission: mission.startOfMission,
+    endOfMission: mission.endOfMission,
+    amount: mission.amount,
+    createdAt: mission.createdAt,
+    numberOfStudents: mission.studentsIds?.length,
+    company: formatToCompanyAdminResponseDto(company),
+    students: students.map((student) => {
+      return {
+        name: student.firstName + ' ' + student.lastName,
+      };
+    }),
+  };
 }
