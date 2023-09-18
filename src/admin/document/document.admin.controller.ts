@@ -73,9 +73,9 @@ export class DocumentAdminController {
     description: 'Delete a document',
   })
   async deleteDocument(
-    @Param('id', DocumentByIdPipe) document: Document,
+    @Param('id', DocumentByIdPipe) documentId: number,
   ): Promise<any> {
-    return this.documentService.deleteDocument(document.id);
+    return this.documentService.deleteDocument(documentId);
   }
 
   @Get(':id')
@@ -88,9 +88,9 @@ export class DocumentAdminController {
     type : DocumentAdminReponseDto
   })
   async getDocument(
-    @Param('id', DocumentByIdPipe) document: Document,
+    @Param('id', DocumentByIdPipe) documentId: number,
   ): Promise<any> {
-    return this.documentService.getDocument(document.id);
+    return this.documentService.getDocument(documentId);
   }
 
   @Get(':id/download')
@@ -102,9 +102,10 @@ export class DocumentAdminController {
     description: 'Download a document',
   })
   async downloadDocument(
-    @Param('id', DocumentByIdPipe) document: Document,
+    @Param('id', DocumentByIdPipe) documentId: number,
     @Res() res,
   ): Promise<any> {
-    return this.documentService.downloadDocument(document.id, res);
+    
+    return this.documentService.downloadDocument(documentId, res);
   }
 }

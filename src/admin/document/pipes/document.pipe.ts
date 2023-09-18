@@ -11,7 +11,7 @@ export class DocumentByIdPipe implements PipeTransform {
         const document = await this.documentService.findDocumentById(
             parseInt(documentId),
         );
-        if (document) return document;
+        if (document) return document.id;
         else throw new NotFoundException('DOCUMENT_NOT_FOUND');
     }
 }
