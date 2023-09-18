@@ -51,6 +51,10 @@ export class StudentController {
     @Req() req,
     @Body() CreateStudentProfile: CreateStudentProfileDto,
     ) {
+
+      console.log('Student Profile: ', CreateStudentProfile)
+
+
     return this.studentService.updateStudentProfile(
         picture,
         CreateStudentProfile,
