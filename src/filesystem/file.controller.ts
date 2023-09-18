@@ -27,7 +27,7 @@ export class FileController {
   )
   async uploadFile(@UploadedFile() file: Express.Multer.File): Promise<string> {
     const fileName = await this.fileService.storeFile(file);
-    return `File ${fileName} uploaded successfully`;
+    return `${fileName}`;
   }
 
   @Get()
