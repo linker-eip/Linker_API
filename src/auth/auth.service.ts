@@ -13,12 +13,13 @@ import { ForgetPasswordDto } from 'src/auth/dto/forget-password.dto';
 import { SendMailDto } from 'src/mail/dto/send-mail.dto';
 import { MailService } from 'src/mail/mail.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { GoogleLoginDto } from './dto/google-login.dto';
+import { GoogleLoginDto, GoogleLoginTokenDto } from './dto/google-login.dto';
 import { google } from 'googleapis';
 import { env } from 'process';
 import axios from 'axios';
 import { oauth2 } from 'googleapis/build/src/apis/oauth2';
 import { StudentUser } from 'src/student/entity/StudentUser.entity';
+import { GoogleApiService } from './services/google-api-services';
 
 @Injectable()
 export class AuthService {
@@ -27,6 +28,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly companyService: CompanyService,
     private readonly mailService: MailService,
+    private readonly googleApiService: GoogleApiService,
   ) {}
 
   async hashPassword(password: string): Promise<string> {
@@ -236,11 +238,11 @@ export class AuthService {
     return { message: 'Mot de passe rénitialisé avec succès' };
   }
 
-  async googleLogin(googleLoginDto: GoogleLoginDto) {
+  async googleStudentLoginWithCode(googleLoginDto: GoogleLoginDto) {
     const oauth2Client = new google.auth.OAuth2(
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
-      'https://localhost:8080/test',
+      'http://localhost:8080/test',
     );
 
     // Generate Oauth2 Link (Keeping for later use)
@@ -287,6 +289,193 @@ export class AuthService {
       const token = jwt.sign(
         { email: savedUser.email, userType: "USER_STUDENT" },
         process.env.JWT_SECRET,
+      );
+
+      await this.studentService.updateStudentProfile(
+        null,
+        {
+          firstName: savedUser.firstName,
+          lastName: savedUser.lastName,
+          description: '',
+          email: savedUser.email,
+          phone: '',
+          location: '',
+          picture: null,
+          studies: [],
+          skills: [],
+          jobs: [],
+          website: '',
+        },
+        savedUser
+      );
+
+      return { token };
+    }
+  }
+
+  async googleStudentLoginWithToken(googleLoginTokenDto: GoogleLoginTokenDto) {
+    const userinfos = await this.googleApiService.getPersonFromAccessToken(
+      googleLoginTokenDto.token,
+    );
+
+    const existingUser = await this.studentService.findOne(userinfos.email);
+
+    if (existingUser) {
+      const token = jwt.sign(
+        { email: existingUser.email, userType: "USER_STUDENT" },
+        process.env.JWT_SECRET,
+      );
+      return { token };
+    } else {
+      const newUser = new StudentUser();
+      newUser.email = userinfos.email;
+      newUser.password = await this.hashPassword(googleLoginTokenDto.token);
+      newUser.firstName = userinfos.given_name;
+      newUser.lastName = userinfos.family_name;
+
+      const savedUser = await this.studentService.save(newUser);
+
+      const token = jwt.sign(
+        { email: savedUser.email, userType: "USER_STUDENT" },
+        process.env.JWT_SECRET,
+      );
+
+      await this.studentService.updateStudentProfile(
+        null,
+        {
+          firstName: savedUser.firstName,
+          lastName: savedUser.lastName,
+          description: '',
+          email: savedUser.email,
+          phone: '',
+          location: '',
+          picture: null,
+          studies: [],
+          skills: [],
+          jobs: [],
+          website: '',
+        },
+        savedUser
+      );
+
+      return { token };
+    }
+  }
+
+  async googleCompanyLoginWithCode(googleLoginDto: GoogleLoginDto) {
+    const oauth2Client = new google.auth.OAuth2(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      'http://localhost:8080/test',
+    );
+
+    // Generate Oauth2 Link (Keeping for later use)
+    // const scopes = [
+    //   "https://www.googleapis.com/auth/userinfo.email",
+    //   "https://www.googleapis.com/auth/userinfo.profile"
+    // ]
+    // const authorizationUrl = oauth2Client.generateAuthUrl({
+    //   access_type: 'offline',
+    //   scope: scopes,
+    //   include_granted_scopes: true
+    // });
+    // console.log(authorizationUrl)
+
+    let tokens;
+    try {
+      tokens = await oauth2Client.getToken(googleLoginDto.code);
+    } catch (e) {
+      return { error: 'Invalid token' };
+    }
+    const userinfos = await axios.get(
+      'https://oauth2.googleapis.com/tokeninfo?id_token=' +
+        tokens.tokens.id_token,
+    );
+    const existingUser = await this.companyService.findOne(
+      userinfos.data.email,
+    );
+
+    if (existingUser) {
+      const token = jwt.sign(
+        { email: existingUser.email, userType: "USER_COMPANY" },
+        process.env.JWT_SECRET,
+      );
+      return { token };
+    } else {
+      const newUser = new CompanyUser();
+      newUser.email = userinfos.data.email;
+      newUser.password = await this.hashPassword(tokens.id_token);
+      newUser.companyName = userinfos.data.given_name + ' ' + userinfos.data.family_name;
+      newUser.phoneNumber = '+33';
+
+      const savedUser = await this.companyService.save(newUser);
+
+      const token = jwt.sign(
+        { email: savedUser.email, userType: "USER_COMPANY" },
+        process.env.JWT_SECRET,
+      );
+
+      await this.companyService.updateCompanyProfile(
+        {
+          name: savedUser.companyName,
+          description: '',
+          email: savedUser.email,
+          phone: savedUser.phoneNumber,
+          address: '',
+          size: 0,
+          location: '',
+          activity: '',
+          speciality: '',
+          website: '',
+        },
+        savedUser,
+      );
+
+      return { token };
+    }
+  }
+
+  async googleCompanyLoginWithToken(googleLoginTokenDto: GoogleLoginTokenDto) {
+    const userinfos = await this.googleApiService.getPersonFromAccessToken(
+      googleLoginTokenDto.token,
+    );
+
+    const existingUser = await this.companyService.findOne(userinfos.email);
+
+    if (existingUser) {
+      const token = jwt.sign(
+        { email: existingUser.email, userType: "USER_COMPANY" },
+        process.env.JWT_SECRET,
+      );
+      return { token };
+    } else {
+      const newUser = new CompanyUser();
+      newUser.email = userinfos.email;
+      newUser.password = await this.hashPassword(googleLoginTokenDto.token);
+      newUser.companyName = userinfos.given_name + ' ' + userinfos.family_name;
+      newUser.phoneNumber = '+33';
+
+      const savedUser = await this.companyService.save(newUser);
+
+      const token = jwt.sign(
+        { email: savedUser.email, userType: "USER_COMPANY" },
+        process.env.JWT_SECRET,
+      );
+
+      await this.companyService.updateCompanyProfile(
+        {
+          name: savedUser.companyName,
+          description: '',
+          email: savedUser.email,
+          phone: savedUser.phoneNumber,
+          address: '',
+          size: 0,
+          location: '',
+          activity: '',
+          speciality: '',
+          website: '',
+        },
+        savedUser,
       );
 
       return { token };

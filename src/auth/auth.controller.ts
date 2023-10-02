@@ -21,7 +21,7 @@ import { ForgetPasswordDto } from 'src/auth/dto/forget-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgetPasswordResponseDto } from './dto/forget-password-response.dto';
 import { ResetPasswordResponseDto } from './dto/reset-password-response.dto';
-import { GoogleLoginDto } from './dto/google-login.dto';
+import { GoogleLoginDto, GoogleLoginTokenDto } from './dto/google-login.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtService } from '@nestjs/jwt';
 
@@ -30,7 +30,7 @@ import { JwtService } from '@nestjs/jwt';
 @ApiBearerAuth()
 export class AuthController {
   constructor(private readonly authService: AuthService,
-              private readonly jwtService: JwtService) {}
+    private readonly jwtService: JwtService) { }
 
   @Post('student/register')
   @ApiOperation({
@@ -152,17 +152,41 @@ export class AuthController {
     return this.authService.resetStudentPassword(body);
   }
 
-  @Post('student/google-login')
-  @ApiOperation({summary: 'Login a user using Google OAuth'})
-  async googleLogin(@Body() body: GoogleLoginDto) {
-      if (!body.code)
-          throw new HttpException("code is required", HttpStatus.BAD_REQUEST)
-      return this.authService.googleLogin(body);
+  @Post('student/google/code')
+  @ApiOperation({ summary: 'Login a student user using Google OAuth' })
+  async googleLoginWithCode(@Body() body: GoogleLoginDto) {
+    if (!body.code)
+      throw new HttpException("code is required", HttpStatus.BAD_REQUEST)
+    return this.authService.googleStudentLoginWithCode(body);
+  }
+
+  @Post('student/google/token')
+  @ApiOperation({ summary: 'Login a student user using Google OAuth token' })
+  async googleLoginWithToken(@Body() body: GoogleLoginTokenDto) {
+    if (!body.token)
+      throw new HttpException("token is required", HttpStatus.BAD_REQUEST)
+    return this.authService.googleStudentLoginWithToken(body);
+  }
+
+  @Post('company/google/code')
+  @ApiOperation({ summary: 'Login a company user using Google OAuth' })
+  async googleCompanyLoginWithCode(@Body() body: GoogleLoginDto) {
+    if (!body.code)
+      throw new HttpException("code is required", HttpStatus.BAD_REQUEST)
+    return this.authService.googleCompanyLoginWithCode(body);
+  }
+
+  @Post('company/google/token')
+  @ApiOperation({ summary: 'Login a company user using Google OAuth token' })
+  async googleCompanyLoginWithToken(@Body() body: GoogleLoginTokenDto) {
+    if (!body.token)
+      throw new HttpException("token is required", HttpStatus.BAD_REQUEST)
+    return this.authService.googleCompanyLoginWithToken(body);
   }
 
   @Get('userType')
   @UseGuards(AuthGuard('jwt'))
-  @ApiOperation({summary: 'Gives the type of the user'})
+  @ApiOperation({ summary: 'Gives the type of the user' })
   async getUserType(@Req() req) {
     return req.user.userType
   }
