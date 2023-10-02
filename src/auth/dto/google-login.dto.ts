@@ -12,3 +12,9 @@ export class GoogleLoginDto {
   @IsNotEmpty()
   code: string;
 }
+
+export class GoogleLoginTokenDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  token: string;
+}
