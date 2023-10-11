@@ -21,6 +21,13 @@ import { Studies } from '../student/studies/entity/studies.entity';
 import { RegisterStudentDto } from './dto/register-student.dto';
 import { AuthGuard, PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
+import { RegisterCompanyDto } from './dto/register-company.dto';
+import { LoginStudentDto } from './dto/login-student.dto';
+import { HttpException, HttpStatus } from '@nestjs/common';
+import { LoginCompanyDto } from './dto/login-company.dto';
+import { ForgetPasswordDto } from './dto/forget-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { GoogleLoginDto, GoogleLoginTokenDto } from './dto/google-login.dto';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -86,10 +93,51 @@ describe('AuthService', () => {
 
       jest.spyOn(service, 'registerStudent').mockResolvedValueOnce(expectedStudent);
 
-      const response = await service.registerStudent(registerStudentDto);
+      const response = await controller.registerStudent(registerStudentDto);
 
       expect(service.registerStudent).toHaveBeenCalledWith(registerStudentDto);
       expect(response).toEqual(expectedStudent);
+    });
+  });
+
+  describe('loginStudent', () => {
+    it('should return a student', async () => {
+      const loginStudentDto: LoginStudentDto = {
+        email: 'test@example.com',
+        password: 'Password123!',
+      };
+
+      const expectedStudent = {
+        token: 'token',
+      };
+
+      jest.spyOn(service, 'loginStudent').mockResolvedValueOnce(expectedStudent);
+
+      const response = await controller.loginStudent(loginStudentDto);
+
+      expect(service.loginStudent).toHaveBeenCalledWith(loginStudentDto);
+      expect(response).toEqual(expectedStudent);
+    });
+  });
+
+  describe('loginStudentWrongPassword', () => {
+    it('shouldnt return a student', async () => {
+      const loginStudentDto: LoginStudentDto = {
+        email: 'test@example.com',
+        password: 'Password321!',
+      };
+
+      const expectedStudent = null
+
+      const expectedResponse = {
+        statusCode: HttpStatus.UNAUTHORIZED,
+        message: 'Mot de passe incorrect',
+      }
+
+      jest.spyOn(service, 'loginStudent').mockResolvedValueOnce(expectedStudent);
+
+      await expect(async () => controller.loginStudent(loginStudentDto)).rejects.toThrow("Mot de passe incorrect");
+      expect(service.loginStudent).toHaveBeenCalledWith(loginStudentDto);
     });
   });
 
@@ -100,8 +148,251 @@ describe('AuthService', () => {
     });
   });
 
+  describe('registerCompany', () => {
+    it('should return a company', async () => {
+      const registerCompanyDto: RegisterCompanyDto = {
+        email: 'test@example.com',
+        password: 'Password123!',
+        name: 'Company Name',
+        phoneNumber: '0612345678',
+      };
+
+      const expectedCompany = {
+        token: 'token',
+      };
+
+      jest.spyOn(service, 'registerCompany').mockResolvedValueOnce(expectedCompany);
+
+      const response = await controller.registerCompany(registerCompanyDto);
+
+      expect(service.registerCompany).toHaveBeenCalledWith(registerCompanyDto);
+      expect(response).toEqual(expectedCompany);
+    });
+  });
+
+  describe('loginCompany', () => {
+    it('should return a company', async () => {
+      const loginCompanyDto: LoginCompanyDto = {
+        email: 'test@example.com',
+        password: 'Password123!',
+      };
+
+      const expectedCompany = {
+        token: 'token',
+      };
+
+      jest.spyOn(service, 'loginCompany').mockResolvedValueOnce(expectedCompany);
+
+      const response = await controller.loginCompany(loginCompanyDto);
+
+      expect(service.loginCompany).toHaveBeenCalledWith(loginCompanyDto);
+      expect(response).toEqual(expectedCompany);
+    });
+  });
+
+  describe('loginCompanyWrongPassword', () => {
+    it('shouldnt return a company', async () => {
+      const loginCompanyDto: LoginCompanyDto = {
+        email: 'test@example.com',
+        password: 'Password321!',
+      };
+
+      const expectedCompany = null
+
+      const expectedResponse = {
+        statusCode: HttpStatus.UNAUTHORIZED,
+        message: 'Mot de passe incorrect',
+      }
+
+      jest.spyOn(service, 'loginCompany').mockResolvedValueOnce(expectedCompany);
+
+      await expect(async () => controller.loginCompany(loginCompanyDto)).rejects.toThrow("Mot de passe incorrect");
+      expect(service.loginCompany).toHaveBeenCalledWith(loginCompanyDto);
+    });
+  });
+
+  describe('forgotPasswordStudent', () => {
+    it('should return a reset token', async () => {
+      const forgetPasswordDto: ForgetPasswordDto = {
+        email: 'test@example.com',
+      };
+
+      const expectedToken = {token: "token"}
+
+      jest.spyOn(service, 'generateStudentResetPassword').mockResolvedValueOnce(expectedToken);
+
+      const response = await controller.forgotPasswordStudent(forgetPasswordDto)
+
+      expect(service.generateStudentResetPassword).toHaveBeenCalledWith(forgetPasswordDto);
+      expect(response).toEqual(expectedToken)
+    });
+  });
+
+  describe('forgotPasswordCompany', () => {
+    it('should return a reset token', async () => {
+      const forgetPasswordDto: ForgetPasswordDto = {
+        email: 'test@example.com',
+      };
+
+      const expectedToken = {token: "token"}
+
+      jest.spyOn(service, 'generateCompanyResetPassword').mockResolvedValueOnce(expectedToken);
+
+      const response = await controller.forgotPassword(forgetPasswordDto)
+
+      expect(service.generateCompanyResetPassword).toHaveBeenCalledWith(forgetPasswordDto);
+      expect(response).toEqual(expectedToken)
+    });
+  });
+
+  describe('resetPasswordStudent', () => {
+    it('should return a message', async () => {
+      const resetPasswordDto: ResetPasswordDto = {
+        token: 'token',
+        password: 'newPassword123!'
+      };
+
+      const expectedMessage = {message: "Mot de passe rénitialisé avec succès"}
+
+      jest.spyOn(service, 'resetStudentPassword').mockResolvedValueOnce(expectedMessage);
+
+      const response = await controller.resetPasswordStudent(resetPasswordDto)
+
+      expect(service.resetStudentPassword).toHaveBeenCalledWith(resetPasswordDto);
+      expect(response).toEqual(expectedMessage)
+    });
+  });
+
+  describe('resetPasswordCompany', () => {
+    it('should return a message', async () => {
+      const resetPasswordDto: ResetPasswordDto = {
+        token: 'token',
+        password: 'newPassword123!'
+      };
+
+      const expectedMessage = {message: "Mot de passe rénitialisé avec succès"}
+
+      jest.spyOn(service, 'resetCompanyPassword').mockResolvedValueOnce(expectedMessage);
+
+      const response = await controller.resetPassword(resetPasswordDto)
+
+      expect(service.resetCompanyPassword).toHaveBeenCalledWith(resetPasswordDto);
+      expect(response).toEqual(expectedMessage)
+    });
+  });
+
+  describe('studentGoogleCode', () => {
+    it('should return a token', async () => {
+      const googleLoginDto: GoogleLoginDto = {
+        code: 'code',
+      };
+
+      const expectedToken = {token: "token"}
+
+      jest.spyOn(service, 'googleStudentLoginWithCode').mockResolvedValueOnce(expectedToken);
+
+      const response = await controller.googleLoginWithCode(googleLoginDto)
+
+      expect(service.googleStudentLoginWithCode).toHaveBeenCalledWith(googleLoginDto);
+      expect(response).toEqual(expectedToken)
+    });
+  });
+
+  describe('studentGoogleCodeError', () => {
+    it('shouldnt return a token', async () => {
+      const googleLoginDto: GoogleLoginDto = {
+        code: null
+      };
+
+      await expect(async () => controller.googleLoginWithCode(googleLoginDto)).rejects.toThrow()
+    });
+  });
+
+  describe('companyGoogleCodeError', () => {
+    it('shouldnt return a token', async () => {
+      const googleLoginDto: GoogleLoginDto = {
+        code: null
+      };
+
+      await expect(async () => controller.googleCompanyLoginWithCode(googleLoginDto)).rejects.toThrow()
+    });
+  });
+
+  describe('companyGoogleCode', () => {
+    it('should return a token', async () => {
+      const googleLoginDto: GoogleLoginDto = {
+        code: 'code',
+      };
+  
+      const expectedToken = {token: "token"}
+  
+      jest.spyOn(service, 'googleCompanyLoginWithCode').mockResolvedValueOnce(expectedToken);
+  
+      const response = await controller.googleCompanyLoginWithCode(googleLoginDto)
+  
+      expect(service.googleCompanyLoginWithCode).toHaveBeenCalledWith(googleLoginDto);
+      expect(response).toEqual(expectedToken)
+    });
+  });
+
+  describe('studentGoogleToken', () => {
+    it('should return a token', async () => {
+      const googleLoginDto: GoogleLoginTokenDto = {
+        token: 'token',
+      };
+
+      const expectedToken = {token: "token"}
+
+      jest.spyOn(service, 'googleStudentLoginWithToken').mockResolvedValueOnce(expectedToken);
+
+      const response = await controller.googleLoginWithToken(googleLoginDto)
+
+      expect(service.googleStudentLoginWithToken).toHaveBeenCalledWith(googleLoginDto);
+      expect(response).toEqual(expectedToken)
+    });
+  });
+
+  describe('companyGoogleToken', () => {
+    it('should return a token', async () => {
+      const googleLoginDto: GoogleLoginTokenDto = {
+        token: 'token',
+      };
+  
+      const expectedToken = {token: "token"}
+  
+      jest.spyOn(service, 'googleCompanyLoginWithToken').mockResolvedValueOnce(expectedToken);
+  
+      const response = await controller.googleCompanyLoginWithToken(googleLoginDto)
+  
+      expect(service.googleCompanyLoginWithToken).toHaveBeenCalledWith(googleLoginDto);
+      expect(response).toEqual(expectedToken)
+    });
+  });
+
+  describe('studentGoogleTokenError', () => {
+    it('shouldnt return a token', async () => {
+      const googleLoginDto: GoogleLoginTokenDto = {
+        token: null
+      };
+
+      await expect(async () => controller.googleLoginWithToken(googleLoginDto)).rejects.toThrow()
+    });
+  });
+
+  describe('companyGoogleTokenError', () => {
+    it('shouldnt return a token', async () => {
+      const googleLoginDto: GoogleLoginTokenDto = {
+        token: null
+      };
+
+      await expect(async () => controller.googleCompanyLoginWithToken(googleLoginDto)).rejects.toThrow()
+    });
+  });
+
+
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 });
+
 
