@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { StudentService } from '../student/student.service';
-import { JwtService } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import { CompanyService } from '../company/company.service';
 import { MailService } from '../mail/mail.service';
 import { GoogleApiService } from './services/google-api-services';
@@ -19,12 +19,23 @@ import { Skills } from '../student/skills/entity/skills.entity';
 import { Jobs } from '../student/jobs/entity/jobs.entity';
 import { Studies } from '../student/studies/entity/studies.entity';
 import { RegisterStudentDto } from './dto/register-student.dto';
+import { AuthGuard, PassportModule } from '@nestjs/passport';
+import { AuthController } from './auth.controller';
 
 describe('AuthService', () => {
   let service: AuthService;
+  let controller: AuthController
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [
+        PassportModule.register({ defaultStrategy: 'jwt' }),
+        JwtModule.register({
+          secret: process.env.JWT_SECRET,
+          signOptions: { expiresIn: '60m' },
+        }),
+      ],
+      controllers: [AuthController],
       providers: [AuthService, StudentService, JwtService, CompanyService, MailService, GoogleApiService, SkillsService, JobsService, StudiesService, FileService,
         {
           provide: getRepositoryToken(StudentUser),
@@ -51,8 +62,12 @@ describe('AuthService', () => {
           provide: "MAILER_PROVIDER",
           useValue: "GMAIL"
         }],
-    }).compile();
+    })
+    .overrideGuard(AuthGuard('jwt'))
+    .useValue({ canActivate: jest.fn(() => true) })
+    .compile();
 
+    controller = module.get<AuthController>(AuthController);
     service = module.get<AuthService>(AuthService);
   });
 
@@ -75,6 +90,13 @@ describe('AuthService', () => {
 
       expect(service.registerStudent).toHaveBeenCalledWith(registerStudentDto);
       expect(response).toEqual(expectedStudent);
+    });
+  });
+
+  describe('GET /userType', () => {
+    it('should return the user type', async () => {
+      const req = { user: { userType: 'exampleType' } };
+      expect(await controller.getUserType(req)).toBe('exampleType');
     });
   });
 
