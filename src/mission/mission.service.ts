@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Mission } from './entity/mission.entity';
 import { Repository } from 'typeorm';
@@ -11,7 +11,7 @@ export class MissionService {
     constructor(
         @InjectRepository(Mission)
         private readonly missionRepository: Repository<Mission>,
-        private readonly companyService: CompanyService
+        private readonly companyService: CompanyService,
     ) {}
 
     async findMissionById(missionId: number) : Promise<Mission> {
