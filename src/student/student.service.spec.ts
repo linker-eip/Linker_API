@@ -17,7 +17,7 @@ import { Studies } from "./studies/entity/studies.entity";
 import { Request } from "express";
 import { StudentProfileResponseDto } from "./dto/student-profile-response.dto";
 
-describe('AuthService', () => {
+describe('StudentService', () => {
     let service: StudentService;
     let controller: StudentController
   
