@@ -43,19 +43,3 @@ export class StudentProfileResponseDto {
   @ApiProperty()
   website: string;
 }
-
-export function studentProfileResponseDto(studentProfileResponse : StudentProfileResponseDto) {
-  const dto = new StudentProfileResponseDto();
-  dto.id = studentProfileResponse.id;
-  dto.firstName = studentProfileResponse.firstName;
-  dto.lastName = studentProfileResponse.lastName;
-  dto.description = studentProfileResponse.description;
-  dto.email = studentProfileResponse.email;
-  dto.phone = studentProfileResponse.phone;
-  dto.location = studentProfileResponse.location;
-  dto.studies = studentProfileResponse.studies;
-  dto.skills = studentProfileResponse.skills;
-  dto.jobs = studentProfileResponse.jobs;
-  dto.website = studentProfileResponse.website;
-  return dto;
-}
