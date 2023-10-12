@@ -18,7 +18,7 @@ import { LoginCompanyDto } from './dto/login-company.dto';
 import { LoginCompanyResponseDto } from './dto/login-company-response.dto';
 import { RegisterCompanyResponseDto } from './dto/register-company-response.dto';
 import { RegisterCompanyDto } from './dto/register-company.dto';
-import { ForgetPasswordDto } from 'src/auth/dto/forget-password.dto';
+import { ForgetPasswordDto } from '../auth/dto/forget-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgetPasswordResponseDto } from './dto/forget-password-response.dto';
 import { ResetPasswordResponseDto } from './dto/reset-password-response.dto';

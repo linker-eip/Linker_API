@@ -8,7 +8,7 @@ import { JobsModule } from './jobs/jobs.module';
 import { StudiesService } from './studies/studies.service';
 import { StudiesModule } from './studies/studies.module';
 import { SkillsModule } from './skills/skills.module';
-import { FileService } from 'src/filesystem/file.service';
+import { FileService } from '../filesystem/file.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([StudentUser, StudentProfile]), JobsModule, StudiesModule, SkillsModule],

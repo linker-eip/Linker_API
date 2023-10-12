@@ -1,5 +1,4 @@
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { CompanyUser } from 'src/company/entity/CompanyUser.entity';
 import { StudentUser } from './StudentUser.entity';
 import { Studies } from '../studies/entity/studies.entity';
 import { Skills } from '../skills/entity/skills.entity';
@@ -46,8 +45,8 @@ export class StudentProfile {
   @Column({ nullable: true })
   website: string;
 
-  @OneToOne(() => CompanyUser)
-  @JoinColumn({ name: 'companyId' })
+  @OneToOne(() => StudentUser)
+  @JoinColumn({ name: 'studentId' })
   student: StudentUser;
 
   @Column({ type: 'float', nullable: true, default: 0 })

@@ -8,7 +8,7 @@ import { SkillsService } from './skills/skills.service';
 import { StudentProfileResponseDto } from './dto/student-profile-response.dto';
 import { JobsService } from './jobs/jobs.service';
 import { StudiesService } from './studies/studies.service';
-import { FileService } from 'src/filesystem/file.service';
+import { FileService } from '../filesystem/file.service';
 
 @Injectable()
 export class StudentService {
