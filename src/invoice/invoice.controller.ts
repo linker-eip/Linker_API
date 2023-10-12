@@ -1,6 +1,6 @@
-import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
-import { PdfService } from './pdf.service';
+import { InvoiceService } from './invoice.service';
 import { createReadStream } from 'fs';
 import { CompanyInvoiceDataDto } from '../company/dto/company-invoice-data.dto';
 import { CompanyCreateInvoiceDto } from '../company/dto/company-create-invoice.dto';
@@ -11,8 +11,8 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 @UseGuards(AuthGuard('jwt'))
 @ApiTags('Pdf')
 @ApiBearerAuth()
-export class PdfController {
-  constructor(private readonly pdfService: PdfService) {}
+export class InvoiceController {
+  constructor(private readonly pdfService: InvoiceService) {}
 
   @Post('generate')
   async generatePdf(
@@ -20,7 +20,7 @@ export class PdfController {
     @Req() req,
     @Body() body: CompanyCreateInvoiceDto,
   ): Promise<void> {
-    const filePath = 'output.pdf';
+    const filePath = 'invoice.pdf';
 
     try {
       await this.pdfService.generateInvoice(req.user.email, body);
@@ -35,5 +35,13 @@ export class PdfController {
     } catch (error) {
       res.status(500).send(`Error generating PDF: ${error.message}`);
     }
+  }
+
+  @Get('download/:id')
+  async getInvoice(
+    @Param('id') id: number,
+    @Res() res: Response,
+  ): Promise<void> {
+    this.pdfService.downloadInvoice(id, res);
   }
 }

@@ -27,6 +27,27 @@ export class FileService {
     });
   }
 
+  async storeFileStream(
+    fileStream: NodeJS.ReadableStream,
+    originalname: string,
+  ): Promise<string> {
+    const fileName = `${Date.now()}-${originalname}`;
+    const filePath = path.join('linker_external', 'public', fileName);
+    const publicUrl = this.getPublicUrl(fileName);
+
+    // Create the directory if it doesn't exist
+    await fsExtra.ensureDir(path.dirname(filePath));
+
+    return new Promise((resolve, reject) => {
+      const writeStream = createWriteStream(filePath);
+
+      fileStream.pipe(writeStream);
+
+      writeStream.on('finish', () => resolve(publicUrl));
+      writeStream.on('error', (error) => reject(error));
+    });
+  }
+
   private getPublicUrl(fileName: string): string {
     const baseUrl = process.env.BASE_URL; // Set your base URL in configuration
     return `${baseUrl}/public/${fileName}`; // Update the path based on your file storage setup

@@ -5,7 +5,6 @@ import { CompanyUser } from './entity/CompanyUser.entity';
 import { Repository } from 'typeorm';
 import { CreateCompanyProfileDto } from './dto/create-company-profile.dto';
 import { CompanyCreateInvoiceDto } from './dto/company-create-invoice.dto';
-import { PdfService } from '../pdf/pdf.service';
 import { CompanyInvoiceDataDto } from './dto/company-invoice-data.dto';
 import { MissionService } from '../mission/mission.service';
 import { StudentService } from '../student/student.service';

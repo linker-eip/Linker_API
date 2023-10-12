@@ -3,4 +3,5 @@ export enum DocumentTypeEnum {
     PROFILEPICTURE = '¨PROFILEPICTURE',
     CV = 'CV',
     IDENTITYCARD = 'IDENTITYCARD',
+    INVOICE = 'INVOICE',
 }
