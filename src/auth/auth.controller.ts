@@ -47,7 +47,7 @@ export class AuthController {
     return await this.authService.registerStudent(registerStudentDto);
   }
 
-  @Post('studient/verify')
+  @Post('student/verify')
   @ApiOperation({
     description: "Verify student account",
     summary: "Verify student account",
