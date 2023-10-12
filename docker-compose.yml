@@ -32,6 +32,7 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       BASE_URL: ${BASE_URL}
+      SIRET_BEARER: ${SIRET_BEARER}
     depends_on:
       - db
     networks:

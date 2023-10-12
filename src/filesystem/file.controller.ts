@@ -12,8 +12,10 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from './file.service';
 import 'multer'
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('api/file')
+@ApiTags('FILE')
 export class FileController {
   constructor(private readonly fileService: FileService) {}
 
