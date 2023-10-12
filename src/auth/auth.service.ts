@@ -94,6 +94,17 @@ export class AuthService {
     return { token };
   }
 
+  async verifyStudent(code: string) {
+    const student = await this.studentService.findOneByVerificationKey(code);
+    if (!student) {
+      throw new HttpException('Code de vérification invalide', HttpStatus.NOT_FOUND)
+    }
+
+    student.verificationKey = null
+    student.isVerified = true
+    this.studentService.save(student)
+  }
+
   async registerCompany(registerCompanyDto: RegisterCompanyDto) {
     const { email, password, name, phoneNumber } = registerCompanyDto;
 
