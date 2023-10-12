@@ -5,6 +5,7 @@ import {
   HttpException,
   HttpStatus,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -44,6 +45,15 @@ export class AuthController {
   })
   async registerStudent(@Body() registerStudentDto: RegisterStudentDto) {
     return await this.authService.registerStudent(registerStudentDto);
+  }
+
+  @Post('studient/verify')
+  @ApiOperation({
+    description: "Verify student account",
+    summary: "Verify student account",
+  })
+  async verifyStudent(@Query('code') code: string) {
+    return this.authService.verifyStudent(code);
   }
 
   @Post('company/register')

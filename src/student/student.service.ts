@@ -38,9 +38,16 @@ export class StudentService {
       where: { resetPasswordToken: token },
     });
   }
-  async save(student: StudentUser): Promise<StudentUser> {
-    return this.studentRepository.save(student);
+
+  async findOneByVerificationKey(key: string): Promise<StudentUser | undefined> {
+    return this.studentRepository.findOne({
+      where: { verificationKey: key },
+    })
   }
+
+    async save(student: StudentUser): Promise<StudentUser> {
+        return this.studentRepository.save(student);
+    }
 
   async findStudentProfile(email: string) {
     const profile = await this.studentProfileRepository.findOne({ where: { email } });
@@ -62,7 +69,7 @@ export class StudentService {
       website: profile.website,
       note: profile.note
     };
-    
+
   }
 
   async updateStudentProfile(
