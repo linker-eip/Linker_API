@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { MailService } from './mail.service';
-import { MailController } from './mail.controller';
 
 @Module({
   providers: [
@@ -19,7 +18,7 @@ import { MailController } from './mail.controller';
     },
     MailService,
   ],
-  controllers: [MailController],
+  controllers: [],
   exports: [MailService],
 })
 export class MailModule {}

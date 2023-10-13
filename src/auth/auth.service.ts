@@ -1,25 +1,26 @@
 import { HttpCode, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { LoginStudentDto } from './dto/login-student.dto';
 import { RegisterStudentDto } from './dto/register-student.dto';
-import { StudentService } from 'src/student/student.service';
+import { StudentService } from '../student/student.service';
 import * as jwt from 'jsonwebtoken';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginCompanyDto } from './dto/login-company.dto';
-import { CompanyService } from 'src/company/company.service';
+import { CompanyService } from '../company/company.service';
 import { RegisterCompanyDto } from './dto/register-company.dto';
-import { CompanyUser } from 'src/company/entity/CompanyUser.entity';
-import { ForgetPasswordDto } from 'src/auth/dto/forget-password.dto';
-import { SendMailDto } from 'src/mail/dto/send-mail.dto';
-import { MailService } from 'src/mail/mail.service';
+import { CompanyUser } from '../company/entity/CompanyUser.entity';
+import { ForgetPasswordDto } from '../auth/dto/forget-password.dto';
+import { SendMailDto } from '../mail/dto/send-mail.dto';
+import { MailService } from '../mail/mail.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { GoogleLoginDto, GoogleLoginTokenDto } from './dto/google-login.dto';
 import { google } from 'googleapis';
 import { env } from 'process';
 import axios from 'axios';
 import { oauth2 } from 'googleapis/build/src/apis/oauth2';
-import { StudentUser } from 'src/student/entity/StudentUser.entity';
+import { StudentUser } from '../student/entity/StudentUser.entity';
 import { GoogleApiService } from './services/google-api-services';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -59,6 +60,9 @@ export class AuthService {
     newUser.firstName = firstName;
     newUser.lastName = lastName;
 
+    const randomBytes = crypto.randomBytes(Math.ceil(32 / 2));
+    newUser.verificationKey = randomBytes.toString('hex').slice(0, 32);
+
     const savedUser = await this.studentService.save(newUser);
 
     const token = jwt.sign({ email: savedUser.email, userType: "USER_STUDENT" }, process.env.JWT_SECRET);
@@ -81,7 +85,24 @@ export class AuthService {
       savedUser
     );
 
+    const sendMailDto = new SendMailDto();
+    sendMailDto.to = savedUser.email
+    sendMailDto.subject = 'Verification de compte Linker'
+    sendMailDto.text = 'Veuillez vérifier votre compte Linker : ' + process.env.BASE_URL + '/auth/verify/' + savedUser.verificationKey
+    this.mailService.sendMail(sendMailDto)
+
     return { token };
+  }
+
+  async verifyStudent(code: string) {
+    const student = await this.studentService.findOneByVerificationKey(code);
+    if (!student) {
+      throw new HttpException('Code de vérification invalide', HttpStatus.NOT_FOUND)
+    }
+
+    student.verificationKey = null
+    student.isVerified = true
+    this.studentService.save(student)
   }
 
   async registerCompany(registerCompanyDto: RegisterCompanyDto) {

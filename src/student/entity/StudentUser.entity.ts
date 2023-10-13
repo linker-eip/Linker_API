@@ -30,8 +30,14 @@ export class StudentUser {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  @Column({ type: 'varchar', nullable: true })
-  resetPasswordToken: string;
+    @Column({ type: 'varchar', nullable: true})
+    resetPasswordToken: string;
+
+    @Column({ type: 'boolean', default: false})
+    isVerified: boolean;
+
+    @Column({ type: 'varchar', nullable: true})
+    verificationKey: string;
 
   @Column('simple-array', { nullable: true })
   missionsIds: number[];

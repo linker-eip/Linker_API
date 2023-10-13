@@ -8,7 +8,7 @@ import { SkillsService } from './skills/skills.service';
 import { StudentProfileResponseDto } from './dto/student-profile-response.dto';
 import { JobsService } from './jobs/jobs.service';
 import { StudiesService } from './studies/studies.service';
-import { FileService } from 'src/filesystem/file.service';
+import { FileService } from '../filesystem/file.service';
 
 @Injectable()
 export class StudentService {
@@ -38,9 +38,16 @@ export class StudentService {
       where: { resetPasswordToken: token },
     });
   }
-  async save(student: StudentUser): Promise<StudentUser> {
-    return this.studentRepository.save(student);
+
+  async findOneByVerificationKey(key: string): Promise<StudentUser | undefined> {
+    return this.studentRepository.findOne({
+      where: { verificationKey: key },
+    })
   }
+
+    async save(student: StudentUser): Promise<StudentUser> {
+        return this.studentRepository.save(student);
+    }
 
   async findStudentProfile(email: string) {
     const profile = await this.studentProfileRepository.findOne({
