@@ -87,7 +87,7 @@ export class InvoiceService {
       pdf.pipe(stream);
 
       pdf.rect(0, 0, 612, 60).fill('#005275');
-      pdf.image('assets/linker_logo.png', 0, 10, { width: 150 });
+      //pdf.image('assets/linker_logo.png', 0, 10, { width: 150 });
 
       const headerText = data.companyName;
       const headerWidth = pdf.widthOfString(headerText);
@@ -138,7 +138,7 @@ export class InvoiceService {
 
       // Add footer
       pdf.rect(0, 750, 612, 60).fill('#005275');
-      pdf.image('assets/linker_logo.png', 0, 750, { width: 150 });
+      //pdf.image('assets/linker_logo.png', 0, 750, { width: 150 });
 
       // Define column headers
       const headers = ['Task', 'Description', 'Cost'];
