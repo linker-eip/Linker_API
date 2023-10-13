@@ -7,7 +7,7 @@ import { CompanyCreateInvoiceDto } from '../company/dto/company-create-invoice.d
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
-@Controller('invoice')
+@Controller('api/invoice')
 @UseGuards(AuthGuard('jwt'))
 @ApiTags('Invoice')
 @ApiBearerAuth()
