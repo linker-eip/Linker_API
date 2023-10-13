@@ -29,6 +29,7 @@ export class InvoiceService {
     @InjectRepository(Document)
     private readonly DocumentAdminRepository: Repository<Document>,
     private readonly fileService: FileService,
+    //private readonly companyService: CompanyService,
   ) {}
 
   async generateInvoice(email: string, body: CompanyCreateInvoiceDto) {
@@ -255,4 +256,32 @@ export class InvoiceService {
     }
   }
   
+  async getInvoices(email: string): Promise<any> {
+    const companyProfile = await this.companyProfileRepository.findOne({
+      where: { email: email },
+    });
+    if (!companyProfile) throw new Error(`Could not find company profile`);
+    const documentsQuery = this.DocumentAdminRepository.createQueryBuilder(
+      'document',
+    );
+    documentsQuery.where('document.documentUser = :documentUser', {
+      documentUser: DocumentUserEnum.COMPANY,
+    });
+    documentsQuery.andWhere('document.userId = :userId', {
+      userId: companyProfile.companyId,
+    });
+    documentsQuery.andWhere('document.documentType = :documentType', {
+      documentType: DocumentTypeEnum.INVOICE,
+    });
+    const documents = await documentsQuery.getMany();
+    return documents;
+  }
+
+  async deleteInvoice(id: number): Promise<any> {
+    const document = await this.findInvoiceById(id);
+    if (!document) throw new NotFoundException(`Could not find document`);
+    await this.fileService.deleteFile(document.documentPath);
+    await this.DocumentAdminRepository.delete(id);
+    return 'Document deleted';
+  }
 }
