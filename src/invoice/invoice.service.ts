@@ -51,17 +51,17 @@ export class InvoiceService {
     if (!studentProfile)
       throw new NotFoundException(`Could not find student profile`);
     const Data = new CompanyInvoiceDataDto();
-    Data.companyName = companyName;
-    Data.address = address;
-    Data.location = location;
-    Data.phoneNumber = phoneNumber;
+    Data.companyName = companyName ? companyName : '';
+    Data.address = address ? address : '';
+    Data.location = location ? location : '';
+    Data.phoneNumber = phoneNumber ? phoneNumber : '';
     Data.headerFields = headerFields;
     Data.rows = rows;
     Data.amount = amount;
-    Data.missionName = mission.name;
+    Data.missionName = mission.name ? mission.name : '';
     Data.invoiceNumber = mission.id;
     Data.studentName = studentProfile.firstName + ' ' + studentProfile.lastName;
-    Data.studentLocation = studentProfile.location;
+    Data.studentLocation = studentProfile.location ? studentProfile.location : '';
 
     return this.generatePdf('invoice.pdf', Data, companyProfile);
   }
