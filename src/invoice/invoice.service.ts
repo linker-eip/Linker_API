@@ -117,11 +117,10 @@ export class InvoiceService {
       const phoneNumberWidth = pdf.widthOfString(phoneNumber);
       const phoneNumberX = (pdf.page.width - phoneNumberWidth) / 2 + 200;
       pdf.font('Helvetica').fontSize(10).text(phoneNumber, phoneNumberX, 130);
-
       pdf.font('Helvetica-Bold').fontSize(16).text('Facture', 50, 200);
       pdf.font('Helvetica-Bold').fontSize(14).text(data.missionName, 50, 230);
       pdf.font('Helvetica').fontSize(10).text('Numéro de facture :', 50, 260);
-      pdf.font('Helvetica').fontSize(10).text('16', 150, 260);
+      pdf.font('Helvetica').fontSize(10).text(Math.floor(Math.random() * 1000000), 150, 260);
 
       pdf.font('Helvetica-Bold').fontSize(16).text('Étudiant', 460, 230);
       pdf.font('Helvetica').fontSize(10).text(data.studentName, 460, 260);
@@ -205,7 +204,6 @@ export class InvoiceService {
         .text(data.amount + ' €', 460, tableYPos + 5);
 
       pdf.on('end', () => {
-        console.log('PDF generated successfully.');
         const fileStream = createReadStream(filePath);
         this.fileService.storeFileStream(fileStream, 'invoice.pdf').then(async (file: string) => {
           const filepath: string = file;
