@@ -15,6 +15,8 @@ import { FileController } from './filesystem/file.controller';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path'
 import { MissionModule } from './mission/mission.module';
+import { SiretService } from './siret/siret.service';
+import { SiretController } from './siret/siret.controller';
 import { InvoiceModule } from './invoice/invoice.module';
 
 @Module({
@@ -52,7 +54,7 @@ import { InvoiceModule } from './invoice/invoice.module';
     MissionModule,
     InvoiceModule
   ],
-  controllers: [FileController],
-  providers: [JwtStrategy],
+  controllers: [FileController, SiretController],
+  providers: [JwtStrategy, SiretService],
 })
 export class AppModule {}
