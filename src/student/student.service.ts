@@ -20,7 +20,7 @@ export class StudentService {
     private readonly skillsService: SkillsService,
     private readonly jobsservice: JobsService,
     private readonly studiesService: StudiesService,
-    private readonly fileService: FileService
+    private readonly fileService: FileService,
   ) {}
 
   async findAll(): Promise<StudentUser[]> {
@@ -50,14 +50,16 @@ export class StudentService {
     }
 
   async findStudentProfile(email: string) {
-    const profile = await this.studentProfileRepository.findOne({ where: { email } });
+    const profile = await this.studentProfileRepository.findOne({
+      where: { email },
+    });
     if (!profile) throw new Error(`Could not find student profile`);
     const skills = await this.skillsService.findSkills(profile.id);
     const jobs = await this.jobsservice.findJobs(profile.id);
     const studies = await this.studiesService.findStudies(profile.id);
     return {
-      lastName : profile.lastName,
-      firstName : profile.firstName,
+      lastName: profile.lastName,
+      firstName: profile.firstName,
       description: profile.description,
       email: profile.email,
       phone: profile.phone,
@@ -67,9 +69,8 @@ export class StudentService {
       skills: skills,
       jobs: jobs,
       website: profile.website,
-      note: profile.note
+      note: profile.note,
     };
-
   }
 
   async updateStudentProfile(
@@ -95,7 +96,6 @@ export class StudentService {
       studentProfile.email = user.email;
     }
 
-
     if (CreateStudentProfile.firstName !== null) {
       studentProfile.firstName = CreateStudentProfile.firstName;
     }
@@ -117,7 +117,7 @@ export class StudentService {
     }
 
     if (picture) {
-      studentProfile.picture = await this.fileService.storeFile(picture)
+      studentProfile.picture = await this.fileService.storeFile(picture);
     }
 
     if (CreateStudentProfile.studies !== null) {
@@ -140,7 +140,10 @@ export class StudentService {
 
     if (CreateStudentProfile.jobs !== null) {
       for (let i = 0; i < CreateStudentProfile?.jobs?.length; i++) {
-        await this.jobsservice.addJob(studentProfile, CreateStudentProfile.jobs[i]);
+        await this.jobsservice.addJob(
+          studentProfile,
+          CreateStudentProfile.jobs[i],
+        );
       }
     }
 
@@ -151,5 +154,13 @@ export class StudentService {
     await this.studentProfileRepository.save(studentProfile);
 
     return studentProfile;
+  }
+
+  async findStudentProfileByStudentId(Studentid: number) {
+    const profile = await this.studentProfileRepository.findOne({
+      where: { studentId: Studentid },
+    });
+    if (!profile) throw new Error(`Could not find student profile`);
+    return profile;
   }
 }

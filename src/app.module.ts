@@ -17,6 +17,7 @@ import { join } from 'path'
 import { MissionModule } from './mission/mission.module';
 import { SiretService } from './siret/siret.service';
 import { SiretController } from './siret/siret.controller';
+import { InvoiceModule } from './invoice/invoice.module';
 
 @Module({
   imports: [
@@ -50,7 +51,8 @@ import { SiretController } from './siret/siret.controller';
     MailModule,
     AdminModule,
     FileModule,
-    MissionModule
+    MissionModule,
+    InvoiceModule
   ],
   controllers: [FileController, SiretController],
   providers: [JwtStrategy, SiretService],
