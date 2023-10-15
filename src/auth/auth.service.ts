@@ -185,9 +185,10 @@ export class AuthService {
     if (!company) {
       return { error: "Il n'existe pas de compte associé à l'adresse e-mail " + body.email};
     }
-    const randomString = [...Array(16)]
-      .map(() => Math.random().toString(36)[2])
-      .join('');
+
+    const randomString = Math.random().toString(36).substring(2, 8);
+
+
     company.resetPasswordToken = randomString;
     const emailBody =
       'Voici votre clé pour réinitialiser votre mot de passe : ' +
@@ -225,9 +226,8 @@ export class AuthService {
     if (!student) {
       return { error: "Il n'existe pas de compte associé à l'adresse e-mail " + body.email};
     }
-    const randomString = [...Array(16)]
-      .map(() => Math.random().toString(36)[2])
-      .join('');
+    const randomString = Math.random().toString(36).substring(2, 8);
+
     student.resetPasswordToken = randomString;
     const emailBody =
       'Voici votre clé pour réinitialiser votre mot de passe : ' +
