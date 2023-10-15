@@ -49,7 +49,7 @@ export class DocumentAdminController {
     type: DocumentAdminReponseDto,
   })
   @UseInterceptors(FileInterceptor('file'))
-  async updateStudentProfile(
+  async uploadDocumentAdmin(
     @Body() body: UploadDocumentAdminDto,
     @UploadedFile(new ParseFilePipe({})) file,
   ): Promise<any> {
