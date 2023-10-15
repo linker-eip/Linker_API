@@ -20,7 +20,7 @@ export class SiretService {
 
         try {
             const response = await axios.request(config)
-            return response.data
+            return response.data.etablissement
         } catch (e) {
             throw new HttpException("SIRET invalide", HttpStatus.BAD_REQUEST)
         }
