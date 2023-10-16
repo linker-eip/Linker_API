@@ -49,7 +49,7 @@ export class AuthService {
     const existingUser = await this.studentService.findOne(email);
 
     if (existingUser) {
-      throw new HttpException("Il n'existe pas de compte associé à cet e-mail", HttpStatus.UNAUTHORIZED)
+      throw new HttpException("Un compte utilisant cette adresse e-mail existe déjà.", HttpStatus.UNAUTHORIZED)
     }
 
     const newUser = new StudentUser();
