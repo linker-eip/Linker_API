@@ -23,6 +23,7 @@ import { Studies } from '../student/studies/entity/studies.entity';
 import { Document } from '../documents/entity/document.entity';
 import { DocumentTypeEnum } from '../documents/enum/document-type.enum';
 import { DocumentUserEnum } from '../documents/enum/document-user.enum';
+import { InvoiceController } from './invoice.controller';
 
 describe('InvoiceService', () => {
   let service: InvoiceService;
@@ -30,9 +31,11 @@ describe('InvoiceService', () => {
   let missionService: MissionService;
   let studentService: StudentService;
   let fileService: FileService;
+  let controller: InvoiceController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      controllers: [InvoiceController],
       providers: [
         InvoiceService,
         MissionService,
@@ -89,11 +92,17 @@ describe('InvoiceService', () => {
     missionService = module.get<MissionService>(MissionService);
     studentService = module.get<StudentService>(StudentService);
     fileService = module.get<FileService>(FileService);
+
+    controller = module.get<InvoiceController>(InvoiceController);
   });
 
   describe('getInvoices', () => {
     it('should return an array of invoices', async () => {
-      const email = 'test@gmail.com';
+      const req = {
+        user: {
+          email: 'test@gmail.com',
+        },
+      };
 
       const document: Document[] = [
         {
@@ -116,8 +125,139 @@ describe('InvoiceService', () => {
 
       jest.spyOn(service, 'getInvoices').mockResolvedValueOnce(document);
 
-      const response = await service.getInvoices(email);
+      const response = await controller.getInvoices(req);
+
+      expect(service.getInvoices).toHaveBeenCalledWith(req.user.email);
       expect(response).toEqual(document);
+    });
+  });
+
+  describe('generatePdf', () => {
+    it('should return a pdf', async () => {
+      const req = {
+        user: {
+          email: 'test@gmail.com',
+        },
+      };
+
+      const res = {
+        status: jest.fn(() => res),
+        sendFile: jest.fn(),
+        send: jest.fn(),
+      };
+
+      const companyCreateInvoiceDto: CompanyCreateInvoiceDto = {
+        missionId: 1,
+        studentId: 1,
+        amount: 100,
+        headerFields: [
+          'Description',
+          'Quantité',
+          'Prix Unitaire(HT)',
+          'Total(HT)',
+        ],
+        rows: [
+          {
+            Description: "Page d'accueil",
+            Quantité: 1,
+            'Prix Unitaire(HT)': '120 €',
+            'Total(HT)': '120 €',
+          },
+          {
+            Description: 'Page formulaire',
+            Quantité: 1,
+            'Prix Unitaire(HT)': '90 €',
+            'Total(HT)': '90 €',
+          },
+          {
+            Description: 'Base de donnée',
+            Quantité: 1,
+            'Prix Unitaire(HT)': '140 €',
+            'Total(HT)': '140 €',
+          },
+        ],
+      };
+
+      const document: Document = {
+        id: 1,
+        documentPath: 'test',
+        documentType: DocumentTypeEnum.INVOICE,
+        documentUser: DocumentUserEnum.COMPANY,
+        userId: 1,
+        createdAt: new Date(),
+      };
+
+      jest.spyOn(service, 'generateInvoice').mockResolvedValueOnce();
+
+      const response = await controller.generatePdf(
+        res,
+        req,
+        companyCreateInvoiceDto,
+      );
+
+      expect(service.generateInvoice).toHaveBeenCalledWith(
+        req.user.email,
+        companyCreateInvoiceDto,
+      );
+      expect(response).toEqual(undefined);
+    });
+  });
+
+  describe('getInvoice', () => {
+    it('should return an invoice', async () => {
+      const res = {
+        status: jest.fn(() => res),
+        sendFile: jest.fn(),
+        send: jest.fn(),
+      };
+
+      const req = {
+        user: {
+          email: 'test@gmail.com',
+        },
+      };
+
+      const document: Document = {
+        id: 1,
+        documentPath: 'test',
+        documentType: DocumentTypeEnum.INVOICE,
+        documentUser: DocumentUserEnum.COMPANY,
+        userId: 1,
+        createdAt: new Date(),
+      };
+
+      jest.spyOn(service, 'downloadInvoice').mockResolvedValueOnce(res);
+
+      const response = await controller.getInvoice(1, res);
+
+      expect(service.downloadInvoice).toHaveBeenCalledWith(1, res);
+      expect(response).toEqual(response);
+    });
+  });
+
+  describe('deleteInvoice', () => {
+    it('should delete an invoice', async () => {
+      const document: Document = {
+        id: 1,
+        documentPath: 'test',
+        documentType: DocumentTypeEnum.INVOICE,
+        documentUser: DocumentUserEnum.COMPANY,
+        userId: 1,
+        createdAt: new Date(),
+      };
+
+      const req = {
+        user: {
+          email: 'tony@gmail.com',
+        },
+      };
+
+      jest.spyOn(service, 'deleteInvoice').mockResolvedValueOnce(true);
+
+      const response = await controller.deleteInvoice(1);
+
+      expect(service.deleteInvoice).toHaveBeenCalledWith(1);
+      expect(response).toEqual(true);
     });
   });
 
