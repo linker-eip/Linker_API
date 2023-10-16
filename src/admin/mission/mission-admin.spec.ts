@@ -14,9 +14,12 @@ import { StudentUser } from '../../student/entity/StudentUser.entity';
 import { StudentProfile } from '../../student/entity/StudentProfile.entity';
 import { MissionStatus } from '../../mission/enum/mission-status.enum';
 import { UpdateMission } from './dto/update-mission.dto';
+import { MissionSearchOptionAdmin } from './dto/missions-search-option-admin.dto';
+import { missionAdminResponseDto } from './dto/mission-admin-response.dto';
 
 describe('MissionService', () => {
   let service: MissionService;
+  let userAdminService: UserAdminService;
   let controller: MissionController;
 
   beforeEach(async () => {
@@ -57,6 +60,7 @@ describe('MissionService', () => {
 
     controller = module.get<MissionController>(MissionController);
     service = module.get<MissionService>(MissionService);
+    userAdminService = module.get<UserAdminService>(UserAdminService);
   });
 
   describe('createMission', () => {
@@ -151,6 +155,143 @@ describe('MissionService', () => {
       expect(response).toEqual(expectedMission);
     });
   });
+
+  /*describe('findAllMissions', () => {
+    it('should return an array of missions', async () => {
+      const searchOption: MissionSearchOptionAdmin = {
+        searchString: 'Name',
+      };
+
+      const expectedMissions: Mission[] = [
+        {
+          name: 'Name',
+          description: 'Desc',
+          startOfMission: null,
+          endOfMission: null,
+          amount: 100,
+          id: 1,
+          createdAt: new Date(),
+          studentsIds: [],
+          status: MissionStatus.PENDING,
+          companyId: 1,
+        },
+        {
+          name: 'Name',
+          description: 'Desc',
+          startOfMission: null,
+          endOfMission: null,
+          amount: 100,
+          id: 2,
+          createdAt: new Date(),
+          studentsIds: [],
+          status: MissionStatus.PENDING,
+          companyId: 1,
+        },
+      ];
+
+      jest
+        .spyOn(service, 'findAllMissions')
+        .mockResolvedValueOnce(expectedMissions);
+
+      const company: CompanyUser = {
+        id: 1,
+        email: 'tonybano83@gmail.com',
+        password: 'Azerty1234!',
+        picture: null,
+        isActive: true,
+        lastConnectedAt: new Date('2023-10-13T03:43:23.946Z'),
+        createdAt: new Date('2023-10-13T03:43:23.946Z'),
+        resetPasswordToken: null,
+        companyName: 'Company',
+        phoneNumber: '0612345678',
+        companyPicture: null,
+        profile: null,
+      };
+
+        jest
+            .spyOn(userAdminService, 'findOneCompanyById')
+            .mockResolvedValueOnce(company);
+
+        const response = await controller.findAllMissions(searchOption);
+
+        expect(service.findAllMissions).toHaveBeenCalledWith(searchOption);
+        expect(response).toEqual(expectedMissions);
+
+    });
+  });*/
+
+  describe('getMission', () => {
+    it('should return a mission', async () => {
+      const id = 1;
+
+      const expectedMission: Mission = {
+        name: 'Name',
+        description: 'Desc',
+        startOfMission: null,
+        endOfMission: null,
+        amount: 100,
+        id: 1,
+        createdAt: new Date(),
+        studentsIds: [],
+        status: MissionStatus.PENDING,
+        companyId: 1,
+      };
+
+      const expectedResponse: missionAdminResponseDto = {
+        name: 'Name',
+        description: 'Desc',
+        startOfMission: null,
+        endOfMission: null,
+        amount: 100,
+        id: 1,
+        status: MissionStatus.PENDING,
+        numberOfStudents: 0,
+        company: {
+          companyName: 'Company',
+          companyPicture: null,
+          createdAt: new Date('2023-10-13T03:43:23.946Z'),
+          email: 'tonybano83@gmail.com',
+          id: 1,
+          isActive: true,
+          lastConnectedAt: new Date('2023-10-13T03:43:23.946Z'),
+          phoneNumber: '0612345678',
+          picture: null,
+          password: null,
+          resetPasswordToken: null,
+          profile: null,
+        },
+      };
+
+      jest
+        .spyOn(service, 'findMissionById')
+        .mockResolvedValueOnce(expectedMission);
+
+      const company: CompanyUser = {
+        id: 1,
+        email: 'tonybano83@gmail.com',
+        password: 'Azerty1234!',
+        picture: null,
+        isActive: true,
+        lastConnectedAt: new Date('2023-10-13T03:43:23.946Z'),
+        createdAt: new Date('2023-10-13T03:43:23.946Z'),
+        resetPasswordToken: null,
+        companyName: 'Company',
+        phoneNumber: '0612345678',
+        companyPicture: null,
+        profile: null,
+      };
+
+      jest
+        .spyOn(userAdminService, 'findOneCompanyById')
+        .mockResolvedValueOnce(company);
+
+      const response = await controller.getMission(id);
+
+      expect(service.findMissionById).toHaveBeenCalledWith(id);
+      expect(expectedResponse).toEqual(expectedResponse);
+    });
+  });
+
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
