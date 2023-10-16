@@ -1,77 +1,3 @@
-/*import { Test, TestingModule } from '@nestjs/testing';
-import { JwtModule } from '@nestjs/jwt';
-import { FileService } from '../filesystem/file.service';
-import { AuthGuard, PassportModule } from '@nestjs/passport';
-import { FileController } from './file.controller';
-
-describe('FileService', () => {
-  let service: FileService;
-  let controller: FileController
-
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        PassportModule.register({ defaultStrategy: 'jwt' }),
-        JwtModule.register({
-          secret: process.env.JWT_SECRET,
-          signOptions: { expiresIn: '60m' },
-        }),
-      ],
-      controllers: [FileController],
-      providers: [FileService],
-    })
-      .overrideGuard(AuthGuard('jwt'))
-      .useValue({ canActivate: jest.fn(() => true) })
-      .compile();
-
-    controller = module.get<FileController>(FileController);
-    service = module.get<FileService>(FileService);
-  });
-
-  describe('getFile', () => {
-    it('should return a file object', async () => {
-      jest.spyOn(service, 'getFile').mockReturnValueOnce(null)
-
-      const response = await controller.getFile("fileName", null)
-      expect(response).toEqual(null);
-    })
-  })
-
-  describe('uploadFile', () => {
-    it('should upload a file', async () => {
-      const file: Express.Multer.File = {
-        fieldname: 'file',
-        originalname: 'test-file.txt',
-        encoding: '7bit',
-        mimetype: 'text/plain',
-        destination: './uploads',
-        filename: 'test-file.txt',
-        path: './uploads/test-file.txt',
-        size: 12345,
-        stream: null,
-        buffer: Buffer.from(''),
-
-      };
-
-      jest.spyOn(service, 'storeFile').mockReturnValueOnce(Promise.resolve("linker-external/public/test-file.txt"));
-
-      const response = await controller.uploadFile(file)
-
-      expect(response).toEqual('linker-external/public/test-file.txt');
-      expect(service.storeFile).toHaveBeenCalledWith(file);
-    })
-  });
-
-
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
-});
-
-
-
-*/
-
 import { Test, TestingModule } from '@nestjs/testing';
 import { DocumentAdminController } from './document.admin.controller';
 import { DocumentAdminService } from './document.admin.service';
@@ -89,8 +15,7 @@ import { UserAdminService } from '../user-admin/user-admin.service';
 import { UploadDocumentAdminDto } from './dto/upload-document-admin.dto';
 import { DocumentUserEnum } from '../../documents/enum/document-user.enum';
 import { DocumentTypeEnum } from '../../documents/enum/document-type.enum';
-
-//do the same but for document.service.spec.ts
+import { DocumentSearchOptionAdminDto } from './dto/document-search-option-admin.dto';
 
 describe('DocumentAdminService', () => {
   let service: DocumentAdminService;
@@ -214,7 +139,41 @@ describe('DocumentAdminService', () => {
     });
   });
 
-  
+  describe('getAllDocuments', () => {
+    it('should get all documents', async () => {
+      const searchOption: DocumentSearchOptionAdminDto = {
+        documentType: DocumentTypeEnum.CV,
+        documentUser: DocumentUserEnum.STUDENT,
+        userId: '1',
+      };
+
+      const expectedDocuments = [
+        {
+          documentPath: 'linker-external/public/test-file.txt',
+          documentType: DocumentTypeEnum.CV,
+          documentUser: DocumentUserEnum.STUDENT,
+          userId: 1,
+          id: 1,
+        },
+        {
+          documentPath: 'linker-external/public/test-file.txt',
+          documentType: DocumentTypeEnum.CV,
+          documentUser: DocumentUserEnum.STUDENT,
+          userId: 1,
+          id: 2,
+        },
+      ];
+
+      jest
+        .spyOn(service, 'getAllDocuments')
+        .mockReturnValueOnce(Promise.resolve(expectedDocuments));
+
+      const response = await controller.getAllDocuments(searchOption);
+
+      expect(service.getAllDocuments).toHaveBeenCalled();
+      expect(response).toEqual(expectedDocuments);
+    });
+  });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
