@@ -86,7 +86,7 @@ export class AuthService {
     const sendMailDto = new SendMailDto();
     sendMailDto.to = savedUser.email
     sendMailDto.subject = 'Verification de compte Linker'
-    sendMailDto.text = 'Veuillez vérifier votre compte Linker : ' + process.env.BASE_URL + '/auth/verify/' + savedUser.verificationKey
+    sendMailDto.text = 'Veuillez vérifier votre compte Linker : ' + process.env.FRONT_URL + '/auth/verify/' + savedUser.verificationKey
     this.mailService.sendMail(sendMailDto)
 
     return { token };
