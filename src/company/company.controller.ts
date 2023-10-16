@@ -2,12 +2,13 @@ import { Body, Controller, Get, Post, Put, Req, UseGuards } from '@nestjs/common
 import { CompanyService } from './company.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateCompanyProfileDto } from './dto/create-company-profile.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CompanyProfileResponseDto } from './dto/company-profile-response.dto';
 
 @Controller('api/company')
 @UseGuards(AuthGuard('jwt'))
 @ApiTags('Company')
+@ApiBearerAuth()
 export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}
 

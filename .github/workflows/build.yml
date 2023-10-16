@@ -1,0 +1,33 @@
+name: Server build and test coverage pipelines
+
+on:
+  pull_request:
+    types: [opened, reopened]
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install dependencies
+        run: yarn install
+      
+      - name: Build
+        working-directory: .
+        run: docker build . -f Dockerfile -t linker-api:$(date +%s)
+      
+      - name: Run tests with coverage
+        run: yarn test:cov
+      
+      - name: Check branch coverage
+        run: |
+          node check-coverage.js

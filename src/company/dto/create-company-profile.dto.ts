@@ -1,44 +1,55 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber, IsString } from "class-validator";
+import { IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateCompanyProfileDto {
-  @ApiProperty()
-  @IsString()
+  @ApiProperty({ description: "Nom de l'entreprise" })
+  @IsOptional()
+  @IsString({ message: "Le nom doit être une chaîne de caractères" })
   name: string;
-
-  @ApiProperty()
-  @IsString()
+  
+  @ApiProperty({ description: "Description de l'entreprise" })
+  @IsString({ message: "La description doit être une chaîne de caractères" })
+  @IsOptional()
   description: string;
-
-  @ApiProperty()
-  @IsString()
+  
+  @ApiProperty({ description: "Adresse email de l'entreprise" })
+  @IsString({ message: "L'email doit être une chaîne de caractères" })
+  @IsOptional()
   email: string;
-
-  @ApiProperty()
-  @IsString()
+  
+  @ApiProperty({ description: "Numéro de téléphone de l'entreprise" })
+  @IsString({ message: "Le numéro de téléphone doit être une chaîne de caractères" })
+  @IsOptional()
   phone: string;
-
-  @ApiProperty()
-  @IsString()
+  
+  @ApiProperty({ description: "Adresse de l'entreprise" })
+  @IsString({ message: "L'adresse doit être une chaîne de caractères" })
+  @IsOptional()
   address: string;
-
-  @ApiProperty()
-  @IsNumber()
+  
+  @ApiProperty({ description: "Taille de l'entreprise" })
+  @IsNumber({}, { message: "La taille doit être un nombre" })
+  @IsOptional()
   size: number;
-
-  @ApiProperty()
-  @IsString()
+  
+  @ApiProperty({ description: "Emplacement de l'entreprise" })
+  @IsString({ message: "L'emplacement doit être une chaîne de caractères" })
+  @IsOptional()
   location: string;
-
-  @ApiProperty()
-  @IsString()
+  
+  @ApiProperty({ description: "Activité de l'entreprise" })
+  @IsString({ message: "L'activité doit être une chaîne de caractères" })
+  @IsOptional()
   activity: string;
-
-  @ApiProperty()
-  @IsString()
+  
+  @ApiProperty({ description: "Spécialité de l'entreprise" })
+  @IsString({ message: "La spécialité doit être une chaîne de caractères" })
+  @IsOptional()
   speciality: string;
-
-  @ApiProperty()
-  @IsString()
+  
+  @ApiProperty({ description: "Site web de l'entreprise" })
+  @IsString({ message: "Le site web doit être une chaîne de caractères" })
+  @IsOptional()
   website: string;
+  
 }

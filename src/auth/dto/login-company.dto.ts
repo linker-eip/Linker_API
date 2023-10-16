@@ -8,17 +8,18 @@ import {
 } from 'class-validator';
 
 export class LoginCompanyDto {
-  @ApiProperty()
-  @IsEmail()
-  @IsNotEmpty()
-  @IsString()
-  @IsDefined()
+  @ApiProperty({ description: "Adresse email de l'utilisateur" })
+  @IsEmail(undefined, { message: "L'email est invalide" })
+  @IsNotEmpty({ message: "L'email ne doit pas être vide" })
+  @IsString({ message: "L'email doit être une chaîne de caractères" })
+  @IsDefined({ message: "L'email doit être défini" })
   email: string;
 
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsString()
-  @IsDefined()
-  @MinLength(8)
+  @ApiProperty({ description: "Mot de passe de l'utilisateur" })
+  @IsNotEmpty({ message: "Le mot de passe ne doit pas être vide" })
+  @IsString({ message: "Le mot de passe doit être une chaîne de caractères" })
+  @IsDefined({ message: "Le mot de passe doit être défini" })
+  @MinLength(8, { message: "Le mot de passe doit contenir au moins 8 caractères" })
   password: string;
+
 }

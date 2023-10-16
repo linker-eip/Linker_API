@@ -1,30 +1,37 @@
 import {
   Body,
   Controller,
+  Get,
   HttpException,
   HttpStatus,
   Post,
+  Query,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginStudentDto } from './dto/login-student.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginStudentResponseDto } from './dto/login-student-response.dto';
 import { RegisterStudentDto } from './dto/register-student.dto';
 import { LoginCompanyDto } from './dto/login-company.dto';
 import { LoginCompanyResponseDto } from './dto/login-company-response.dto';
 import { RegisterCompanyResponseDto } from './dto/register-company-response.dto';
 import { RegisterCompanyDto } from './dto/register-company.dto';
-import { ForgetPasswordDto } from 'src/auth/dto/forget-password.dto';
+import { ForgetPasswordDto } from '../auth/dto/forget-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgetPasswordResponseDto } from './dto/forget-password-response.dto';
 import { ResetPasswordResponseDto } from './dto/reset-password-response.dto';
-import { GoogleLoginDto } from './dto/google-login.dto';
+import { GoogleLoginDto, GoogleLoginTokenDto } from './dto/google-login.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('api/auth')
 @ApiTags('AUTH')
+@ApiBearerAuth()
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService,
+    private readonly jwtService: JwtService) { }
 
   @Post('student/register')
   @ApiOperation({
@@ -37,11 +44,16 @@ export class AuthController {
     type: LoginStudentResponseDto,
   })
   async registerStudent(@Body() registerStudentDto: RegisterStudentDto) {
-    const res = await this.authService.registerStudent(registerStudentDto);
-    if (!res.token) {
-      throw new HttpException('Invalid informations', HttpStatus.UNAUTHORIZED);
-    }
-    return res;
+    return await this.authService.registerStudent(registerStudentDto);
+  }
+
+  @Post('student/verify')
+  @ApiOperation({
+    description: "Verify student account",
+    summary: "Verify student account",
+  })
+  async verifyStudent(@Query('code') code: string) {
+    return this.authService.verifyStudent(code);
   }
 
   @Post('company/register')
@@ -55,11 +67,7 @@ export class AuthController {
     type: RegisterCompanyResponseDto,
   })
   async registerCompany(@Body() registerCompanyDto: RegisterCompanyDto) {
-    const res = await this.authService.registerCompany(registerCompanyDto);
-    if (!res.token) {
-      throw new HttpException('Invalid informations', HttpStatus.UNAUTHORIZED);
-    }
-    return res;
+    return await this.authService.registerCompany(registerCompanyDto);
   }
 
   @Post('student/login')
@@ -75,7 +83,7 @@ export class AuthController {
   async loginStudent(@Body() loginStudentDto: LoginStudentDto) {
     const token = await this.authService.loginStudent(loginStudentDto);
     if (!token) {
-      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('Mot de passe incorrect', HttpStatus.UNAUTHORIZED);
     }
     return token;
   }
@@ -93,7 +101,7 @@ export class AuthController {
   async loginCompany(@Body() loginCompanyDto: LoginCompanyDto) {
     const token = await this.authService.loginCompany(loginCompanyDto);
     if (!token) {
-      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('Mot de passe incorrect.', HttpStatus.UNAUTHORIZED);
     }
     return token;
   }
@@ -154,11 +162,42 @@ export class AuthController {
     return this.authService.resetStudentPassword(body);
   }
 
-  @Post('student/google-login')
-  @ApiOperation({summary: 'Login a user using Google OAuth'})
-  async googleLogin(@Body() body: GoogleLoginDto) {
-      if (!body.code)
-          throw new HttpException("code is required", HttpStatus.BAD_REQUEST)
-      return this.authService.googleLogin(body);
+  @Post('student/google/code')
+  @ApiOperation({ summary: 'Login a student user using Google OAuth' })
+  async googleLoginWithCode(@Body() body: GoogleLoginDto) {
+    if (!body.code)
+      throw new HttpException("code is required", HttpStatus.BAD_REQUEST)
+    return this.authService.googleStudentLoginWithCode(body);
+  }
+
+  @Post('student/google/token')
+  @ApiOperation({ summary: 'Login a student user using Google OAuth token' })
+  async googleLoginWithToken(@Body() body: GoogleLoginTokenDto) {
+    if (!body.token)
+      throw new HttpException("token is required", HttpStatus.BAD_REQUEST)
+    return this.authService.googleStudentLoginWithToken(body);
+  }
+
+  @Post('company/google/code')
+  @ApiOperation({ summary: 'Login a company user using Google OAuth' })
+  async googleCompanyLoginWithCode(@Body() body: GoogleLoginDto) {
+    if (!body.code)
+      throw new HttpException("code is required", HttpStatus.BAD_REQUEST)
+    return this.authService.googleCompanyLoginWithCode(body);
+  }
+
+  @Post('company/google/token')
+  @ApiOperation({ summary: 'Login a company user using Google OAuth token' })
+  async googleCompanyLoginWithToken(@Body() body: GoogleLoginTokenDto) {
+    if (!body.token)
+      throw new HttpException("token is required", HttpStatus.BAD_REQUEST)
+    return this.authService.googleCompanyLoginWithToken(body);
+  }
+
+  @Get('userType')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Gives the type of the user' })
+  async getUserType(@Req() req) {
+    return req.user.userType
   }
 }

@@ -4,6 +4,10 @@ import { CompanyProfile } from './entity/CompanyProfile.entity';
 import { CompanyUser } from './entity/CompanyUser.entity';
 import { Repository } from 'typeorm';
 import { CreateCompanyProfileDto } from './dto/create-company-profile.dto';
+import { CompanyCreateInvoiceDto } from './dto/company-create-invoice.dto';
+import { CompanyInvoiceDataDto } from './dto/company-invoice-data.dto';
+import { MissionService } from '../mission/mission.service';
+import { StudentService } from '../student/student.service';
 
 @Injectable()
 export class CompanyService {
@@ -69,17 +73,39 @@ export class CompanyService {
         if (!companyProfile) {
             companyProfile = new CompanyProfile();
         }
+
+
         companyProfile.companyId = user.id
-        companyProfile.name = CreateCompanyProfileDto.name;
-        companyProfile.description = CreateCompanyProfileDto.description;
+
+        if (CreateCompanyProfileDto.name)
+          companyProfile.name = CreateCompanyProfileDto.name;
+
+        if (CreateCompanyProfileDto.description)
+          companyProfile.description = CreateCompanyProfileDto.description;
+        
         companyProfile.email = user.email;
-        companyProfile.phone = CreateCompanyProfileDto.phone;
-        companyProfile.address = CreateCompanyProfileDto.address;
-        companyProfile.size = CreateCompanyProfileDto.size;
-        companyProfile.location = CreateCompanyProfileDto.location;
-        companyProfile.activity = CreateCompanyProfileDto.activity;
-        companyProfile.speciality = CreateCompanyProfileDto.speciality;
-        companyProfile.website = CreateCompanyProfileDto.website;
+        
+        if (CreateCompanyProfileDto.phone)
+          companyProfile.phone = CreateCompanyProfileDto.phone;
+        
+        if (CreateCompanyProfileDto.address)
+          companyProfile.address = CreateCompanyProfileDto.address;
+
+        if (CreateCompanyProfileDto.size)
+          companyProfile.size = CreateCompanyProfileDto.size;
+        
+        if (CreateCompanyProfileDto.location)
+          companyProfile.location = CreateCompanyProfileDto.location;
+        
+        if (CreateCompanyProfileDto.activity)
+          companyProfile.activity = CreateCompanyProfileDto.activity;
+
+        if (CreateCompanyProfileDto.speciality)
+          companyProfile.speciality = CreateCompanyProfileDto.speciality;
+
+        if (CreateCompanyProfileDto.website)
+          companyProfile.website = CreateCompanyProfileDto.website;
+
         return this.companyProfileRepository.save(companyProfile);
     }
 }

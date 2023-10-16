@@ -1,11 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Studies } from '../studies/entity/studies.entity';
+import { Skills } from '../skills/entity/skills.entity';
+import { Jobs } from '../jobs/entity/jobs.entity';
+import { StudiesDto } from '../studies/dto/studies.dto';
+import { SkillsDto } from '../skills/dto/skills.dto';
+import { JobsDto } from '../jobs/dto/jobs.dto';
 
 export class StudentProfileResponseDto {
   @ApiProperty()
   id: number;
 
   @ApiProperty()
-  name: string;
+  firstName: string;
+
+  @ApiProperty()
+  lastName: string;
 
   @ApiProperty()
   description: string;
@@ -20,10 +29,16 @@ export class StudentProfileResponseDto {
   location: string;
 
   @ApiProperty()
-  studies: string;
+  picture: string;
 
-  @ApiProperty()
-  skills: string;
+  @ApiProperty({type : StudiesDto, isArray : true})
+  studies: Studies[];
+
+  @ApiProperty({type : SkillsDto, isArray : true})
+  skills: Skills[];
+
+  @ApiProperty({type : JobsDto, isArray : true})
+  jobs: Jobs[];
 
   @ApiProperty()
   website: string;
