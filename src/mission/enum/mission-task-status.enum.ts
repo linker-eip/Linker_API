@@ -1,6 +1,6 @@
 export enum MissionTaskStatus {
   SEARCHING = 'SEARCHING',
   PENDING = 'PENDING',
-  CANCELED = 'CANCELED',
+  CANCELLED = 'CANCELLED',
   FINISHED = 'FINISHED',
 }
