@@ -25,6 +25,13 @@ export class GroupService {
         return group
     }
 
+    async findGroupByName(name: string): Promise<Group> {
+        const group = await this.groupRepository.findOne({
+            where: { name: name }
+        })
+        return group
+    }
+
     async createGroup(req: any, createGroupDto: CreateGroupDto) {
         let student;
         try {
@@ -33,8 +40,12 @@ export class GroupService {
             throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED)
         }
 
-        if (student.group != null) {
+        if (student.groupId != null) {
             throw new HttpException('Student already has a group', HttpStatus.BAD_REQUEST)
+        }
+
+        if (await this.findGroupByName(createGroupDto.name) != null) {
+            throw new HttpException('Il existe déjà un groupe portant ce nom', HttpStatus.BAD_REQUEST)
         }
 
         const group = new Group();
