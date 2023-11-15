@@ -1,8 +1,9 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GroupService } from './group.service';
 import { CreateGroupDto } from './dto/create-group-dto';
+import { UpdateGroupDto } from './dto/update-group-dto';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
@@ -18,5 +19,17 @@ export class GroupController {
     })
     async createGroup(@Req() req, @Body() createGroupDto: CreateGroupDto) {
         return await this.groupService.createGroup(req, createGroupDto)
+    }
+
+    @Put()
+    @ApiOperation({
+      description: 'Update a group',
+      summary: 'Update a group',
+    })
+    async updateGroup(
+        @Req() req,
+        @Body() updateGroupDto: UpdateGroupDto,
+    ) {
+        return await this.groupService.updateGroup(req, updateGroupDto)
     }
 }
