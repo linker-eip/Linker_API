@@ -9,13 +9,13 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateMissionDto } from './dto/create-mission-dto';
 import { UpdateMissionDto } from './dto/update-mission-dto';
 import { MissionService } from './mission.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateMissionTaskDto } from './dto/create-mission-task.dto';
-import { UpdateMissionTaskDto } from './dto/create-mission-task.dto copy';
+import { UpdateMissionTaskDto } from './dto/update-mission-task.dto';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
@@ -82,6 +82,7 @@ export class MissionController {
     description: 'Update a task for a mission',
     summary: 'Update a task for a mission',
   })
+  @ApiOkResponse({ description: 'Update a task for a mission' })
   async updateMissionTask(
     @Param('taskId') taskId: number,
     @Body() body : UpdateMissionTaskDto,

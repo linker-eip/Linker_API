@@ -5,19 +5,31 @@ import { MissionTaskStatus } from "../enum/mission-task-status.enum";
 export class UpdateMissionTaskDto {
     @ApiProperty()
     @IsString()
-    name: string;
+    @IsOptional()
+    name?: string;
 
     @ApiProperty()
     @IsString()
-    description: string;
+    @IsOptional()
+    description?: string;
 
     @ApiProperty()
     @IsNumber()
     @IsOptional()
-    studentId: number;
+    studentId?: number;
 
     @ApiProperty()
     @IsEnum(MissionTaskStatus)
     @IsOptional()
-    status: MissionTaskStatus;
+    status?: MissionTaskStatus;
+
+    @ApiProperty()
+    @IsNumber()
+    @IsOptional()
+    amount?: number;
+
+    @ApiProperty()
+    @IsString()
+    @IsOptional()
+    skills?: string;
 }

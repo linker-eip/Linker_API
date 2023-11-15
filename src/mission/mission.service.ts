@@ -12,7 +12,7 @@ import { CompanyService } from '../company/company.service';
 import { UpdateMissionDto } from './dto/update-mission-dto';
 import { CreateMissionTaskDto } from './dto/create-mission-task.dto';
 import { MissionTask } from './entity/mission-task.entity';
-import { UpdateMissionTaskDto } from './dto/create-mission-task.dto copy';
+import { UpdateMissionTaskDto } from './dto/update-mission-task.dto';
 
 @Injectable()
 export class MissionService {
@@ -55,6 +55,7 @@ export class MissionService {
     mission.endOfMission = createMissionDto.endOfMission;
     mission.amount = createMissionDto.amount;
     mission.companyId = company.id;
+    mission.skills = createMissionDto.skills;
 
     return await this.missionRepository.save(mission);
   }
@@ -115,6 +116,10 @@ export class MissionService {
       update.amount = updateMissionDto.amount;
     }
 
+    if (updateMissionDto.skills !== null) {
+      update.skills = updateMissionDto.skills;
+    }
+
     await this.missionRepository.update(mission.id, update);
     return await this.findMissionById(missionId);
   }
@@ -152,6 +157,8 @@ export class MissionService {
     missionTask.description = createMissionTaskDto.description;
     missionTask.studentId = createMissionTaskDto.studentId;
     missionTask.missionId = missionId;
+    missionTask.amount = createMissionTaskDto.amount;
+    missionTask.skills = createMissionTaskDto.skills;
 
     return await this.missionTaskRepository.save(missionTask);
   }
@@ -197,6 +204,14 @@ export class MissionService {
 
     if (createMissionTaskDto.status !== null) {
       update.status = createMissionTaskDto.status;
+    }
+
+    if (createMissionTaskDto.amount !== null) {
+      update.amount = createMissionTaskDto.amount;
+    }
+
+    if (createMissionTaskDto.skills !== null) {
+      update.skills = createMissionTaskDto.skills;
     }
 
     await this.missionTaskRepository.update(missionTask.id, update);

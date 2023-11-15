@@ -14,4 +14,13 @@ export class CreateMissionTaskDto {
     @IsNumber()
     @IsOptional()
     studentId: number;
+
+    @ApiProperty()
+    @IsNumber()
+    amount: number;
+
+    @ApiProperty()
+    @IsString()
+    @IsOptional()
+    skills: string;
 }

@@ -40,4 +40,7 @@ export class Mission {
 
   @Column({ type: 'float', nullable: false })
   amount: number;
+
+  @Column({ type: 'varchar', length: 1024, nullable: true })
+  skills: string;
 }
