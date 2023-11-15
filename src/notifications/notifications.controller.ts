@@ -1,4 +1,4 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { NotificationsService } from './notifications.service';
@@ -17,5 +17,14 @@ export class NotificationsController {
     })
     async getNotifications(@Req() req) {
         return await this.notificationService.getNotifications(req)
+    }
+
+    @Post()
+    @ApiOperation({
+        description: 'Update notifications status',
+        summary: 'Update notifications status'
+    })
+    async updateNotificationsStatus(@Req() req, @Body() ids: number[]) {
+        return await this.notificationService.updateNotificationsStatus(req, ids)
     }
 }
