@@ -5,6 +5,7 @@ import { Group } from './entity/Group.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UpdateGroupDto } from './dto/update-group-dto';
+import { GetGroupeResponse } from './dto/get-group-response-dto';
 
 @Injectable()
 export class GroupService {
@@ -12,11 +13,11 @@ export class GroupService {
         @InjectRepository(Group)
         private readonly groupRepository: Repository<Group>,
         private readonly studentService: StudentService
-        ) {}
-        
+    ) { }
+
     async findGroupById(groupId: number): Promise<Group> {
         const group = await this.groupRepository.findOne({
-            where: {id: groupId}
+            where: { id: groupId }
         })
         return group
     }
@@ -28,7 +29,7 @@ export class GroupService {
         } catch (err) {
             throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED)
         }
-        
+
         if (student.group != null) {
             throw new HttpException('Student already has a group', HttpStatus.BAD_REQUEST)
         }
@@ -45,21 +46,21 @@ export class GroupService {
         this.studentService.save(student);
         return (group)
     }
-    
+
     async updateGroup(req: any, updateGroupDto: UpdateGroupDto) {
         let group;
         let student = await this.studentService.findOneByEmail(req.user.email)
         try {
-            group = await this.groupRepository.findOne({where: {leaderId: student.id}})
+            group = await this.groupRepository.findOne({ where: { leaderId: student.id } })
         } catch (err) {
             throw new HttpException("Bad request", HttpStatus.BAD_REQUEST);
         }
-        
-        
-        if (group == null) 
-        throw new HttpException("Vous n'êtes pas le chef d'un groupe", HttpStatus.BAD_REQUEST)
-    
-    if (updateGroupDto.name != null) {
+
+
+        if (group == null)
+            throw new HttpException("Vous n'êtes pas le chef d'un groupe", HttpStatus.BAD_REQUEST)
+
+        if (updateGroupDto.name != null) {
             group.name = updateGroupDto.name;
         }
         if (updateGroupDto.description != null) {
@@ -71,18 +72,18 @@ export class GroupService {
         await this.groupRepository.save(group);
         return await this.findGroupById(group.id)
     }
-    
+
     async deleteGroup(req: any) {
         let group;
         let student = await this.studentService.findOneByEmail(req.user.email)
         try {
-            group = await this.groupRepository.findOne({where: {leaderId: student.id}})
+            group = await this.groupRepository.findOne({ where: { leaderId: student.id } })
         } catch (err) {
             throw new HttpException("Bad request", HttpStatus.BAD_REQUEST);
         }
 
-        if (group == null) 
-        throw new HttpException("Vous n'êtes pas le chef d'un groupe", HttpStatus.BAD_REQUEST)
+        if (group == null)
+            throw new HttpException("Vous n'êtes pas le chef d'un groupe", HttpStatus.BAD_REQUEST)
 
         group.studentIds.forEach(async id => {
             let student = await this.studentService.findOneById(id)
@@ -91,5 +92,29 @@ export class GroupService {
         });
 
         this.groupRepository.delete(group.id);
+    }
+
+    async getGroup(req: any): Promise<GetGroupeResponse> {
+        let group;
+        let student = await this.studentService.findOneByEmail(req.user.email)
+        try {
+            group = await this.groupRepository.findOne({ where: { id: student.groupId } })
+        } catch (err) {
+            throw new HttpException("Bad request", HttpStatus.BAD_REQUEST);
+        }
+
+        if (group == null) {
+            throw new HttpException("Vous n'avez pas de groupe", HttpStatus.NOT_FOUND);
+        }
+
+        let response: GetGroupeResponse = {
+            name: group.name,
+            description: group.description,
+            picture: group.picture,
+            membersIds: group.studentIds,
+            leaderId: group.leaderId,
+            isLeader: group.leaderId == student.id
+        }
+        return response;
     }
 }
