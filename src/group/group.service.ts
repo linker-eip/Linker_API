@@ -6,13 +6,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UpdateGroupDto } from './dto/update-group-dto';
 import { GetGroupeResponse } from './dto/get-group-response-dto';
+import { NotificationsService } from 'src/notifications/notifications.service';
+import { NotificationType } from 'src/notifications/entity/Notification.entity';
 
 @Injectable()
 export class GroupService {
     constructor(
         @InjectRepository(Group)
         private readonly groupRepository: Repository<Group>,
-        private readonly studentService: StudentService
+        private readonly studentService: StudentService,
+        private readonly notificationService: NotificationsService
     ) { }
 
     async findGroupById(groupId: number): Promise<Group> {
@@ -44,6 +47,9 @@ export class GroupService {
         await this.groupRepository.save(group);
         student.groupId = group.id
         this.studentService.save(student);
+
+        this.notificationService.createNotification("Groupe créé", "Le groupe " + group.name + " a bien été créé", NotificationType.GROUP, student.id)
+
         return (group)
     }
 

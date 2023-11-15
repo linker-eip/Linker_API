@@ -21,6 +21,7 @@ import { InvoiceModule } from './invoice/invoice.module';
 import { GroupController } from './group/group.controller';
 import { GroupService } from './group/group.service';
 import { GroupModule } from './group/group.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -56,7 +57,8 @@ import { GroupModule } from './group/group.module';
     FileModule,
     MissionModule,
     InvoiceModule,
-    GroupModule
+    GroupModule,
+    NotificationsModule
   ],
   controllers: [FileController, SiretController],
   providers: [JwtStrategy, SiretService],
