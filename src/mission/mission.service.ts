@@ -111,7 +111,7 @@ export class MissionService {
             company = await this.companyService.findOne(req.user.email)
         } catch (err) {
             throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED) 
-        }   
+        }
         return this.findAllByCompanyId(company.id)
     }
 }

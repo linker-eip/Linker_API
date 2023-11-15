@@ -41,4 +41,7 @@ export class StudentUser {
 
   @Column('simple-array', { nullable: true })
   missionsIds: number[];
+
+  @Column({ type: 'int', default: null, nullable: true })
+  groupId: number;
 }

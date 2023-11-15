@@ -46,7 +46,7 @@ export class AuthService {
   async registerStudent(registerStudentDto: RegisterStudentDto) {
     const { email, password, firstName, lastName } = registerStudentDto;
 
-    const existingUser = await this.studentService.findOne(email);
+    const existingUser = await this.studentService.findOneByEmail(email);
 
     if (existingUser) {
       throw new HttpException("Un compte utilisant cette adresse e-mail existe déjà.", HttpStatus.UNAUTHORIZED)
@@ -145,7 +145,7 @@ export class AuthService {
   }
 
   async loginStudent(loginStudentDto: LoginStudentDto) {
-    const student = await this.studentService.findOne(loginStudentDto.email);
+    const student = await this.studentService.findOneByEmail(loginStudentDto.email);
 
     if (!student) {
       return {
@@ -222,7 +222,7 @@ export class AuthService {
   }
 
   async generateStudentResetPassword(body: ForgetPasswordDto) {
-    const student = await this.studentService.findOne(body.email);
+    const student = await this.studentService.findOneByEmail(body.email);
     if (!student) {
       return { error: "Il n'existe pas de compte associé à l'adresse e-mail " + body.email};
     }
@@ -286,7 +286,7 @@ export class AuthService {
       'https://oauth2.googleapis.com/tokeninfo?id_token=' +
         tokens.tokens.id_token,
     );
-    const existingUser = await this.studentService.findOne(
+    const existingUser = await this.studentService.findOneByEmail(
       userinfos.data.email,
     );
 
@@ -337,7 +337,7 @@ export class AuthService {
       googleLoginTokenDto.token,
     );
 
-    const existingUser = await this.studentService.findOne(userinfos.email);
+    const existingUser = await this.studentService.findOneByEmail(userinfos.email);
 
     if (existingUser) {
       const token = jwt.sign(
