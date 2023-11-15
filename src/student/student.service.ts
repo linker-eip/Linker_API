@@ -27,8 +27,12 @@ export class StudentService {
     return this.studentRepository.find();
   }
 
-  async findOne(email: string): Promise<StudentUser | undefined> {
+  async findOneByEmail(email: string): Promise<StudentUser | undefined> {
     return this.studentRepository.findOne({ where: { email } });
+  }
+
+  async findOneById(studentId: number): Promise<StudentUser | undefined> {
+    return this.studentRepository.findOne({ where: {id: studentId}});
   }
 
   async findOneByResetPasswordToken(

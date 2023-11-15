@@ -24,7 +24,7 @@ export class GroupService {
     async createGroup(req: any, createGroupDto: CreateGroupDto) {
         let student;
         try {
-            student = await this.studentService.findOne(req.user.email);
+            student = await this.studentService.findOneByEmail(req.user.email);
         } catch (err) {
             throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED)
         }
@@ -39,24 +39,27 @@ export class GroupService {
         group.picture = createGroupDto.picture;
         group.leaderId = student.id;
         group.studentIds = [student.id]
-        
-        return await this.groupRepository.save(group);
-    }
 
+        await this.groupRepository.save(group);
+        student.groupId = group.id
+        this.studentService.save(student);
+        return (group)
+    }
+    
     async updateGroup(req: any, updateGroupDto: UpdateGroupDto) {
         let group;
-        let student = await this.studentService.findOne(req.user.email)
+        let student = await this.studentService.findOneByEmail(req.user.email)
         try {
             group = await this.groupRepository.findOne({where: {leaderId: student.id}})
         } catch (err) {
             throw new HttpException("Bad request", HttpStatus.BAD_REQUEST);
         }
-
-
+        
+        
         if (group == null) 
-            throw new HttpException("Vous n'êtes pas le chef d'un groupe", HttpStatus.BAD_REQUEST)
-
-        if (updateGroupDto.name != null) {
+        throw new HttpException("Vous n'êtes pas le chef d'un groupe", HttpStatus.BAD_REQUEST)
+    
+    if (updateGroupDto.name != null) {
             group.name = updateGroupDto.name;
         }
         if (updateGroupDto.description != null) {
@@ -68,5 +71,25 @@ export class GroupService {
         await this.groupRepository.save(group);
         return await this.findGroupById(group.id)
     }
+    
+    async deleteGroup(req: any) {
+        let group;
+        let student = await this.studentService.findOneByEmail(req.user.email)
+        try {
+            group = await this.groupRepository.findOne({where: {leaderId: student.id}})
+        } catch (err) {
+            throw new HttpException("Bad request", HttpStatus.BAD_REQUEST);
+        }
 
+        if (group == null) 
+        throw new HttpException("Vous n'êtes pas le chef d'un groupe", HttpStatus.BAD_REQUEST)
+
+        group.studentIds.forEach(async id => {
+            let student = await this.studentService.findOneById(id)
+            student.groupId = null;
+            this.studentService.save(student)
+        });
+
+        this.groupRepository.delete(group.id);
+    }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { GroupService } from './group.service';
@@ -31,5 +31,15 @@ export class GroupController {
         @Body() updateGroupDto: UpdateGroupDto,
     ) {
         return await this.groupService.updateGroup(req, updateGroupDto)
+    }
+
+    @Delete()
+    @ApiOperation({ description: 'Delete a group',
+        summary: 'Delete a group',
+    })
+    async deleteGroup(
+        @Req() req
+    ) {
+        return await this.groupService.deleteGroup(req);
     }
 }
