@@ -6,18 +6,28 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UpdateGroupDto } from './dto/update-group-dto';
 import { GetGroupeResponse } from './dto/get-group-response-dto';
+import { NotificationsService } from 'src/notifications/notifications.service';
+import { NotificationType } from 'src/notifications/entity/Notification.entity';
 
 @Injectable()
 export class GroupService {
     constructor(
         @InjectRepository(Group)
         private readonly groupRepository: Repository<Group>,
-        private readonly studentService: StudentService
+        private readonly studentService: StudentService,
+        private readonly notificationService: NotificationsService
     ) { }
 
     async findGroupById(groupId: number): Promise<Group> {
         const group = await this.groupRepository.findOne({
             where: { id: groupId }
+        })
+        return group
+    }
+
+    async findGroupByName(name: string): Promise<Group> {
+        const group = await this.groupRepository.findOne({
+            where: { name: name }
         })
         return group
     }
@@ -30,8 +40,12 @@ export class GroupService {
             throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED)
         }
 
-        if (student.group != null) {
+        if (student.groupId != null) {
             throw new HttpException('Student already has a group', HttpStatus.BAD_REQUEST)
+        }
+
+        if (await this.findGroupByName(createGroupDto.name) != null) {
+            throw new HttpException('Il existe déjà un groupe portant ce nom', HttpStatus.BAD_REQUEST)
         }
 
         const group = new Group();
@@ -44,6 +58,9 @@ export class GroupService {
         await this.groupRepository.save(group);
         student.groupId = group.id
         this.studentService.save(student);
+
+        this.notificationService.createNotification("Groupe créé", "Le groupe " + group.name + " a bien été créé", NotificationType.GROUP, student.id)
+
         return (group)
     }
 
