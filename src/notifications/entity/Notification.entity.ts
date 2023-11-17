@@ -27,6 +27,9 @@ export class Notification {
     @Column({ type: 'int', nullable: true })
     companyId?: number;
 
+    @Column({ type: 'boolean', nullable: false, default: false })
+    isDeleted: boolean;
+
     @Column({ type: 'boolean', nullable: false, default: false})
     alreadySeen: boolean
 

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { NotificationsService } from './notifications.service';
@@ -26,5 +26,14 @@ export class NotificationsController {
     })
     async updateNotificationsStatus(@Req() req, @Body() ids: number[]) {
         return await this.notificationService.updateNotificationsStatus(req, ids)
+    }
+
+    @Delete(':id')
+    @ApiOperation({
+        description: 'Delete notification by id',
+        summary: 'Delete notification by id',
+    })
+    async deleteNotification(@Req() req, @Param('id') id: number) {
+        return await this.notificationService.deleteNotification(req, id);
     }
 }
