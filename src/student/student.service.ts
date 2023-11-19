@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { StudentUser } from './entity/StudentUser.entity';
@@ -9,6 +9,9 @@ import { StudentProfileResponseDto } from './dto/student-profile-response.dto';
 import { JobsService } from './jobs/jobs.service';
 import { StudiesService } from './studies/studies.service';
 import { FileService } from '../filesystem/file.service';
+import { UpdateSkillDto } from './skills/dto/update-skill.dto';
+import { UpdateJobsDto } from './jobs/dto/update-jobs.dto';
+import { UpdateStudiesDto } from './studies/dto/update-studies.dto';
 
 @Injectable()
 export class StudentService {
@@ -32,7 +35,7 @@ export class StudentService {
   }
 
   async findOneById(studentId: number): Promise<StudentUser | undefined> {
-    return this.studentRepository.findOne({ where: {id: studentId}});
+    return this.studentRepository.findOne({ where: { id: studentId } });
   }
 
   async findOneByResetPasswordToken(
@@ -43,15 +46,17 @@ export class StudentService {
     });
   }
 
-  async findOneByVerificationKey(key: string): Promise<StudentUser | undefined> {
+  async findOneByVerificationKey(
+    key: string,
+  ): Promise<StudentUser | undefined> {
     return this.studentRepository.findOne({
       where: { verificationKey: key },
-    })
+    });
   }
 
-    async save(student: StudentUser): Promise<StudentUser> {
-        return this.studentRepository.save(student);
-    }
+  async save(student: StudentUser): Promise<StudentUser> {
+    return this.studentRepository.save(student);
+  }
 
   async findStudentProfile(email: string) {
     const profile = await this.studentProfileRepository.findOne({
@@ -157,7 +162,7 @@ export class StudentService {
 
     await this.studentProfileRepository.save(studentProfile);
 
-    return studentProfile;
+    return this.findStudentProfile(req.email);
   }
 
   async findStudentProfileByStudentId(Studentid: number) {
@@ -167,4 +172,65 @@ export class StudentService {
     if (!profile) throw new Error(`Could not find student profile`);
     return profile;
   }
+
+  async updateSkill(skillId: number, body: UpdateSkillDto, req: any) {
+
+    const studentProfile = await this.studentProfileRepository.findOne({
+      where: { email: req.email },
+    });
+    if (!studentProfile) {
+      throw new HttpException('Invalid student profile', HttpStatus.UNAUTHORIZED)
+    }
+
+    const skill = await this.skillsService.findSkillById(skillId);
+    if (!skill) {
+      throw new HttpException('Invalid skill', HttpStatus.NOT_FOUND)
+    }
+
+    await this.skillsService.updateSkill(skillId, body);
+
+    return this.findStudentProfile(req.email);
+  }
+
+  async updateJob(jobId: number, body: UpdateJobsDto, req: any) {
+        
+      const studentProfile = await this.studentProfileRepository.findOne({
+        where: { email: req.email },
+      });
+      if (!studentProfile) {
+        throw new HttpException('Invalid student profile', HttpStatus.UNAUTHORIZED)
+      }
+  
+
+      const job = await this.jobsservice.findJobById(jobId);
+      if (!job) {
+        throw new HttpException('Invalid job', HttpStatus.NOT_FOUND)
+      }
+
+  
+      await this.jobsservice.updateJob(jobId, body);
+  
+      return this.findStudentProfile(req.email);
+    }
+
+  async updateStudies(studiesId: number, body: UpdateStudiesDto, req: any) {
+          
+        const studentProfile = await this.studentProfileRepository.findOne({
+          where: { email: req.email },
+        });
+        if (!studentProfile) {
+          throw new HttpException('Invalid student profile', HttpStatus.UNAUTHORIZED)
+        }
+    
+  
+        const studies = await this.studiesService.findStudieById(studiesId);
+        if (!studies) {
+          throw new HttpException('Invalid studies', HttpStatus.NOT_FOUND)
+        }
+  
+    
+        await this.studiesService.updateStudie(studiesId, body);
+    
+        return this.findStudentProfile(req.email);
+      }
 }

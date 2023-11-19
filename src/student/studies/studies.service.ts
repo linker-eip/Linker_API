@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Studies } from './entity/studies.entity';
 import { Repository } from 'typeorm';
 import { StudentProfile } from '../entity/StudentProfile.entity';
+import { UpdateStudiesDto } from './dto/update-studies.dto';
 
 @Injectable()
 export class StudiesService {
@@ -40,5 +41,20 @@ export class StudiesService {
     return this.studiesRepository.find({
       where: { studentProfile: { id: studentProfileId } },
     });
+  }
+
+  async findStudieById(id: number): Promise<Studies> {
+    return this.studiesRepository.findOne({ where: { id } });
+  }
+
+  async updateStudie(id: number, studies: UpdateStudiesDto): Promise<Studies> {
+    const studie = await this.findStudieById(id);
+    studie.name = studies.name;
+    studie.logo = studies.logo;
+    studie.city = studies.city;
+    studie.duration = studies.duration;
+    studie.description = studies.description;
+
+    return this.studiesRepository.save(studie);
   }
 }

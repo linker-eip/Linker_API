@@ -3,6 +3,7 @@ import { Jobs } from './entity/jobs.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { StudentProfile } from '../entity/StudentProfile.entity';
+import { UpdateJobsDto } from './dto/update-jobs.dto';
 
 @Injectable()
 export class JobsService {
@@ -40,5 +41,20 @@ export class JobsService {
     return this.jobsRepository.find({
       where: { studentProfile: { id: studentProfileId } },
     });
+  }
+
+  async findJobById(id: number): Promise<Jobs> {
+    return this.jobsRepository.findOne({ where: { id } });
+  }
+
+  async updateJob(id: number, jobs: UpdateJobsDto): Promise<Jobs> {
+    const job = await this.findJobById(id);
+    job.name = jobs.name;
+    job.logo = jobs.logo;
+    job.city = jobs.city;
+    job.duration = jobs.duration;
+    job.description = jobs.description;
+
+    return this.jobsRepository.save(job);
   }
 }

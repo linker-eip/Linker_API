@@ -1,19 +1,22 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { StudentProfile } from "../../entity/StudentProfile.entity";
+import { ApiProperty } from '@nestjs/swagger';
+import { StudentProfile } from '../../entity/StudentProfile.entity';
 
 export class JobsDto {
-    @ApiProperty()
-    name: string;
+  @ApiProperty()
+  id: number;
 
-    @ApiProperty()
-    logo: string;
+  @ApiProperty()
+  name: string;
 
-    @ApiProperty()
-    city: string;
+  @ApiProperty()
+  logo: string;
 
-    @ApiProperty()
-    duration: string;
+  @ApiProperty()
+  city: string;
 
-    @ApiProperty()
-    description: string;
+  @ApiProperty()
+  duration: string;
+
+  @ApiProperty()
+  description: string;
 }
