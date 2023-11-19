@@ -174,17 +174,19 @@ export class StudentService {
   }
 
   async updateSkill(skillId: number, body: UpdateSkillDto, req: any) {
-
     const studentProfile = await this.studentProfileRepository.findOne({
       where: { email: req.email },
     });
     if (!studentProfile) {
-      throw new HttpException('Invalid student profile', HttpStatus.UNAUTHORIZED)
+      throw new HttpException(
+        'Invalid student profile',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
 
     const skill = await this.skillsService.findSkillById(skillId);
     if (!skill) {
-      throw new HttpException('Invalid skill', HttpStatus.NOT_FOUND)
+      throw new HttpException('Invalid skill', HttpStatus.NOT_FOUND);
     }
 
     await this.skillsService.updateSkill(skillId, body);
@@ -193,44 +195,105 @@ export class StudentService {
   }
 
   async updateJob(jobId: number, body: UpdateJobsDto, req: any) {
-        
-      const studentProfile = await this.studentProfileRepository.findOne({
-        where: { email: req.email },
-      });
-      if (!studentProfile) {
-        throw new HttpException('Invalid student profile', HttpStatus.UNAUTHORIZED)
-      }
-  
-
-      const job = await this.jobsservice.findJobById(jobId);
-      if (!job) {
-        throw new HttpException('Invalid job', HttpStatus.NOT_FOUND)
-      }
-
-  
-      await this.jobsservice.updateJob(jobId, body);
-  
-      return this.findStudentProfile(req.email);
+    const studentProfile = await this.studentProfileRepository.findOne({
+      where: { email: req.email },
+    });
+    if (!studentProfile) {
+      throw new HttpException(
+        'Invalid student profile',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
 
+    const job = await this.jobsservice.findJobById(jobId);
+    if (!job) {
+      throw new HttpException('Invalid job', HttpStatus.NOT_FOUND);
+    }
+
+    await this.jobsservice.updateJob(jobId, body);
+
+    return this.findStudentProfile(req.email);
+  }
+
   async updateStudies(studiesId: number, body: UpdateStudiesDto, req: any) {
-          
-        const studentProfile = await this.studentProfileRepository.findOne({
-          where: { email: req.email },
-        });
-        if (!studentProfile) {
-          throw new HttpException('Invalid student profile', HttpStatus.UNAUTHORIZED)
-        }
-    
-  
-        const studies = await this.studiesService.findStudieById(studiesId);
-        if (!studies) {
-          throw new HttpException('Invalid studies', HttpStatus.NOT_FOUND)
-        }
-  
-    
-        await this.studiesService.updateStudie(studiesId, body);
-    
-        return this.findStudentProfile(req.email);
-      }
+    const studentProfile = await this.studentProfileRepository.findOne({
+      where: { email: req.email },
+    });
+    if (!studentProfile) {
+      throw new HttpException(
+        'Invalid student profile',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const studies = await this.studiesService.findStudieById(studiesId);
+    if (!studies) {
+      throw new HttpException('Invalid studies', HttpStatus.NOT_FOUND);
+    }
+
+    await this.studiesService.updateStudie(studiesId, body);
+
+    return this.findStudentProfile(req.email);
+  }
+
+  async deleteSkill(skillId: number, req: any) {
+    const studentProfile = await this.studentProfileRepository.findOne({
+      where: { email: req.email },
+    });
+    if (!studentProfile) {
+      throw new HttpException(
+        'Invalid student profile',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const skill = await this.skillsService.findSkillById(skillId);
+    if (!skill) {
+      throw new HttpException('Invalid skill', HttpStatus.NOT_FOUND);
+    }
+
+    await this.skillsService.deleteSkill(skillId);
+
+    return this.findStudentProfile(req.email);
+  }
+
+  async deleteJob(jobId: number, req: any) {
+    const studentProfile = await this.studentProfileRepository.findOne({
+      where: { email: req.email },
+    });
+    if (!studentProfile) {
+      throw new HttpException(
+        'Invalid student profile',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    const job = await this.jobsservice.findJobById(jobId);
+    if (!job) {
+      throw new HttpException('Invalid job', HttpStatus.NOT_FOUND);
+    }
+
+    await this.jobsservice.deleteJob(jobId);
+
+    return this.findStudentProfile(req.email);
+  }
+
+  async deleteStudies(studiesId: number, req: any) {
+    const studentProfile = await this.studentProfileRepository.findOne({
+      where: { email: req.email },
+    });
+    if (!studentProfile) {
+      throw new HttpException(
+        'Invalid student profile',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    const studies = await this.studiesService.findStudieById(studiesId);
+    if (!studies) {
+      throw new HttpException('Invalid studies', HttpStatus.NOT_FOUND);
+    }
+
+    await this.studiesService.deleteStudie(studiesId);
+
+    return this.findStudentProfile(req.email);
+  }
 }

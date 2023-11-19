@@ -9,6 +9,7 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  Delete
 } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { Get } from '@nestjs/common';
@@ -76,7 +77,6 @@ export class StudentController {
     );
   }
 
-
   @Put('skill/:id')
   @ApiOperation({
     description: 'Update student skill',
@@ -90,7 +90,7 @@ export class StudentController {
   async updateSkill(
     @Body() body: UpdateSkillDto,
     @Req() req,
-    @Param('id') id: number
+    @Param('id') id: number,
   ) {
     return this.studentService.updateSkill(id, body, req.user);
   }
@@ -108,7 +108,7 @@ export class StudentController {
   async updateJob(
     @Body() body: UpdateJobsDto,
     @Req() req,
-    @Param('id') id: number
+    @Param('id') id: number,
   ) {
     return this.studentService.updateJob(id, body, req.user);
   }
@@ -126,9 +126,50 @@ export class StudentController {
   async updateStudies(
     @Body() body: UpdateStudiesDto,
     @Req() req,
-    @Param('id') id: number
+    @Param('id') id: number,
   ) {
     return this.studentService.updateStudies(id, body, req.user);
   }
 
+  @Delete('skill/:id')
+  @ApiOperation({
+    description: 'Delete student skill',
+    summary: 'Delete student skill',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Delete student skill',
+    type: StudentProfileResponseDto,
+  })
+  async deleteSkill(@Req() req, @Param('id') id: number) {
+    return this.studentService.deleteSkill(id, req.user);
+  }
+
+  @Delete('job/:id')
+  @ApiOperation({
+    description: 'Delete student job',
+    summary: 'Delete student job',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Delete student job',
+    type: StudentProfileResponseDto,
+  })
+  async deleteJob(@Req() req, @Param('id') id: number) {
+    return this.studentService.deleteJob(id, req.user);
+  }
+
+  @Delete('studies/:id')
+  @ApiOperation({
+    description: 'Delete student studies',
+    summary: 'Delete student studies',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Delete student studies',
+    type: StudentProfileResponseDto,
+  })
+  async deleteStudies(@Req() req, @Param('id') id: number) {
+    return this.studentService.deleteStudies(id, req.user);
+  }
 }

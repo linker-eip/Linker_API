@@ -57,4 +57,9 @@ export class StudiesService {
 
     return this.studiesRepository.save(studie);
   }
+
+  async deleteStudie(id: number) {
+    const studie = await this.findStudieById(id);
+    return this.studiesRepository.remove(studie);
+  }
 }

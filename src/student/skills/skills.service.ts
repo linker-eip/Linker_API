@@ -54,4 +54,9 @@ export class SkillsService {
     });
   }
 
+  async deleteSkill(skillId: number) {
+    const skill = await this.findSkillById(skillId);
+    return this.skillsRepository.remove(skill);
+  }
+
 }

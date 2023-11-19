@@ -57,4 +57,9 @@ export class JobsService {
 
     return this.jobsRepository.save(job);
   }
+
+  async deleteJob(id: number) {
+    const job = await this.findJobById(id);
+    return this.jobsRepository.remove(job);
+  }
 }
