@@ -244,4 +244,30 @@ export class MissionService {
 
     return await this.missionTaskRepository.delete(missionTask.id);
   }
+
+  async getMissionTasks(missionId: number, req: any) {
+    let company = null;
+    try {
+      company = await this.companyService.findOne(req.user.email);
+    } catch (err) {
+      throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
+    }
+
+    if (typeof missionId !== 'number' || isNaN(missionId)) {
+      throw new HttpException(
+        'Invalid missionId. Please provide a valid number',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const mission = await this.findMissionById(missionId);
+
+    if (mission == null || mission.companyId != company.id) {
+      throw new HttpException('Invalid mission', HttpStatus.NOT_FOUND);
+    }
+
+    return await this.missionTaskRepository.find({
+      where: { missionId },
+    });
+  }
 }
