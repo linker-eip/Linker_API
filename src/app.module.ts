@@ -18,6 +18,10 @@ import { MissionModule } from './mission/mission.module';
 import { SiretService } from './siret/siret.service';
 import { SiretController } from './siret/siret.controller';
 import { InvoiceModule } from './invoice/invoice.module';
+import { GroupController } from './group/group.controller';
+import { GroupService } from './group/group.service';
+import { GroupModule } from './group/group.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -52,7 +56,9 @@ import { InvoiceModule } from './invoice/invoice.module';
     AdminModule,
     FileModule,
     MissionModule,
-    InvoiceModule
+    InvoiceModule,
+    GroupModule,
+    NotificationsModule
   ],
   controllers: [FileController, SiretController],
   providers: [JwtStrategy, SiretService],
