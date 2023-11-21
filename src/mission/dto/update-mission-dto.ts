@@ -33,5 +33,9 @@ export class UpdateMissionDto {
   @IsNumber(undefined, { message: "Le montant doit être un nombre" })
   @IsOptional()
   amount: number;
-  
+
+  @ApiProperty({ description: "Compétences" })
+  @IsString({ message: "Les compétences doivent être une chaîne de caractères" })
+  @IsOptional()
+  skills: string;
 }
