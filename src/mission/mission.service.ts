@@ -131,6 +131,9 @@ export class MissionService {
     } catch (err) {
       throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
     }
+    if (company == null) {
+      throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
+    }
     return this.findAllByCompanyId(company.id);
   }
 
