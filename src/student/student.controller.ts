@@ -1,4 +1,4 @@
-import { Body, Controller, FileTypeValidator, ParseFilePipe, Put, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, FileTypeValidator, HttpStatus, MaxFileSizeValidator, ParseFilePipe, Put, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { Get } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -6,6 +6,7 @@ import { CreateStudentProfileDto } from './dto/create-student-profile.dto';
 import { StudentProfileResponseDto } from './dto/student-profile-response.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { FileMimeTypeValidator, SupportedImageMimeTypes } from 'src/document-transfer/src/helpers/fmt.validator';
 
 @Controller('api/student')
 @UseGuards(AuthGuard('jwt'))
@@ -14,6 +15,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class StudentController {
     constructor(private readonly studentService: StudentService) {}
 
+
+    
     @Get('profile')
     @ApiOperation({
       description: 'Get student profile',
@@ -40,14 +43,20 @@ export class StudentController {
     })
     @UseInterceptors(FileInterceptor('picture'))
     async updateStudentProfile(
-    @UploadedFile(
-      new ParseFilePipe({
-        validators: [
-          new FileTypeValidator({ fileType: 'image/jpeg' }),
-        ],
-        fileIsRequired: false,
-      })
-    ) picture,
+      @UploadedFile(
+        new ParseFilePipe({
+          fileIsRequired: true,
+          errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+          validators: [
+            new MaxFileSizeValidator({
+              maxSize: 3_500_000,
+            }),
+            new FileMimeTypeValidator({
+              mimeTypes: SupportedImageMimeTypes
+            })
+          ]
+        })
+      ) picture,
     @Req() req,
     @Body() CreateStudentProfile: CreateStudentProfileDto,
     ) {

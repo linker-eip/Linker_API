@@ -22,6 +22,7 @@ import { GroupController } from './group/group.controller';
 import { GroupService } from './group/group.service';
 import { GroupModule } from './group/group.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { DocumentTransferModule } from './document-transfer/src/document-transfer.module';
 
 @Module({
   imports: [
@@ -58,7 +59,8 @@ import { NotificationsModule } from './notifications/notifications.module';
     MissionModule,
     InvoiceModule,
     GroupModule,
-    NotificationsModule
+    NotificationsModule,
+    DocumentTransferModule
   ],
   controllers: [FileController, SiretController],
   providers: [JwtStrategy, SiretService],
