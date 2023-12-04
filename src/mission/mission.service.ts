@@ -182,6 +182,10 @@ export class MissionService {
       where: { id: taskId },
     });
 
+    if (missionTask == null) {
+      throw new HttpException('Invalid mission task', HttpStatus.NOT_FOUND);
+    }
+
     const mission = await this.findMissionById(missionTask.missionId);
 
     if (mission == null || mission.companyId != company.id) {
