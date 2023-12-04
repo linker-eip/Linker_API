@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GroupService } from './group.service';
 import { CreateGroupDto } from './dto/create-group-dto';
 import { UpdateGroupDto } from './dto/update-group-dto';
@@ -49,6 +49,15 @@ export class GroupController {
     @ApiOperation({
         description: 'Get your group',
         summary: 'Get your group',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Group found',
+        type: GetGroupeResponse
+    })
+    @ApiResponse({
+        status: 404,
+        description: 'Group not found',
     })
     async getGroup(
         @Req() req
