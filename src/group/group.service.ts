@@ -13,6 +13,7 @@ import { GroupInvite } from './entity/GroupInvite.entity';
 
 @Injectable()
 export class GroupService {
+
     constructor(
         @InjectRepository(Group)
         private readonly groupRepository: Repository<Group>,
@@ -187,10 +188,29 @@ export class GroupService {
 
     async cancelInvite(req: any, userId: number) {
         let group = await this.getUserGroup(req)
+        let student = await this.studentService.findOneByEmail(req.user.email)
+
+        if (group.leaderId != student.id) {
+            throw new HttpException("Vous n'êtes pas le chef d'un groupe", 400)
+        }
 
         let groupInvite = await this.groupInviteRepository.findOne({where: {userId: userId, groupId: group.id}})
         if (groupInvite) {
             this.groupInviteRepository.delete(groupInvite);
         }
+    }
+
+    async getInvites(req: any, userId: number): Promise<number[]> {
+        let group = await this.getUserGroup(req)
+        let student = await this.studentService.findOneByEmail(req.user.email)
+
+        if (group.leaderId != student.id) {
+            throw new HttpException("Vous n'êtes pas le chef d'un groupe", 400)
+        }
+
+        let groupInvites = await this.groupInviteRepository.findBy({groupId: group.id})
+
+        return groupInvites.map(it => it.id)
+
     }
 }

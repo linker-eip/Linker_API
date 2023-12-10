@@ -99,7 +99,28 @@ export class GroupController {
         status: 200,
         description: 'Successfully cancelled',
     })
+    @ApiResponse({
+        status: 400,
+        description: 'You are not the group leader',
+    })
     async cancelInvite(@Req() req, @Param('userId') userId: number) {
         return await this.groupService.cancelInvite(req, userId);
+    }
+
+    @Get('/groupInvites')
+    @ApiOperation({
+        description: 'See who you invited to your group',
+        summary: 'See who you invited to your group',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Successfully got invites',
+    })
+    @ApiResponse({
+        status: 400,
+        description: 'You are not the group leader',
+    })
+    async getGroupInvites(@Req() req, @Param('userId') userId: number): Promise<number[]> {
+        return await this.groupService.getInvites(req, userId);
     }
 }
