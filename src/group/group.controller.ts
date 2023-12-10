@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GroupService } from './group.service';
@@ -63,5 +63,30 @@ export class GroupController {
         @Req() req
     ): Promise<GetGroupeResponse> {
         return await this.groupService.getGroup(req);
+    }
+
+    @Get('/invite/:userId')
+    @ApiOperation({
+        description: 'Invite user to your group',
+        summary: 'Invite user to your group',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Successfully invited',
+    })
+    @ApiResponse({
+        status: 404,
+        description: 'Unknown user',
+    })
+    @ApiResponse({
+        status: 409,
+        description: 'User already has a group',
+    })
+    @ApiResponse({
+        status: 400,
+        description: 'You are not the group leader',
+    })
+    async inviteUser(@Req() req, @Param('userId') userId: number) {
+        return await this.groupService.inviteUser(req, userId);
     }
 }

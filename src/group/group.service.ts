@@ -8,15 +8,35 @@ import { UpdateGroupDto } from './dto/update-group-dto';
 import { GetGroupeResponse } from './dto/get-group-response-dto';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { NotificationType } from 'src/notifications/entity/Notification.entity';
+import { Request } from 'express';
+import { GroupInvite } from './entity/GroupInvite.entity';
 
 @Injectable()
 export class GroupService {
     constructor(
         @InjectRepository(Group)
         private readonly groupRepository: Repository<Group>,
+        @InjectRepository(GroupInvite)
+        private readonly groupInviteRepository: Repository<GroupInvite>,
         private readonly studentService: StudentService,
         private readonly notificationService: NotificationsService
     ) { }
+
+    async getUserGroup(req: any) : Promise<Group> {
+        let group;
+        let student = await this.studentService.findOneByEmail(req.user.email)
+        try {
+            group = await this.groupRepository.findOne({ where: { id: student.groupId } })
+        } catch (err) {
+            throw new HttpException("Bad request", HttpStatus.BAD_REQUEST);
+        }
+
+        if (group == null) {
+            throw new HttpException("Vous n'avez pas de groupe", HttpStatus.NOT_FOUND);
+        }
+
+        return group;
+    }
 
     async findGroupById(groupId: number): Promise<Group> {
         const group = await this.groupRepository.findOne({
@@ -133,5 +153,35 @@ export class GroupService {
             isLeader: group.leaderId == student.id
         }
         return response;
+    }
+
+    async inviteUser(req: any, userId: number) {
+        let group = await this.getUserGroup(req)
+        let student = await this.studentService.findOneByEmail(req.user.email)
+
+        if (group.leaderId != student.id) {
+            throw new HttpException("Vous n'êtes pas le chef d'un groupe", 400)
+        }
+
+        let invitedStudent = await this.studentService.findOneById(userId);
+        if (invitedStudent == null) {
+            throw new HttpException("Cet étudiant n'existe pas", HttpStatus.NOT_FOUND)
+        }
+
+        if (invitedStudent.groupId != null) {
+            throw new HttpException("Cet étudiant a déjà un groupe", HttpStatus.CONFLICT)
+        }
+
+        if (await this.groupInviteRepository.findOne({where: {userId: invitedStudent.id, groupId: group.id}}) != null) {
+            throw new HttpException("Vous avez déjà invité cet étudiant", HttpStatus.BAD_REQUEST)
+        }
+
+        let groupInvite = new GroupInvite();
+
+        groupInvite.groupId = group.id;
+        groupInvite.userId = invitedStudent.id;
+
+        this.groupInviteRepository.save(groupInvite);
+        this.notificationService.createNotification("Invitation", "Vous avez été invité à rejoindre le groupe " + group.name, NotificationType.GROUP, invitedStudent.id)
     }
 }
