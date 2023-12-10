@@ -2,9 +2,10 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from 
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GroupService } from './group.service';
-import { CreateGroupDto } from './dto/create-group-dto';
-import { UpdateGroupDto } from './dto/update-group-dto';
-import { GetGroupeResponse } from './dto/get-group-response-dto';
+import { CreateGroupDto } from './get-invites-response-dto.ts/create-group-dto';
+import { UpdateGroupDto } from './get-invites-response-dto.ts/update-group-dto';
+import { GetGroupeResponse } from './get-invites-response-dto.ts/get-group-response-dto';
+import { GetInvitesResponse } from './dto/get-invites-response-dto';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
@@ -109,8 +110,8 @@ export class GroupController {
 
     @Get('/groupInvites')
     @ApiOperation({
-        description: 'See who you invited to your group',
-        summary: 'See who you invited to your group',
+        description: 'Get invited users ids',
+        summary: 'Get invited users ids',
     })
     @ApiResponse({
         status: 200,
@@ -120,7 +121,20 @@ export class GroupController {
         status: 400,
         description: 'You are not the group leader',
     })
-    async getGroupInvites(@Req() req, @Param('userId') userId: number): Promise<number[]> {
-        return await this.groupService.getInvites(req, userId);
+    async getGroupInvites(@Req() req): Promise<number[]> {
+        return await this.groupService.getGroupInvites(req);
+    }
+
+    @Get('/invites')
+    @ApiOperation({
+        description: 'Get group that invited you ids',
+        summary: 'Get group that invited you ids',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Successfully got invites',
+    })
+    async getInvites(@Req() req): Promise<GetInvitesResponse[]> {
+        return await this.groupService.getInvites(req);
     }
 }

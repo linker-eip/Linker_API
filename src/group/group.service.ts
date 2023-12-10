@@ -1,19 +1,19 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateGroupDto } from './dto/create-group-dto';
+import { CreateGroupDto } from './get-invites-response-dto.ts/create-group-dto';
 import { StudentService } from 'src/student/student.service';
 import { Group } from './entity/Group.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UpdateGroupDto } from './dto/update-group-dto';
-import { GetGroupeResponse } from './dto/get-group-response-dto';
+import { UpdateGroupDto } from './get-invites-response-dto.ts/update-group-dto';
+import { GetGroupeResponse } from './get-invites-response-dto.ts/get-group-response-dto';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { NotificationType } from 'src/notifications/entity/Notification.entity';
 import { Request } from 'express';
 import { GroupInvite } from './entity/GroupInvite.entity';
+import { GetInvitesResponse } from './dto/get-invites-response-dto';
 
 @Injectable()
 export class GroupService {
-
     constructor(
         @InjectRepository(Group)
         private readonly groupRepository: Repository<Group>,
@@ -200,7 +200,7 @@ export class GroupService {
         }
     }
 
-    async getInvites(req: any, userId: number): Promise<number[]> {
+    async getGroupInvites(req: any): Promise<number[]> {
         let group = await this.getUserGroup(req)
         let student = await this.studentService.findOneByEmail(req.user.email)
 
@@ -210,7 +210,21 @@ export class GroupService {
 
         let groupInvites = await this.groupInviteRepository.findBy({groupId: group.id})
 
-        return groupInvites.map(it => it.id)
+        return groupInvites.map(it => it.userId)
 
+    }
+
+    async getInvites(req: any): Promise<GetInvitesResponse[]> {
+        let student = await this.studentService.findOneByEmail(req.user.email)
+
+        let groupInvites = await this.groupInviteRepository.findBy({userId: student.id})
+
+        let groups = Promise.all(groupInvites.map(async it => {
+            let group = await this.groupRepository.findOne({where: {id: it.groupId}})
+            let response : GetInvitesResponse = {id: group.id, name: group.name, picture: group.picture}
+            return response
+        }))
+
+        return groups
     }
 }
