@@ -184,4 +184,13 @@ export class GroupService {
         this.groupInviteRepository.save(groupInvite);
         this.notificationService.createNotification("Invitation", "Vous avez été invité à rejoindre le groupe " + group.name, NotificationType.GROUP, invitedStudent.id)
     }
+
+    async cancelInvite(req: any, userId: number) {
+        let group = await this.getUserGroup(req)
+
+        let groupInvite = await this.groupInviteRepository.findOne({where: {userId: userId, groupId: group.id}})
+        if (groupInvite) {
+            this.groupInviteRepository.delete(groupInvite);
+        }
+    }
 }

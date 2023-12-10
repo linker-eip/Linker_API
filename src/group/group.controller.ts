@@ -89,4 +89,17 @@ export class GroupController {
     async inviteUser(@Req() req, @Param('userId') userId: number) {
         return await this.groupService.inviteUser(req, userId);
     }
+
+    @Delete('/invite/:userId')
+    @ApiOperation({
+        description: 'Cancel user invitation',
+        summary: 'Cancel user invitation',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Successfully cancelled',
+    })
+    async cancelInvite(@Req() req, @Param('userId') userId: number) {
+        return await this.groupService.cancelInvite(req, userId);
+    }
 }
