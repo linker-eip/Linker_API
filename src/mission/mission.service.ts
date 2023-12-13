@@ -13,6 +13,12 @@ import { UpdateMissionDto } from './dto/update-mission-dto';
 import { CreateMissionTaskDto } from './dto/create-mission-task.dto';
 import { MissionTask } from './entity/mission-task.entity';
 import { UpdateMissionTaskDto } from './dto/update-mission-task.dto';
+import { GroupService } from '../group/group.service';
+import { StudentService } from '../student/student.service';
+import { MissionInvite } from './entity/mission-invite.entity';
+import { MissionInviteStatus } from './enum/mission-invite-status.enum';
+import { MissionStatus } from './enum/mission-status.enum';
+import { MissionTaskStatus } from './enum/mission-task-status.enum';
 
 @Injectable()
 export class MissionService {
@@ -22,6 +28,10 @@ export class MissionService {
     private readonly companyService: CompanyService,
     @InjectRepository(MissionTask)
     private readonly missionTaskRepository: Repository<MissionTask>,
+    private readonly groupService: GroupService,
+    private readonly studentService: StudentService,
+    @InjectRepository(MissionInvite)
+    private readonly missionInviteRepository: Repository<MissionInvite>,
   ) {}
 
   async findMissionById(missionId: number): Promise<Mission> {
@@ -276,5 +286,140 @@ export class MissionService {
     return await this.missionTaskRepository.find({
       where: { missionId },
     });
+  }
+
+  async acceptMission(missionId: number, groupId: number, req: any) {
+    let missionInvite = await this.missionInviteRepository.findOne({
+      where: { missionId, groupId },
+    });
+
+    if (missionInvite == null) {
+      throw new HttpException('Invalid mission invite', HttpStatus.NOT_FOUND);
+    }
+    let student = null;
+    try {
+      student = await this.studentService.findOneByEmail(req.user.email);
+    } catch (err) {
+      throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED);
+    }
+    if (student == null) {
+      throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED);
+    }
+    let mission = await this.findMissionById(missionId);
+    if (mission == null) {
+      throw new HttpException('Invalid mission', HttpStatus.NOT_FOUND);
+    }
+    let group = await this.groupService.findGroupById(groupId);
+    if (group == null) {
+      throw new HttpException('Invalid group', HttpStatus.NOT_FOUND);
+    }
+
+    if (group.leaderId != student.id) {
+      throw new HttpException(
+        'Only the group leader can accept a mission',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    if (mission.groupId != null) {
+      throw new HttpException(
+        'This mission is already accepted by a group',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    mission.groupId = groupId;
+    missionInvite.status = MissionInviteStatus.ACCEPTED;
+
+    await this.missionRepository.save(mission);
+    await this.missionInviteRepository.save(missionInvite);
+    return;
+  }
+
+  async refuseMission(missionId: number, groupId: number, req: any) {
+    let missionInvite = await this.missionInviteRepository.findOne({
+      where: { missionId, groupId },
+    });
+
+    if (missionInvite == null) {
+      throw new HttpException('Invalid mission invite', HttpStatus.NOT_FOUND);
+    }
+    let student = null;
+    try {
+      student = await this.studentService.findOneByEmail(req.user.email);
+    } catch (err) {
+      throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED);
+    }
+    if (student == null) {
+      throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED);
+    }
+    let mission = await this.findMissionById(missionId);
+    if (mission == null) {
+      throw new HttpException('Invalid mission', HttpStatus.NOT_FOUND);
+    }
+    let group = await this.groupService.findGroupById(groupId);
+    if (group == null) {
+      throw new HttpException('Invalid group', HttpStatus.NOT_FOUND);
+    }
+
+    if (group.leaderId != student.id) {
+      throw new HttpException(
+        'Only the group leader can refuse a mission',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    missionInvite.status = MissionInviteStatus.REFUSED;
+
+    await this.missionInviteRepository.save(missionInvite);
+    return;
+  }
+
+  async finishMission(missionId: number, req: any) {
+    let mission = await this.findMissionById(missionId);
+    if (mission == null) {
+      throw new HttpException('Invalid mission', HttpStatus.NOT_FOUND);
+    }
+    let company = null;
+    try {
+      company = await this.companyService.findOne(req.user.email);
+    } catch (err) {
+      throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
+    }
+
+    if (company == null) {
+      throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
+    }
+
+    if (mission.companyId != company.id) {
+      throw new HttpException(
+        'You can only finish your own missions',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    let missionTasks = await this.missionTaskRepository.find({
+      where: { missionId },
+    });
+
+    for (let missionTask of missionTasks) {
+      if (missionTask.status != MissionTaskStatus.FINISHED) {
+        throw new HttpException(
+          'You can only finish a mission if all tasks are finished',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+
+    if (mission.status == MissionStatus.FINISHED) {
+      throw new HttpException(
+        'This mission is already finished',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    mission.status = MissionStatus.FINISHED;
+
+    await this.missionRepository.save(mission);
   }
 }

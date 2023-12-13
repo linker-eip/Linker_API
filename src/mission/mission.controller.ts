@@ -125,4 +125,39 @@ export class MissionController {
   async getMissionTasks(@Param('missionId') missionId: number, @Req() req) {
     return await this.missionService.getMissionTasks(missionId, req);
   }
+
+  @Post('accept/:missionId/:groupId')
+  @ApiOperation({
+    description: 'Accept a mission for a group',
+    summary: 'Accept a mission for a group',
+  })
+  async acceptMission(
+    @Param('missionId') missionId: number,
+    @Param('groupId') groupId: number,
+    @Req() req,
+  ) {
+    return await this.missionService.acceptMission(missionId, groupId, req);
+  }
+
+  @Post('refuse/:missionId/:groupId')
+  @ApiOperation({
+    description: 'Refuse a mission for a group',
+    summary: 'Refuse a mission for a group',
+  })
+  async refuseMission(
+    @Param('missionId') missionId: number,
+    @Param('groupId') groupId: number,
+    @Req() req,
+  ) {
+    return await this.missionService.refuseMission(missionId, groupId, req);
+  }
+
+  @Post('finish/:missionId')
+  @ApiOperation({
+    description: 'Finish a mission',
+    summary: 'Finish a mission',
+  })
+  async finishMission(@Param('missionId') missionId: number, @Req() req) {
+    return await this.missionService.finishMission(missionId, req);
+  }
 }
