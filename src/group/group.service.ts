@@ -220,10 +220,6 @@ export class GroupService {
     async getInvites(req: any): Promise<GetInvitesResponse[]> {
         let student = await this.studentService.findOneByEmail(req.user.email)
 
-        if (student.groupId == null) {
-            throw new HttpException("Vous n'avez pas de groupe", HttpStatus.NOT_FOUND);
-        }
-
         let groupInvites = await this.groupInviteRepository.findBy({userId: student.id})
 
         let groups = Promise.all(groupInvites.map(async it => {

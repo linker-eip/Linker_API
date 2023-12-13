@@ -127,8 +127,8 @@ export class GroupController {
 
     @Get('/invites')
     @ApiOperation({
-        description: 'Get group that invited you ids',
-        summary: 'Get group that invited you ids',
+        description: 'Get group that invited you',
+        summary: 'Get group that invited you',
     })
     @ApiResponse({
         status: 200,
