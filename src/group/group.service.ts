@@ -114,6 +114,9 @@ export class GroupService {
     async getGroup(req: any): Promise<GetGroupeResponse> {
         let group;
         let student = await this.studentService.findOneByEmail(req.user.email)
+        if (student.groupId == null) {
+            throw new HttpException("Vous n'avez pas de groupe", HttpStatus.NOT_FOUND);
+        }
         try {
             group = await this.groupRepository.findOne({ where: { id: student.groupId } })
         } catch (err) {
