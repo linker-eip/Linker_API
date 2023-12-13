@@ -137,4 +137,22 @@ export class GroupController {
     async getInvites(@Req() req): Promise<GetInvitesResponse[]> {
         return await this.groupService.getInvites(req);
     }
+
+    @Post('/invites/accept/:groupId')
+    @ApiOperation({
+        description: 'Accept group invitation from its id',
+        summary: 'Accept group invitation from its id',
+    })
+    async acceptInvite(@Req() req, @Param('groupId') groupId: number) {
+        return await this.groupService.acceptInvite(req, groupId);
+    }
+
+    @Post('/invites/refuse/:groupId')
+    @ApiOperation({
+        description: 'Accept group invitation from its id',
+        summary: 'Accept group invitation from its id',
+    })
+    async refuseInvite(@Req() req, @Param('groupId') groupId: number) {
+        return await this.groupService.refuseInvite(req, groupId);
+    }
 }

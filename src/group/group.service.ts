@@ -230,4 +230,42 @@ export class GroupService {
 
         return groups
     }
+
+    async acceptInvite(req: any, groupId: number) {
+        let student = await this.studentService.findOneByEmail(req.user.email)
+
+        let groupInvite = await this.groupInviteRepository.findOne({where:{userId: student.id, groupId: groupId}})
+
+        if (groupInvite == null) {
+            throw new HttpException("Invitation invalide", HttpStatus.BAD_REQUEST);
+        }
+
+        let group = await this.groupRepository.findOne({where: {id: groupInvite.groupId}})
+
+        group.studentIds.push(student.id);
+        student.groupId = group.id;
+
+        await this.groupInviteRepository.delete({userId: student.id});
+
+        await this.groupRepository.save(group);
+        await this.studentService.save(student);
+
+        this.notificationService.createNotification("Invitation acceptée",student.firstName + " " + student.lastName + " a accepté de rejoindre votre groupe", NotificationType.GROUP, group.leaderId)
+    }
+
+    async refuseInvite(req: any, groupId: number) {
+        let student = await this.studentService.findOneByEmail(req.user.email)
+
+        let groupInvite = await this.groupInviteRepository.findOne({where:{userId: student.id, groupId: groupId}})
+
+        if (groupInvite == null) {
+            throw new HttpException("Invitation invalide", HttpStatus.BAD_REQUEST);
+        }
+
+        let group = await this.groupRepository.findOne({where: {id: groupInvite.groupId}})
+
+        await this.groupInviteRepository.delete(groupInvite);
+
+        this.notificationService.createNotification("Invitation refusée",student.firstName + " " + student.lastName + " a refusé de rejoindre votre groupe", NotificationType.GROUP, group.leaderId)
+    }
 }
