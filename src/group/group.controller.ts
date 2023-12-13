@@ -66,7 +66,7 @@ export class GroupController {
         return await this.groupService.getGroup(req);
     }
 
-    @Get('/invite/:userId')
+    @Post('/invite/:userId')
     @ApiOperation({
         description: 'Invite user to your group',
         summary: 'Invite user to your group',
