@@ -1,10 +1,11 @@
-import { Body, Controller, Delete, Get, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GroupService } from './group.service';
 import { CreateGroupDto } from './dto/create-group-dto';
 import { UpdateGroupDto } from './dto/update-group-dto';
 import { GetGroupeResponse } from './dto/get-group-response-dto';
+import { GetInvitesResponse } from './dto/get-invites-response-dto';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
@@ -63,5 +64,95 @@ export class GroupController {
         @Req() req
     ): Promise<GetGroupeResponse> {
         return await this.groupService.getGroup(req);
+    }
+
+    @Post('/invite/:userId')
+    @ApiOperation({
+        description: 'Invite user to your group',
+        summary: 'Invite user to your group',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Successfully invited',
+    })
+    @ApiResponse({
+        status: 404,
+        description: 'Unknown user',
+    })
+    @ApiResponse({
+        status: 409,
+        description: 'User already has a group',
+    })
+    @ApiResponse({
+        status: 400,
+        description: 'You are not the group leader',
+    })
+    async inviteUser(@Req() req, @Param('userId') userId: number) {
+        return await this.groupService.inviteUser(req, userId);
+    }
+
+    @Delete('/invite/:userId')
+    @ApiOperation({
+        description: 'Cancel user invitation',
+        summary: 'Cancel user invitation',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Successfully cancelled',
+    })
+    @ApiResponse({
+        status: 400,
+        description: 'You are not the group leader',
+    })
+    async cancelInvite(@Req() req, @Param('userId') userId: number) {
+        return await this.groupService.cancelInvite(req, userId);
+    }
+
+    @Get('/groupInvites')
+    @ApiOperation({
+        description: 'Get invited users ids',
+        summary: 'Get invited users ids',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Successfully got invites',
+    })
+    @ApiResponse({
+        status: 400,
+        description: 'You are not the group leader',
+    })
+    async getGroupInvites(@Req() req): Promise<number[]> {
+        return await this.groupService.getGroupInvites(req);
+    }
+
+    @Get('/invites')
+    @ApiOperation({
+        description: 'Get group that invited you',
+        summary: 'Get group that invited you',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Successfully got invites',
+    })
+    async getInvites(@Req() req): Promise<GetInvitesResponse[]> {
+        return await this.groupService.getInvites(req);
+    }
+
+    @Post('/invites/accept/:groupId')
+    @ApiOperation({
+        description: 'Accept group invitation from its id',
+        summary: 'Accept group invitation from its id',
+    })
+    async acceptInvite(@Req() req, @Param('groupId') groupId: number) {
+        return await this.groupService.acceptInvite(req, groupId);
+    }
+
+    @Post('/invites/refuse/:groupId')
+    @ApiOperation({
+        description: 'Accept group invitation from its id',
+        summary: 'Accept group invitation from its id',
+    })
+    async refuseInvite(@Req() req, @Param('groupId') groupId: number) {
+        return await this.groupService.refuseInvite(req, groupId);
     }
 }
