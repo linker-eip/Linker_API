@@ -2,9 +2,9 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from 
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GroupService } from './group.service';
-import { CreateGroupDto } from './get-invites-response-dto.ts/create-group-dto';
-import { UpdateGroupDto } from './get-invites-response-dto.ts/update-group-dto';
-import { GetGroupeResponse } from './get-invites-response-dto.ts/get-group-response-dto';
+import { CreateGroupDto } from './dto/create-group-dto';
+import { UpdateGroupDto } from './dto/update-group-dto';
+import { GetGroupeResponse } from './dto/get-group-response-dto';
 import { GetInvitesResponse } from './dto/get-invites-response-dto';
 
 @ApiBearerAuth()

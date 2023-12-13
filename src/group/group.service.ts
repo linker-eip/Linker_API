@@ -1,11 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateGroupDto } from './get-invites-response-dto.ts/create-group-dto';
+import { CreateGroupDto } from './dto/create-group-dto';
 import { StudentService } from 'src/student/student.service';
 import { Group } from './entity/Group.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UpdateGroupDto } from './get-invites-response-dto.ts/update-group-dto';
-import { GetGroupeResponse } from './get-invites-response-dto.ts/get-group-response-dto';
+import { UpdateGroupDto } from './dto/update-group-dto';
+import { GetGroupeResponse } from './dto/get-group-response-dto';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { NotificationType } from 'src/notifications/entity/Notification.entity';
 import { Request } from 'express';
@@ -216,6 +216,10 @@ export class GroupService {
 
     async getInvites(req: any): Promise<GetInvitesResponse[]> {
         let student = await this.studentService.findOneByEmail(req.user.email)
+
+        if (student.groupId == null) {
+            throw new HttpException("Vous n'avez pas de groupe", HttpStatus.NOT_FOUND);
+        }
 
         let groupInvites = await this.groupInviteRepository.findBy({userId: student.id})
 
