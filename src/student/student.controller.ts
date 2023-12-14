@@ -9,12 +9,14 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
-  Delete
+  Delete,
+  Query
 } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { Get } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiOkResponse,
   ApiOperation,
   ApiResponse,
   ApiTags,
@@ -26,6 +28,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateSkillDto } from './skills/dto/update-skill.dto';
 import { UpdateJobsDto } from './jobs/dto/update-jobs.dto';
 import { UpdateStudiesDto } from './studies/dto/update-studies.dto';
+import { StudentSearchResponseDto, formatToStudentSearchResponseDto } from './dto/student-search-response.dto';
+import { StudentSearchOptionDto } from './dto/student-search-option.dto';
 
 @Controller('api/student')
 @UseGuards(AuthGuard('jwt'))
@@ -171,5 +175,23 @@ export class StudentController {
   })
   async deleteStudies(@Req() req, @Param('id') id: number) {
     return this.studentService.deleteStudies(id, req.user);
+  }
+
+  @Get('search')
+  @ApiOperation({
+    description: 'Get all students',
+    summary: 'Get all students',
+  })
+  @ApiOkResponse({
+    description: 'Get all students',
+    type: StudentSearchResponseDto,
+    isArray: true,
+  })
+  async findAllStudents(
+    @Query() searchOption: StudentSearchOptionDto,
+    @Req() req,
+  ): Promise<StudentSearchResponseDto[]> {
+    const students = await this.studentService.findAllStudents(searchOption);
+    return students.map(formatToStudentSearchResponseDto);
   }
 }
