@@ -149,8 +149,9 @@ export class GroupService {
         }
 
         let groupMember = await this.studentService.findAllByIdIn(group.studentIds)
-        let groupMemberDtos = groupMember.map(it => {
-            let dto = { firstName: it.firstName, lastName: it.lastName, id: it.id, isLeader: (group.leaderId == it.id), picture: it.picture };
+        let groupMemberDtos = groupMember.map(async it => {
+            let studentProfile = await this.studentService.findStudentProfile(it.email)
+            let dto = { firstName: it.firstName, lastName: it.lastName, id: it.id, isLeader: (group.leaderId == it.id), picture: studentProfile.picture };
             return dto;
         });
         
