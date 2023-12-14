@@ -191,7 +191,6 @@ export class StudentController {
     @Query() searchOption: StudentSearchOptionDto,
     @Req() req,
   ): Promise<StudentSearchResponseDto[]> {
-    const students = await this.studentService.findAllStudents(searchOption);
-    return students.map(formatToStudentSearchResponseDto);
+    return await this.studentService.findAllStudents(searchOption);
   }
 }

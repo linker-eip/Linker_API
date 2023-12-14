@@ -13,6 +13,7 @@ import { UpdateSkillDto } from './skills/dto/update-skill.dto';
 import { UpdateJobsDto } from './jobs/dto/update-jobs.dto';
 import { UpdateStudiesDto } from './studies/dto/update-studies.dto';
 import { StudentSearchOptionDto } from './dto/student-search-option.dto';
+import { StudentSearchResponseDto, formatToStudentSearchResponseDto } from './dto/student-search-response.dto';
 
 @Injectable()
 export class StudentService {
@@ -304,7 +305,7 @@ export class StudentService {
 
   async findAllStudents(
     searchOption: StudentSearchOptionDto,
-  ): Promise<StudentUser[]> {
+  ): Promise<StudentSearchResponseDto[]> {
     const { searchString } = searchOption;
 
     let studentsQuery: SelectQueryBuilder<StudentUser> =
@@ -359,6 +360,14 @@ export class StudentService {
     );
 
     const students = await studentsQuery.getMany();
-    return students;
+
+    return await Promise.all(students.map(async student => {
+      try {
+      let studentProfile = await this.studentProfileRepository.findOneBy({studentId: student.id})
+      return formatToStudentSearchResponseDto(student, studentProfile.picture);
+      } catch(e) {
+        throw new Error();
+      }
+    }))
   }
 }

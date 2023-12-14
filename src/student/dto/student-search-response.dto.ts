@@ -25,12 +25,12 @@ export class StudentSearchResponseDto {
   picture: string;
 }
 
-export function formatToStudentSearchResponseDto(student: StudentUser) {
+export function formatToStudentSearchResponseDto(student: StudentUser, picture: string | null) {
     const dto = new StudentSearchResponseDto();
     dto.id = student.id;
     dto.email = student.email;
     dto.firstName = student.firstName;
     dto.lastName = student.lastName;
-    dto.picture = student.picture;
+    dto.picture = picture;
     return dto;
   }
