@@ -210,7 +210,7 @@ export class GroupService {
         }
     }
 
-    async getGroupInvites(req: any): Promise<number[]> {
+    async getGroupInvites(req: any): Promise<GetInvitesResponse[]> {
         let group = await this.getUserGroup(req)
         let student = await this.studentService.findOneByEmail(req.user.email)
 
@@ -220,7 +220,16 @@ export class GroupService {
 
         let groupInvites = await this.groupInviteRepository.findBy({groupId: group.id})
 
-        return groupInvites.map(it => it.userId)
+        return Promise.all(groupInvites.map(async it => {
+            let user = await this.studentService.findOneById(it.userId)
+            let userProfile = await this.studentService.findStudentProfile(user.email)
+            let groupInviteResponse : GetInvitesResponse = {
+                id: user.id,
+                name: user.firstName + ' ' + user.lastName,
+                picture: userProfile.picture
+            }
+            return groupInviteResponse
+        }))
 
     }
 

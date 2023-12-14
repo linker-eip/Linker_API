@@ -123,7 +123,7 @@ export class GroupController {
         status: 400,
         description: 'You are not the group leader',
     })
-    async getGroupInvites(@Req() req): Promise<number[]> {
+    async getGroupInvites(@Req() req): Promise<GetInvitesResponse[]> {
         return await this.groupService.getGroupInvites(req);
     }
 
@@ -135,6 +135,8 @@ export class GroupController {
     @ApiResponse({
         status: 200,
         description: 'Successfully got invites',
+        type: GetInvitesResponse,
+        isArray: true,
     })
     async getInvites(@Req() req): Promise<GetInvitesResponse[]> {
         return await this.groupService.getInvites(req);
