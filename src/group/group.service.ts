@@ -5,7 +5,7 @@ import { Group } from './entity/Group.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UpdateGroupDto } from './dto/update-group-dto';
-import { GetGroupeResponse } from './dto/get-group-response-dto';
+import { GetGroupeResponse, groupMembersDto } from './dto/get-group-response-dto';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { NotificationType } from 'src/notifications/entity/Notification.entity';
 import { Request } from 'express';
@@ -148,11 +148,18 @@ export class GroupService {
             throw new HttpException("Vous n'avez pas de groupe", HttpStatus.NOT_FOUND);
         }
 
+        let groupMember = await this.studentService.findAllByIdIn(group.studentIds)
+        let groupMemberDtos = groupMember.map(it => {
+            let dto = { firstName: it.firstName, lastName: it.lastName, id: it.id, isLeader: (group.leaderId == it.id), picture: it.picture };
+            return dto;
+        });
+        
+
         let response: GetGroupeResponse = {
             name: group.name,
             description: group.description,
             picture: group.picture,
-            membersIds: group.studentIds,
+            members: groupMemberDtos,
             leaderId: group.leaderId,
             isLeader: group.leaderId == student.id
         }

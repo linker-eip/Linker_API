@@ -116,6 +116,8 @@ export class GroupController {
     @ApiResponse({
         status: 200,
         description: 'Successfully got invites',
+        type: GetInvitesResponse,
+        isArray: true,
     })
     @ApiResponse({
         status: 400,

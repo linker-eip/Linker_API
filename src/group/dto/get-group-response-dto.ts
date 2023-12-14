@@ -12,11 +12,28 @@ export class GetGroupeResponse {
     picture: string;
 
     @ApiProperty()
-    membersIds: number[];
+    members: groupMembersDto[];
 
     @ApiProperty()
     leaderId: number;
 
     @ApiProperty()
     isLeader: boolean;
+}
+
+export class groupMembersDto {
+    @ApiProperty()
+    firstName: string;
+
+    @ApiProperty()
+    lastName: string;
+
+    @ApiProperty()
+    picture: string;
+
+    @ApiProperty()
+    isLeader: boolean;
+
+    @ApiProperty()
+    id: number;
 }

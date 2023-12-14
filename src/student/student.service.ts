@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { StudentUser } from './entity/StudentUser.entity';
 import { StudentProfile } from './entity/StudentProfile.entity';
 import { CreateStudentProfileDto } from './dto/create-student-profile.dto';
@@ -52,6 +52,10 @@ export class StudentService {
     return this.studentRepository.findOne({
       where: { verificationKey: key },
     });
+  }
+
+  async findAllByIdIn(ids: number[]) : Promise<StudentUser[]> {
+    return this.studentRepository.findBy({id: In(ids)});
   }
 
   async save(student: StudentUser): Promise<StudentUser> {
