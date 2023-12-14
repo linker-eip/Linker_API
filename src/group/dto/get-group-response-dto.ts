@@ -1,26 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 
-export class GetGroupeResponse {
-    @ApiProperty()
-    name: string;
-
-    @ApiProperty()
-    description: string;
-
-    @ApiProperty()
-    picture: string;
-
-    @ApiProperty()
-    members: groupMembersDto[];
-
-    @ApiProperty()
-    leaderId: number;
-
-    @ApiProperty()
-    isLeader: boolean;
-}
-
 export class groupMembersDto {
     @ApiProperty()
     firstName: string;
@@ -37,3 +17,23 @@ export class groupMembersDto {
     @ApiProperty()
     id: number;
 }
+export class GetGroupeResponse {
+    @ApiProperty()
+    name: string;
+
+    @ApiProperty()
+    description: string;
+
+    @ApiProperty()
+    picture: string;
+
+    @ApiProperty({ type: [groupMembersDto] })
+    members: groupMembersDto[];
+
+    @ApiProperty()
+    leaderId: number;
+
+    @ApiProperty()
+    isLeader: boolean;
+}
+
