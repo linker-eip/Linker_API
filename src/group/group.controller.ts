@@ -159,4 +159,13 @@ export class GroupController {
     async refuseInvite(@Req() req, @Param('groupId') groupId: number) {
         return await this.groupService.refuseInvite(req, groupId);
     }
+
+    @Delete('/leave')
+    @ApiOperation({
+        description: 'Leave your group (not possible as a leader)',
+        summary: 'Leave your group (not possible as a leader)',
+    })
+    async leaveGroup(@Req() req) {
+        return await this.groupService.leaveGroup(req);
+    }
 }

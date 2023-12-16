@@ -285,4 +285,24 @@ export class GroupService {
 
         this.notificationService.createNotification("Invitation refusée",student.firstName + " " + student.lastName + " a refusé de rejoindre votre groupe", NotificationType.GROUP, group.leaderId)
     }
+
+    async leaveGroup(req: any) {
+        let student = await this.studentService.findOneByEmail(req.user.email)
+
+        if (student.groupId == null) {
+            throw new HttpException("Vous n'avez pas de groupe", HttpStatus.BAD_REQUEST);
+        }
+
+        let group = await this.getUserGroup(req);
+
+        if (student.id == group.leaderId) {
+            throw new HttpException("Vous ne pouvez pas quitter un group dont vous être le chef", HttpStatus.BAD_REQUEST);
+        }
+
+        group.studentIds = group.studentIds.filter(it => it != student.id);
+        student.groupId = null;
+
+        this.groupRepository.save(group)
+        this.studentService.save(student);
+    }
 }
