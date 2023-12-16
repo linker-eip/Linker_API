@@ -37,7 +37,7 @@ export class CompanyService {
   }
 
   async findOneByResetPasswordToken(
-    token : string,
+    token: string,
   ): Promise<CompanyUser | undefined> {
     return this.companyRepository.findOne({
       where: { resetPasswordToken: token },
@@ -58,6 +58,8 @@ export class CompanyService {
     CompanyProfileObj.activity = companyProfileDto.activity;
     CompanyProfileObj.speciality = companyProfileDto.speciality;
     CompanyProfileObj.website = companyProfileDto.website;
+    CompanyProfileObj.picture = companyProfileDto.picture;
+
     return this.companyProfileRepository.save(CompanyProfileObj);
   }
 
@@ -65,47 +67,55 @@ export class CompanyService {
     return this.companyProfileRepository.findOne({ where: { email } });
   }
 
-    async updateCompanyProfile(CreateCompanyProfileDto : CreateCompanyProfileDto, req: any): Promise<CompanyProfile>
-    {
-        const user = await this.companyRepository.findOne({where: {email: req.email}})
-        if (!user) throw new Error (`Could not find company profile`);
-        let companyProfile = await this.companyProfileRepository.findOne({where: {email: req.email}});
-        if (!companyProfile) {
-            companyProfile = new CompanyProfile();
-        }
-
-
-        companyProfile.companyId = user.id
-
-        if (CreateCompanyProfileDto.name)
-          companyProfile.name = CreateCompanyProfileDto.name;
-
-        if (CreateCompanyProfileDto.description)
-          companyProfile.description = CreateCompanyProfileDto.description;
-        
-        companyProfile.email = user.email;
-        
-        if (CreateCompanyProfileDto.phone)
-          companyProfile.phone = CreateCompanyProfileDto.phone;
-        
-        if (CreateCompanyProfileDto.address)
-          companyProfile.address = CreateCompanyProfileDto.address;
-
-        if (CreateCompanyProfileDto.size)
-          companyProfile.size = CreateCompanyProfileDto.size;
-        
-        if (CreateCompanyProfileDto.location)
-          companyProfile.location = CreateCompanyProfileDto.location;
-        
-        if (CreateCompanyProfileDto.activity)
-          companyProfile.activity = CreateCompanyProfileDto.activity;
-
-        if (CreateCompanyProfileDto.speciality)
-          companyProfile.speciality = CreateCompanyProfileDto.speciality;
-
-        if (CreateCompanyProfileDto.website)
-          companyProfile.website = CreateCompanyProfileDto.website;
-
-        return this.companyProfileRepository.save(companyProfile);
+  async updateCompanyProfile(
+    CreateCompanyProfileDto: CreateCompanyProfileDto,
+    req: any,
+  ): Promise<CompanyProfile> {
+    const user = await this.companyRepository.findOne({
+      where: { email: req.email },
+    });
+    if (!user) throw new Error(`Could not find company profile`);
+    let companyProfile = await this.companyProfileRepository.findOne({
+      where: { email: req.email },
+    });
+    if (!companyProfile) {
+      companyProfile = new CompanyProfile();
     }
+
+    companyProfile.companyId = user.id;
+
+    if (CreateCompanyProfileDto.name)
+      companyProfile.name = CreateCompanyProfileDto.name;
+
+    if (CreateCompanyProfileDto.description)
+      companyProfile.description = CreateCompanyProfileDto.description;
+
+    companyProfile.email = user.email;
+
+    if (CreateCompanyProfileDto.phone)
+      companyProfile.phone = CreateCompanyProfileDto.phone;
+
+    if (CreateCompanyProfileDto.address)
+      companyProfile.address = CreateCompanyProfileDto.address;
+
+    if (CreateCompanyProfileDto.size)
+      companyProfile.size = CreateCompanyProfileDto.size;
+
+    if (CreateCompanyProfileDto.location)
+      companyProfile.location = CreateCompanyProfileDto.location;
+
+    if (CreateCompanyProfileDto.activity)
+      companyProfile.activity = CreateCompanyProfileDto.activity;
+
+    if (CreateCompanyProfileDto.speciality)
+      companyProfile.speciality = CreateCompanyProfileDto.speciality;
+
+    if (CreateCompanyProfileDto.website)
+      companyProfile.website = CreateCompanyProfileDto.website;
+
+    if (CreateCompanyProfileDto.picture)
+      companyProfile.picture = CreateCompanyProfileDto.picture;
+
+    return this.companyProfileRepository.save(companyProfile);
+  }
 }

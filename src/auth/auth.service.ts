@@ -136,6 +136,7 @@ export class AuthService {
         activity: '',
         speciality: '',
         website: '',
+        picture: null,
       },
       savedUser,
     );
@@ -446,6 +447,7 @@ export class AuthService {
           activity: '',
           speciality: '',
           website: '',
+          picture: null,
         },
         savedUser,
       );
@@ -493,6 +495,7 @@ export class AuthService {
           activity: '',
           speciality: '',
           website: '',
+          picture: null,
         },
         savedUser,
       );

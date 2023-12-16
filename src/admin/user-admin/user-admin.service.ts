@@ -329,6 +329,7 @@ export class UserAdminService {
         activity: '',
         speciality: '',
         website: '',
+        picture: null,
       },
       savedUser.email,
     );

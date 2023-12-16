@@ -39,6 +39,9 @@ export class CompanyProfile {
   @Column({ nullable: true })
   website: string;
 
+  @Column({ nullable: true })
+  picture: string;
+
   @OneToOne(() => CompanyUser)
   @JoinColumn({ name: 'companyId' })
   company: CompanyUser;
