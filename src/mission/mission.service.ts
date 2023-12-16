@@ -19,6 +19,7 @@ import { MissionInvite } from './entity/mission-invite.entity';
 import { MissionInviteStatus } from './enum/mission-invite-status.enum';
 import { MissionStatus } from './enum/mission-status.enum';
 import { MissionTaskStatus } from './enum/mission-task-status.enum';
+import { StudentProfileResponseDto } from '../student/dto/student-profile-response.dto';
 
 @Injectable()
 export class MissionService {
@@ -421,5 +422,69 @@ export class MissionService {
     mission.status = MissionStatus.FINISHED;
 
     await this.missionRepository.save(mission);
+  }
+
+  async getMissionDetails(missionId: number, req: any) {
+    let mission = await this.findMissionById(missionId);
+    if (mission == null) {
+      throw new HttpException('Invalid mission', HttpStatus.NOT_FOUND);
+    }
+    let company = null;
+    try {
+      company = await this.companyService.findOne(req.user.email);
+    } catch (err) {
+      throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
+    }
+
+    if (company == null) {
+      throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
+    }
+
+    const companyProfile = await this.companyService.findCompanyProfile(
+      company.email,
+    );
+
+    if (mission.companyId != company.id) {
+      throw new HttpException(
+        'You can only see details of your own missions',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    let missionTasks = await this.missionTaskRepository.find({
+      where: { missionId },
+    });
+
+    let missionTaskArray = [];
+    for (let missionTask of missionTasks) {
+      let student = await this.studentService.findOneById(missionTask.studentId);
+      const studentProfile = await this.studentService.findStudentProfileByStudentId(
+        student.id,
+      );
+      missionTaskArray.push({
+        missionTask,
+        studentProfile,
+      });
+    }
+    let group = await this.groupService.findGroupById(mission.groupId);
+    let groupStudents = [];
+    for (let studentId of group.studentIds) {
+      let student = await this.studentService.findOneById(studentId);
+      const studentProfile = await this.studentService.findStudentProfileByStudentId(
+        student.id,
+      );
+      groupStudents.push({
+        studentProfile,
+      });
+    }
+
+    return {
+      companyProfile,
+      mission,
+      missionTaskArray,
+      group,
+      groupStudents,
+    };
+
   }
 }

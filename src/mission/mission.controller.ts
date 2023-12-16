@@ -160,4 +160,13 @@ export class MissionController {
   async finishMission(@Param('missionId') missionId: number, @Req() req) {
     return await this.missionService.finishMission(missionId, req);
   }
+  @Get('info/:missionId')
+  @ApiOperation({
+    description: 'Get mission details',
+    summary: 'Get mission details',
+  })
+  async getMissionDetails(@Param('missionId') missionId: number, @Req() req) {
+    return await this.missionService.getMissionDetails(missionId, req);
+  }
+
 }
