@@ -203,7 +203,7 @@ export class AuthService {
     sendMailDto.text = emailBody;
     this.mailService.sendMail(sendMailDto);
     await this.companyService.save(company);
-    return { token: company.resetPasswordToken };
+    return ;
   }
 
   async resetCompanyPassword(body: ResetPasswordDto) {
@@ -242,7 +242,7 @@ export class AuthService {
     sendMailDto.text = emailBody;
     this.mailService.sendMail(sendMailDto);
     await this.studentService.save(student);
-    return { token: student.resetPasswordToken };
+    return;
   }
 
   async resetStudentPassword(body: ResetPasswordDto) {
