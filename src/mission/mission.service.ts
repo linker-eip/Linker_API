@@ -457,6 +457,14 @@ export class MissionService {
 
     let missionTaskArray = [];
     for (let missionTask of missionTasks) {
+      if (missionTask.studentId == null) {
+        missionTaskArray.push({
+          missionTask,
+          studentProfile: null,
+        });
+        continue;
+      }
+
       let student = await this.studentService.findOneById(
         missionTask.studentId,
       );
@@ -467,15 +475,19 @@ export class MissionService {
         studentProfile,
       });
     }
-    let group = await this.groupService.findGroupById(mission.groupId);
+    let group = null;
     let groupStudents = [];
-    for (let studentId of group.studentIds) {
-      let student = await this.studentService.findOneById(studentId);
-      const studentProfile =
-        await this.studentService.findStudentProfileByStudentId(student.id);
-      groupStudents.push({
-        studentProfile,
-      });
+
+    if (mission.groupId) {
+      group = await this.groupService.findGroupById(mission.groupId);
+      for (let studentId of group.studentIds) {
+        let student = await this.studentService.findOneById(studentId);
+        const studentProfile =
+          await this.studentService.findStudentProfileByStudentId(student.id);
+        groupStudents.push({
+          studentProfile,
+        });
+      }
     }
 
     return {
