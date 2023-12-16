@@ -46,6 +46,6 @@ export class UpdateMission {
 
   @ApiProperty()
   @IsOptional()
-  @IsNumber({}, { each: true })
-  studentsIds: number[];
+  @IsNumber()
+  groupId: number;
 }

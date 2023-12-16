@@ -22,6 +22,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { CreateMissionTaskDto } from './dto/create-mission-task.dto';
 import { UpdateMissionTaskDto } from './dto/update-mission-task.dto';
 import { MissionTaskDto } from './dto/mission-task.dto';
+import { GetMissionDetailsStudentDto } from './dto/get-mission-details-student.dto';
+import { GetMissionDetailsCompanyDto } from './dto/get-mission-details-company.dto';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
@@ -124,5 +126,65 @@ export class MissionController {
   })
   async getMissionTasks(@Param('missionId') missionId: number, @Req() req) {
     return await this.missionService.getMissionTasks(missionId, req);
+  }
+
+  @Post('accept/:missionId/:groupId')
+  @ApiOperation({
+    description: 'Accept a mission for a group',
+    summary: 'Accept a mission for a group',
+  })
+  async acceptMission(
+    @Param('missionId') missionId: number,
+    @Param('groupId') groupId: number,
+    @Req() req,
+  ) {
+    return await this.missionService.acceptMission(missionId, groupId, req);
+  }
+
+  @Post('refuse/:missionId/:groupId')
+  @ApiOperation({
+    description: 'Refuse a mission for a group',
+    summary: 'Refuse a mission for a group',
+  })
+  async refuseMission(
+    @Param('missionId') missionId: number,
+    @Param('groupId') groupId: number,
+    @Req() req,
+  ) {
+    return await this.missionService.refuseMission(missionId, groupId, req);
+  }
+
+  @Post('finish/:missionId')
+  @ApiOperation({
+    description: 'Finish a mission',
+    summary: 'Finish a mission',
+  })
+  async finishMission(@Param('missionId') missionId: number, @Req() req) {
+    return await this.missionService.finishMission(missionId, req);
+  }
+  @Get('info/:missionId/company')
+  @ApiOperation({
+    description: 'Get mission details for company',
+    summary: 'Get mission details',
+  })
+  @ApiOkResponse({
+    description: 'Get mission details',
+    type: GetMissionDetailsCompanyDto,
+  })
+  async getMissionDetails(@Param('missionId') missionId: number, @Req() req) {
+    return await this.missionService.getMissionDetailsCompany(missionId, req);
+  }
+
+  @Get('info/:missionId/student')
+  @ApiOperation({
+    description: 'Get mission details for student',
+    summary: 'Get mission details',
+  })
+  @ApiOkResponse({
+    description: 'Get mission details',
+    type: GetMissionDetailsStudentDto,
+  })
+  async getMissionDetailsStudent(@Param('missionId') missionId: number, @Req() req) {
+    return await this.missionService.getMissionDetailsStudent(missionId, req);
   }
 }

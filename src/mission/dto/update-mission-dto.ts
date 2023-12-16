@@ -38,4 +38,9 @@ export class UpdateMissionDto {
   @IsString({ message: "Les compétences doivent être une chaîne de caractères" })
   @IsOptional()
   skills: string;
+
+  @ApiProperty()
+  @IsNumber()
+  @IsOptional()
+  groupId: number;
 }

@@ -43,13 +43,13 @@ export function formatToMissionAdminDto(
     name: mission.name,
     status: mission.status,
     companyId: mission.companyId,
-    studentsIds: mission.studentsIds,
+    groupId: mission.groupId,
     description: mission.description,
     startOfMission: mission.startOfMission,
     endOfMission: mission.endOfMission,
     amount: mission.amount,
     createdAt: mission.createdAt,
-    numberOfStudents: mission.studentsIds?.length,
+    numberOfStudents: null,
     company: formatToCompanyAdminResponseDto(company),
     students: students.map((student) => {
       return {
