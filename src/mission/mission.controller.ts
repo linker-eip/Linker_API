@@ -22,6 +22,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { CreateMissionTaskDto } from './dto/create-mission-task.dto';
 import { UpdateMissionTaskDto } from './dto/update-mission-task.dto';
 import { MissionTaskDto } from './dto/mission-task.dto';
+import { GetMissionDetailsStudentDto } from './dto/get-mission-details-student.dto';
+import { GetMissionDetailsCompanyDto } from './dto/get-mission-details-company.dto';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
@@ -160,13 +162,29 @@ export class MissionController {
   async finishMission(@Param('missionId') missionId: number, @Req() req) {
     return await this.missionService.finishMission(missionId, req);
   }
-  @Get('info/:missionId')
+  @Get('info/:missionId/company')
   @ApiOperation({
-    description: 'Get mission details',
+    description: 'Get mission details for company',
     summary: 'Get mission details',
   })
+  @ApiOkResponse({
+    description: 'Get mission details',
+    type: GetMissionDetailsCompanyDto,
+  })
   async getMissionDetails(@Param('missionId') missionId: number, @Req() req) {
-    return await this.missionService.getMissionDetails(missionId, req);
+    return await this.missionService.getMissionDetailsCompany(missionId, req);
   }
 
+  @Get('info/:missionId/student')
+  @ApiOperation({
+    description: 'Get mission details for student',
+    summary: 'Get mission details',
+  })
+  @ApiOkResponse({
+    description: 'Get mission details',
+    type: GetMissionDetailsStudentDto,
+  })
+  async getMissionDetailsStudent(@Param('missionId') missionId: number, @Req() req) {
+    return await this.missionService.getMissionDetailsStudent(missionId, req);
+  }
 }

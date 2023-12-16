@@ -424,7 +424,7 @@ export class MissionService {
     await this.missionRepository.save(mission);
   }
 
-  async getMissionDetails(missionId: number, req: any) {
+  async getMissionDetailsCompany(missionId: number, req: any) {
     let mission = await this.findMissionById(missionId);
     if (mission == null) {
       throw new HttpException('Invalid mission', HttpStatus.NOT_FOUND);
@@ -457,10 +457,11 @@ export class MissionService {
 
     let missionTaskArray = [];
     for (let missionTask of missionTasks) {
-      let student = await this.studentService.findOneById(missionTask.studentId);
-      const studentProfile = await this.studentService.findStudentProfileByStudentId(
-        student.id,
+      let student = await this.studentService.findOneById(
+        missionTask.studentId,
       );
+      const studentProfile =
+        await this.studentService.findStudentProfileByStudentId(student.id);
       missionTaskArray.push({
         missionTask,
         studentProfile,
@@ -470,9 +471,8 @@ export class MissionService {
     let groupStudents = [];
     for (let studentId of group.studentIds) {
       let student = await this.studentService.findOneById(studentId);
-      const studentProfile = await this.studentService.findStudentProfileByStudentId(
-        student.id,
-      );
+      const studentProfile =
+        await this.studentService.findStudentProfileByStudentId(student.id);
       groupStudents.push({
         studentProfile,
       });
@@ -485,6 +485,66 @@ export class MissionService {
       group,
       groupStudents,
     };
+  }
 
+  async getMissionDetailsStudent(missionId: number, req: any) {
+    let mission = await this.findMissionById(missionId);
+    if (mission == null) {
+      throw new HttpException('Invalid mission', HttpStatus.NOT_FOUND);
+    }
+
+    let group = await this.groupService.findGroupById(mission.groupId);
+    if (group == null) {
+      throw new HttpException('Invalid group', HttpStatus.NOT_FOUND);
+    }
+    let student = null;
+    try {
+      student = await this.studentService.findOneByEmail(req.user.email);
+    } catch (err) {
+      throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED);
+    }
+    if (student == null) {
+      throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED);
+    }
+    let groupStudentArrayToInt = group.studentIds.map(Number);
+    if (!groupStudentArrayToInt.includes(student.id)) {
+      throw new HttpException(
+        'You can only see details of your own missions',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    let missionTasks = await this.missionTaskRepository.find({
+      where: { missionId },
+    });
+
+    let missionTaskArray = [];
+    for (let missionTask of missionTasks) {
+      let student = await this.studentService.findOneById(
+        missionTask.studentId,
+      );
+      const studentProfile =
+        await this.studentService.findStudentProfileByStudentId(student.id);
+      missionTaskArray.push({
+        missionTask,
+        studentProfile,
+      });
+    }
+    let groupStudents = [];
+    for (let studentId of group.studentIds) {
+      let student = await this.studentService.findOneById(studentId);
+      const studentProfile =
+        await this.studentService.findStudentProfileByStudentId(student.id);
+      groupStudents.push({
+        studentProfile,
+      });
+    }
+
+    return {
+      mission,
+      missionTaskArray,
+      group,
+      groupStudents,
+    };
   }
 }
