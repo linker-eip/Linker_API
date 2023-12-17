@@ -51,5 +51,10 @@ export class CreateCompanyProfileDto {
   @IsString({ message: "Le site web doit être une chaîne de caractères" })
   @IsOptional()
   website: string;
+
+  @ApiProperty({ description: "Image de l'entreprise" })
+  @IsString({ message: "L'image doit être une chaîne de caractères" })
+  @IsOptional()
+  picture: string;
   
 }

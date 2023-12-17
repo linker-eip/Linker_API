@@ -5,12 +5,13 @@ import { GroupService } from './group.service';
 import { GroupController } from './group.controller';
 import { StudentModule } from 'src/student/student.module';
 import { NotificationsModule } from 'src/notifications/notifications.module';
+import { GroupInvite } from './entity/GroupInvite.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Group]),
+        TypeOrmModule.forFeature([Group, GroupInvite]),
         StudentModule,
-        NotificationsModule
+        NotificationsModule,
     ],
     providers: [GroupService,],
     controllers: [GroupController],

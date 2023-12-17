@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Brackets, In, Repository, SelectQueryBuilder } from 'typeorm';
 import { StudentUser } from './entity/StudentUser.entity';
 import { StudentProfile } from './entity/StudentProfile.entity';
 import { CreateStudentProfileDto } from './dto/create-student-profile.dto';
@@ -13,6 +13,8 @@ import { DocumentTransferService } from 'src/document-transfer/src/services/docu
 import { UpdateSkillDto } from './skills/dto/update-skill.dto';
 import { UpdateJobsDto } from './jobs/dto/update-jobs.dto';
 import { UpdateStudiesDto } from './studies/dto/update-studies.dto';
+import { StudentSearchOptionDto } from './dto/student-search-option.dto';
+import { StudentSearchResponseDto, formatToStudentSearchResponseDto } from './dto/student-search-response.dto';
 
 @Injectable()
 export class StudentService {
@@ -33,7 +35,7 @@ export class StudentService {
   }
 
   async findOneByEmail(email: string): Promise<StudentUser | undefined> {
-    return this.studentRepository.findOne({ where: { email } });
+    return this.studentRepository.findOne({ where: { email: email } });
   }
 
   async findOneById(studentId: number): Promise<StudentUser | undefined> {
@@ -54,6 +56,10 @@ export class StudentService {
     return this.studentRepository.findOne({
       where: { verificationKey: key },
     });
+  }
+
+  async findAllByIdIn(ids: number[]) : Promise<StudentUser[]> {
+    return this.studentRepository.findBy({id: In(ids)});
   }
 
   async save(student: StudentUser): Promise<StudentUser> {
@@ -300,5 +306,73 @@ export class StudentService {
     await this.studiesService.deleteStudie(studiesId);
 
     return this.findStudentProfile(req.email);
+  }
+
+  async findAllStudents(
+    searchOption: StudentSearchOptionDto,
+  ): Promise<StudentSearchResponseDto[]> {
+    const { searchString } = searchOption;
+
+    let studentsQuery: SelectQueryBuilder<StudentUser> =
+      this.studentRepository.createQueryBuilder('studentUser');
+
+    studentsQuery = studentsQuery.andWhere(
+      new Brackets((qb) => {
+        if (searchString && searchString.trim().length > 0) {
+          const searchParams = searchString
+            .trim()
+            .split(',')
+            .map((elem) => elem.trim());
+
+          searchParams.forEach((searchParam, index) => {
+            const emailSearch = `emailSearch${index}`;
+            const firstNameSearch = `firstNameSearch${index}`;
+            const lastNameSearch = `lastNameSearch${index}`;
+
+            qb.orWhere(`studentUser.email LIKE :${emailSearch}`, {
+              [emailSearch]: `%${searchParam}%`,
+            });
+            qb.orWhere(`studentUser.firstName LIKE :${firstNameSearch}`, {
+              [firstNameSearch]: `%${searchParam}%`,
+            });
+            qb.orWhere(`studentUser.lastName LIKE :${lastNameSearch}`, {
+              [lastNameSearch]: `%${searchParam}%`,
+            });
+          });
+        }
+          qb.andWhere('studentUser.isActive = :isActive', {
+            isActive: true,
+          });
+
+        if (searchOption.lastName) {
+          qb.andWhere('studentUser.lastName = :lastName', {
+            lastName: searchOption.lastName,
+          });
+        }
+
+        if (searchOption.firstName) {
+          qb.andWhere('studentUser.firstName = :firstName', {
+            firstName: searchOption.firstName,
+          });
+        }
+
+        if (searchOption.email) {
+          qb.andWhere('studentUser.email = :email', {
+            email: searchOption.email,
+          });
+        }
+      }),
+    );
+
+    const students = await studentsQuery.getMany();
+
+    return await Promise.all(students.map(async student => {
+      try {
+      let studentProfile = await this.studentProfileRepository.findOneBy({studentId: student.id})
+      return formatToStudentSearchResponseDto(student, studentProfile.picture);
+      } catch(e) {
+        throw new Error();
+      }
+    }))
   }
 }
