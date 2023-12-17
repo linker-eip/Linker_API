@@ -20,6 +20,7 @@ import { MissionInviteStatus } from './enum/mission-invite-status.enum';
 import { MissionStatus } from './enum/mission-status.enum';
 import { MissionTaskStatus } from './enum/mission-task-status.enum';
 import { StudentProfileResponseDto } from '../student/dto/student-profile-response.dto';
+import { UpdateTaskStatusDto } from './dto/update-task-status-dto';
 
 @Injectable()
 export class MissionService {
@@ -634,7 +635,7 @@ export class MissionService {
     this.missionTaskRepository.save(task)
   }
 
-  async updateTaskStatus(taskId: number, body: UpdateMissionTaskDto, req: any) {
+  async updateTaskStatus(taskId: number, body: UpdateTaskStatusDto, req: any) {
     let student = await this.studentService.findOneByEmail(req.user.email);
     let task = await this.missionTaskRepository.findOne({ where: { id: taskId } })
     let group = await this.groupService.findGroupById(student.groupId);

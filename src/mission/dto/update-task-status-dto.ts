@@ -5,8 +5,8 @@ import { MissionTaskStatus, MissionTaskStatusStudent } from "../enum/mission-tas
 export class UpdateTaskStatusDto {
     @ApiProperty({
         description: 'The status of the task',
-        enum: MissionTaskStatusStudent,
+        enum: MissionTaskStatus,
       })
-    @IsEnum(MissionTaskStatusStudent)
-    status: MissionTaskStatusStudent;
+    @IsEnum(MissionTaskStatus)
+    status: MissionTaskStatus;
 }
