@@ -243,14 +243,8 @@ export class GroupService {
         let groups = Promise.all(groupInvites.map(async it => {
             let group = await this.groupRepository.findOne({where: {id: it.groupId}})
             console.log(group.leaderId)
-            if (group == null) {
-                console.log("zouzou")
-            }
-            let leader = await this.studentService.findOneById(group.leaderId)
-            if (leader == null) {
-                console.log("zouzou")
-            }
-            let response : GetInvitesResponse = {id: group.id, name: group.name, picture: group.picture, leaderName: leader.firstName + ' ' + leader.lastName}
+            //let leader = await this.studentService.findOneById(group.leaderId)
+            let response : GetInvitesResponse = {id: group.id, name: group.name, picture: group.picture, leaderName: "Michel"}
             return response
         }))
 
