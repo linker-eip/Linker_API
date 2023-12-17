@@ -241,7 +241,7 @@ export class GroupService {
         let groups = await Promise.all(groupInvites.map(async it => {
             let group = await this.groupRepository.findOne({ where: { id: it.groupId } });
             if (group == null) {
-                return null
+                return
             }
             let leader = await this.studentService.findOneById(group.leaderId);
             let response: GetInvitesResponse = {
