@@ -252,7 +252,6 @@ export class GroupService {
             };
             return response;
         }));
-        console.log(groups)
         return groups.filter(group => group !== undefined) as GetInvitesResponse[];
     }
 
