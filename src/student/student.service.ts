@@ -135,7 +135,7 @@ export class StudentService {
 
     if (picture) {
       const [width, height] = [500, 500];
-      const { url, key } = await this.documentTransferService.uploadFile(picture);
+      const url = await this.documentTransferService.uploadFile(picture);
 
       studentProfile.picture = url;
     }

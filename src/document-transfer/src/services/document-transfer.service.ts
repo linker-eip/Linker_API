@@ -23,7 +23,7 @@ export class DocumentTransferService {
     })
   }
 
-  async uploadFile(file: Express.Multer.File): Promise<DocumentResult> {
+  async uploadFile(file: Express.Multer.File) {
     const metadata = await sharp(file.buffer).metadata();
     const width = metadata.width;
     const height = metadata.height;
@@ -47,7 +47,7 @@ export class DocumentTransferService {
       ContentType: file.mimetype,
     }));
 
-    return { url, key };
+    return url;
   }
 
   async deleteFile(key: string): Promise<void> {
