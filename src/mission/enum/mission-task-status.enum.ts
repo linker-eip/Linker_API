@@ -4,3 +4,8 @@ export enum MissionTaskStatus {
   CANCELLED = 'CANCELLED',
   FINISHED = 'FINISHED',
 }
+
+export enum MissionTaskStatusStudent {
+  PENDING = 'PENDING',
+  FINISHED = 'FINISHED',
+}

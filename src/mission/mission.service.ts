@@ -617,7 +617,7 @@ export class MissionService {
     }
     let mission = await this.missionRepository.findOne({ where: { id: task.missionId } })
     if (mission == null || mission.groupId != student.groupId) {
-      throw new HttpException("Tâche invalide2", HttpStatus.NOT_FOUND);
+      throw new HttpException("Tâche invalide", HttpStatus.NOT_FOUND);
     }
 
 
@@ -632,5 +632,29 @@ export class MissionService {
     }
 
     this.missionTaskRepository.save(task)
+  }
+
+  async updateTaskStatus(taskId: number, body: UpdateMissionTaskDto, req: any) {
+    let student = await this.studentService.findOneByEmail(req.user.email);
+    let task = await this.missionTaskRepository.findOne({ where: { id: taskId } })
+    let group = await this.groupService.findGroupById(student.groupId);
+    if (task == null) {
+      throw new HttpException("Tâche invalide", HttpStatus.NOT_FOUND);
+    }
+    if (group == null) {
+      throw new HttpException("Vous n'avez pas de groupe", HttpStatus.BAD_REQUEST);
+    }
+
+    let mission = await this.missionRepository.findOne({ where: { id: task.missionId } })
+    if (mission == null || mission.groupId != student.groupId) {
+      throw new HttpException("Tâche invalide", HttpStatus.NOT_FOUND);
+    }
+    if (student.id == group.leaderId || student.id == task.studentId) {
+      task.status = body.status
+    } else {
+      throw new HttpException("Vous n'avez pas la permission de changer le statut de cette tâche", HttpStatus.FORBIDDEN);
+    }
+
+    this.missionTaskRepository.save(task);
   }
 }
