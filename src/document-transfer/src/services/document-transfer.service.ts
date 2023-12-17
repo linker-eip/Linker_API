@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DocumentResult } from '../types/document-result.type';
 import { getRandomString } from '../helpers/random.helper';
-import sharp from 'sharp';
+import * as sharp from 'sharp';
 
 @Injectable()
 export class DocumentTransferService {
@@ -23,11 +23,15 @@ export class DocumentTransferService {
     })
   }
 
-  async uploadFile(
-    file: Express.Multer.File,
-    dimensions: [number, number],
-  ): Promise<DocumentResult> {
-    const [width, height] = dimensions;
+  async uploadFile(file: Express.Multer.File): Promise<DocumentResult> {
+    const metadata = await sharp(file.buffer).metadata();
+    const width = metadata.width;
+    const height = metadata.height;
+
+    if (!width || !height) {
+      throw new Error('Unable to determine image dimensions');
+    }
+
     const key = getRandomString(48);
     const url = `https://${this.s3Bucket}.s3.${this.s3Region}.amazonaws.com/${key}`;
 
@@ -36,14 +40,12 @@ export class DocumentTransferService {
       .jpeg({ quality: 90 })
       .toBuffer();
     
-    await this.s3Client.send(
-      new PutObjectCommand({
-        Bucket: this.s3Bucket,
-        Key: key,
-        Body: outputBuffer,
-        ContentType: file.mimetype,
-      }),
-    );
+    await this.s3Client.send(new PutObjectCommand({
+      Bucket: this.s3Bucket,
+      Key: key,
+      Body: outputBuffer,
+      ContentType: file.mimetype,
+    }));
 
     return { url, key };
   }

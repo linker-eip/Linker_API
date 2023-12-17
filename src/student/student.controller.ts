@@ -71,9 +71,9 @@ export class StudentController {
             new MaxFileSizeValidator({
               maxSize: 3_500_000,
             }),
-            new FileMimeTypeValidator({
-              mimeTypes: SupportedImageMimeTypes
-            })
+            new FileTypeValidator({
+              fileType: 'image/jpeg',
+            }),
           ]
         })
       ) picture,
