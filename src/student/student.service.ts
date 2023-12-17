@@ -9,6 +9,7 @@ import { StudentProfileResponseDto } from './dto/student-profile-response.dto';
 import { JobsService } from './jobs/jobs.service';
 import { StudiesService } from './studies/studies.service';
 import { FileService } from '../filesystem/file.service';
+import { DocumentTransferService } from 'src/document-transfer/src/services/document-transfer.service';
 import { UpdateSkillDto } from './skills/dto/update-skill.dto';
 import { UpdateJobsDto } from './jobs/dto/update-jobs.dto';
 import { UpdateStudiesDto } from './studies/dto/update-studies.dto';
@@ -26,6 +27,7 @@ export class StudentService {
     private readonly jobsservice: JobsService,
     private readonly studiesService: StudiesService,
     private readonly fileService: FileService,
+    private readonly documentTransferService: DocumentTransferService,
   ) {}
 
   async findAll(): Promise<StudentUser[]> {
@@ -132,7 +134,10 @@ export class StudentService {
     }
 
     if (picture) {
-      studentProfile.picture = await this.fileService.storeFile(picture);
+      const [width, height] = [500, 500];
+      const { url, key } = await this.documentTransferService.uploadFile(picture);
+
+      studentProfile.picture = url;
     }
 
     if (CreateStudentProfile.studies !== null) {
