@@ -1,8 +1,21 @@
-import { Body, Controller, Get, Post, Put, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Put,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { CompanyService } from './company.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateCompanyProfileDto } from './dto/create-company-profile.dto';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CompanyProfileResponseDto } from './dto/company-profile-response.dto';
 
 @Controller('api/company')
@@ -42,7 +55,7 @@ export class CompanyController {
   ) {
     return this.companyService.updateCompanyProfile(
       CreateCompanyProfile,
-      req.user
+      req.user,
     );
   }
 }

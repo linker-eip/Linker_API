@@ -345,6 +345,14 @@ export class MissionService {
     if (missionInvite == null) {
       throw new HttpException('Invalid mission invite', HttpStatus.NOT_FOUND);
     }
+
+    if (missionInvite.status != MissionInviteStatus.PENDING) {
+      throw new HttpException(
+        'This mission invite is already accepted or refused',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     let student = null;
     try {
       student = await this.studentService.findOneByEmail(req.user.email);
