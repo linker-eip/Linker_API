@@ -10,4 +10,7 @@ export class GetInvitesResponse {
 
     @ApiProperty()
     picture: string;
+
+    @ApiProperty()
+    leaderName: string;
 }

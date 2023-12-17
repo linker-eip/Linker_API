@@ -227,7 +227,8 @@ export class GroupService {
             let groupInviteResponse : GetInvitesResponse = {
                 id: user.id,
                 name: user.firstName + ' ' + user.lastName,
-                picture: userProfile.picture
+                picture: userProfile.picture,
+                leaderName: null
             }
             return groupInviteResponse
         }))
@@ -241,7 +242,8 @@ export class GroupService {
 
         let groups = Promise.all(groupInvites.map(async it => {
             let group = await this.groupRepository.findOne({where: {id: it.groupId}})
-            let response : GetInvitesResponse = {id: group.id, name: group.name, picture: group.picture}
+            let leader = await this.studentService.findOneByEmail(req.user.email)
+            let response : GetInvitesResponse = {id: group.id, name: group.name, picture: group.picture, leaderName: leader.firstName + ' ' + leader.lastName}
             return response
         }))
 
