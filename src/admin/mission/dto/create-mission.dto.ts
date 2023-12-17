@@ -26,7 +26,7 @@ export class CreateMissionDto {
   @IsNumber()
   companyId: number;
 
-  @ApiProperty({ type: 'array', items: { type: 'number' }})
-  @IsNumber({}, { each: true })
-  studentsIds: number[];
+  @ApiProperty()
+  @IsNumber()
+  groupId: number;
 }

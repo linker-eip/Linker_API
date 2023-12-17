@@ -24,14 +24,6 @@ export class MissionService {
       throw new NotFoundException(`COMPANY_NOT_FOUND`);
     }
 
-    for (const studentId of createMissionDto.studentsIds) {
-      const student = await this.userAdminService.findOneStudentById(studentId);
-
-      if (!student) {
-        throw new NotFoundException(`STUDENT_NOT_FOUND`);
-      }
-    }
-
     const mission = new Mission();
     mission.name = createMissionDto.name;
     mission.description = createMissionDto.description;
@@ -39,7 +31,7 @@ export class MissionService {
     mission.endOfMission = createMissionDto.endOfMission;
     mission.amount = createMissionDto.amount;
     mission.companyId = createMissionDto.companyId;
-    mission.studentsIds = createMissionDto.studentsIds;
+    mission.groupId = createMissionDto.groupId;
 
     return await this.missionRepository.save(mission);
   }
@@ -135,8 +127,8 @@ export class MissionService {
       update.companyId = body.companyId;
     }
 
-    if (body.studentsIds !== null) {
-      update.studentsIds = body.studentsIds;
+    if (body.groupId !== null) {
+      update.groupId = body.groupId;
     }
 
     await this.missionRepository.update(mission.id, update);

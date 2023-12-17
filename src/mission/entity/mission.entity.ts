@@ -26,8 +26,8 @@ export class Mission {
   @Column({ type: 'int', nullable: true })
   companyId: number;
 
-  @Column('simple-array', { nullable: true })
-  studentsIds: number[];
+  @Column({ type: 'int', nullable: true })
+  groupId: number;
 
   @Column({ type: 'timestamp' })
   startOfMission: Date;
