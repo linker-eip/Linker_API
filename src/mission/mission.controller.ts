@@ -128,6 +128,15 @@ export class MissionController {
     return await this.missionService.getMissionTasks(missionId, req);
   }
 
+  @Put('task/:taskId/affect/:studentId')
+  @ApiOperation({
+    description: 'Affect a student to a task - This route should be used by a student',
+    summary: 'Affect a student to a task - This route should be used by a student',
+  })
+  async affectTask(@Param('taskId') taskId: number, @Param('studentId') studentId: number, @Req() req) {
+    return await this.missionService.affectTask(taskId, studentId, req);
+  }
+
   @Post('accept/:missionId/:groupId')
   @ApiOperation({
     description: 'Accept a mission for a group',

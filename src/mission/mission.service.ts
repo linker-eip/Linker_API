@@ -33,7 +33,7 @@ export class MissionService {
     private readonly studentService: StudentService,
     @InjectRepository(MissionInvite)
     private readonly missionInviteRepository: Repository<MissionInvite>,
-  ) {}
+  ) { }
 
   async findMissionById(missionId: number): Promise<Mission> {
     const mission = await this.missionRepository.findOne({
@@ -268,6 +268,10 @@ export class MissionService {
     try {
       company = await this.companyService.findOne(req.user.email);
     } catch (err) {
+      throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
+    }
+
+    if (company == null) {
       throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
     }
 
@@ -545,7 +549,7 @@ export class MissionService {
             studentProfile: null,
           });
           continue;
-        }        
+        }
         let student = await this.studentService.findOneById(studentId);
         const studentProfile =
           await this.studentService.findStudentProfileByStudentId(student.id);
@@ -598,5 +602,35 @@ export class MissionService {
       group,
       groupStudents,
     };
+  }
+
+  async affectTask(taskId: number, studentId: number, req: any) {
+    let student = await this.studentService.findOneByEmail(req.user.email);
+    let affectedStudent = await this.studentService.findOneById(studentId);
+    let task = await this.missionTaskRepository.findOne({ where: { id: taskId } })
+    let group = await this.groupService.findGroupById(student.groupId);
+    if (task == null) {
+      throw new HttpException("Tâche invalide", HttpStatus.NOT_FOUND);
+    }
+    if (group == null) {
+      throw new HttpException("Vous n'avez pas de groupe", HttpStatus.BAD_REQUEST);
+    }
+    let mission = await this.missionRepository.findOne({ where: { id: task.missionId } })
+    if (mission == null || mission.groupId != student.groupId) {
+      throw new HttpException("Tâche invalide2", HttpStatus.NOT_FOUND);
+    }
+
+
+    if (affectedStudent == null || student.groupId != affectedStudent.groupId) {
+      throw new HttpException("Invalid student", HttpStatus.BAD_REQUEST);
+    }
+
+    if (student.id == group.leaderId || student.id == affectedStudent.id) {
+      task.studentId = affectedStudent.id;
+    } else {
+      throw new HttpException("Vous n'avez pas la permission d'affecter cette tâche", HttpStatus.FORBIDDEN);
+    }
+
+    this.missionTaskRepository.save(task)
   }
 }

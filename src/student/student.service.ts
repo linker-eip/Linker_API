@@ -33,7 +33,7 @@ export class StudentService {
   }
 
   async findOneByEmail(email: string): Promise<StudentUser | undefined> {
-    return this.studentRepository.findOne({ where: { email } });
+    return this.studentRepository.findOne({ where: { email: email } });
   }
 
   async findOneById(studentId: number): Promise<StudentUser | undefined> {
