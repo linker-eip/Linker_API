@@ -24,6 +24,7 @@ import { UpdateMissionTaskDto } from './dto/update-mission-task.dto';
 import { MissionTaskDto } from './dto/mission-task.dto';
 import { GetMissionDetailsStudentDto } from './dto/get-mission-details-student.dto';
 import { GetMissionDetailsCompanyDto } from './dto/get-mission-details-company.dto';
+import { UpdateTaskStatusDto } from './dto/update-task-status-dto';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
@@ -126,6 +127,24 @@ export class MissionController {
   })
   async getMissionTasks(@Param('missionId') missionId: number, @Req() req) {
     return await this.missionService.getMissionTasks(missionId, req);
+  }
+
+  @Put('task/:taskId/affect/:studentId')
+  @ApiOperation({
+    description: 'Affect a student to a task - This route should be used by a student',
+    summary: 'Affect a student to a task - This route should be used by a student',
+  })
+  async affectTask(@Param('taskId') taskId: number, @Param('studentId') studentId: number, @Req() req) {
+    return await this.missionService.affectTask(taskId, studentId, req);
+  }
+
+  @Put('task/:taskId/status')
+  @ApiOperation({
+    description: 'Change task status - This route should be used by a student',
+    summary: 'Change task status - This route should be used by a student',
+  })
+  async updateTaskStatus(@Param('taskId') taskId: number, @Body() body: UpdateTaskStatusDto, @Req() req) {
+    return await this.missionService.updateTaskStatus(taskId, body, req);
   }
 
   @Post('accept/:missionId/:groupId')
