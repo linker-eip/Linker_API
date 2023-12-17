@@ -23,32 +23,39 @@ export class DocumentTransferService {
     })
   }
 
-  async uploadFile(file: Express.Multer.File) {
-    const metadata = await sharp(file.buffer).metadata();
-    const width = metadata.width;
-    const height = metadata.height;
+  async uploadFile(file: Express.Multer.File): Promise<string> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const metadata = await sharp(file.buffer).metadata();
+        const width = metadata.width;
+        const height = metadata.height;
 
-    if (!width || !height) {
-      throw new Error('Unable to determine image dimensions');
-    }
+        if (!width || !height) {
+          throw new Error('Unable to determine image dimensions');
+        }
 
-    const key = getRandomString(48);
-    const url = `https://${this.s3Bucket}.s3.${this.s3Region}.amazonaws.com/${key}`;
+        const key = getRandomString(48);
+        const url = `https://${this.s3Bucket}.s3.${this.s3Region}.amazonaws.com/${key}`;
 
-    const outputBuffer = await sharp(file.buffer)
-      .resize(width, height, { fit: 'cover' })
-      .jpeg({ quality: 90 })
-      .toBuffer();
-    
-    await this.s3Client.send(new PutObjectCommand({
-      Bucket: this.s3Bucket,
-      Key: key,
-      Body: outputBuffer,
-      ContentType: file.mimetype,
-    }));
+        const outputBuffer = await sharp(file.buffer)
+          .resize(width, height, { fit: 'cover' })
+          .jpeg({ quality: 90 })
+          .toBuffer();
 
-    return url;
+        await this.s3Client.send(new PutObjectCommand({
+          Bucket: this.s3Bucket,
+          Key: key,
+          Body: outputBuffer,
+          ContentType: file.mimetype,
+        }));
+
+        resolve(url);
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
+
 
   async deleteFile(key: string): Promise<void> {
     await this.s3Client.send(

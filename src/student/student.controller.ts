@@ -69,7 +69,7 @@ export class StudentController {
     async updateStudentProfile(
       @UploadedFile(
         new ParseFilePipe({
-          fileIsRequired: true,
+          fileIsRequired: false,
           errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
           validators: [
             new MaxFileSizeValidator({
