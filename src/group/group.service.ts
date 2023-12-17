@@ -252,7 +252,8 @@ export class GroupService {
             };
             return response;
         }));
-        return groups
+        console.log(groups)
+        return groups.filter(group => group !== undefined) as GetInvitesResponse[];
     }
 
     async acceptInvite(req: any, groupId: number) {
