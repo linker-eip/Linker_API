@@ -25,6 +25,7 @@ import { MissionTaskDto } from './dto/mission-task.dto';
 import { GetMissionDetailsStudentDto } from './dto/get-mission-details-student.dto';
 import { GetMissionDetailsCompanyDto } from './dto/get-mission-details-company.dto';
 import { UpdateTaskStatusDto } from './dto/update-task-status-dto';
+import { GetMissionDto } from './dto/get-mission.dto';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
@@ -68,6 +69,10 @@ export class MissionController {
   @ApiOperation({
     description: 'Get all missions from a company',
     summary: 'Get all missions from a company',
+  })
+  @ApiOkResponse({
+    description: 'Get all missions from a company',
+    type: GetMissionDto,
   })
   async getMissions(@Req() req) {
     return await this.missionService.getCompanyMissions(req);
