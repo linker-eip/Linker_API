@@ -514,8 +514,28 @@ export class MissionService {
 
   async getMissionDetailsStudent(missionId: number, req: any) {
     let mission = await this.findMissionById(missionId);
+
+    const studentUser = await this.studentService.findOneByEmail(req.user.email);
+    if (studentUser == null) {
+      throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED);
+    }
+
     if (mission == null) {
       throw new HttpException('Invalid mission', HttpStatus.NOT_FOUND);
+    }
+
+    if (mission.groupId == null) {
+      throw new HttpException(
+        "You can't see this mission",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (mission.groupId != studentUser.groupId) {
+      throw new HttpException(
+        "You can't see this mission you are not in the group",
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     let groupStudents = [];
