@@ -67,6 +67,10 @@ export class CompanyService {
     return this.companyProfileRepository.findOne({ where: { email } });
   }
 
+  async findCompanyProfileById(id: number): Promise<CompanyProfile> {
+    return this.companyProfileRepository.findOne({ where: { id } });
+  }
+
   async updateCompanyProfile(
     CreateCompanyProfileDto: CreateCompanyProfileDto,
     req: any,

@@ -4,6 +4,7 @@ import { MissionStatus } from '../enum/mission-status.enum';
 import { MissionTaskDto } from './mission-task.dto';
 import { StudentProfileResponseDto } from '../../student/dto/student-profile-response.dto';
 import { GetGroupeResponse } from '../../group/dto/get-group-response-dto';
+import { CompanyProfileResponseDto } from '../../company/dto/company-profile-response.dto';
 
 export class GetMissionDetailsDto {
   @ApiProperty()
@@ -98,6 +99,10 @@ export class MissionTaskArrayDto {
 }
 
 export class GetMissionDetailsStudentDto {
+
+  @ApiProperty()
+  companyProfile: CompanyProfileResponseDto;
+
   @ApiProperty()
   mission: GetMissionDetailsDto;
 

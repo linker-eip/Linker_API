@@ -21,6 +21,7 @@ import { MissionStatus } from './enum/mission-status.enum';
 import { MissionTaskStatus } from './enum/mission-task-status.enum';
 import { StudentProfileResponseDto } from '../student/dto/student-profile-response.dto';
 import { UpdateTaskStatusDto } from './dto/update-task-status-dto';
+import { MissionSearchOptionStudentDto } from './dto/mission-search-option-student.dto';
 
 @Injectable()
 export class MissionService {
@@ -34,6 +35,7 @@ export class MissionService {
     private readonly studentService: StudentService,
     @InjectRepository(MissionInvite)
     private readonly missionInviteRepository: Repository<MissionInvite>,
+
   ) { }
 
   async findMissionById(missionId: number): Promise<Mission> {
@@ -524,6 +526,10 @@ export class MissionService {
       throw new HttpException('Invalid mission', HttpStatus.NOT_FOUND);
     }
 
+    const companyProfile = await this.companyService.findCompanyProfileById(
+      mission.companyId,
+    );
+
     if (mission.groupId == null) {
       throw new HttpException(
         "You can't see this mission",
@@ -580,6 +586,7 @@ export class MissionService {
       }
     } else {
       return {
+        companyProfile,
         mission,
         missionTaskArray,
         group,
@@ -618,6 +625,7 @@ export class MissionService {
     }
 
     return {
+      companyProfile,
       mission,
       missionTaskArray,
       group,
@@ -677,5 +685,20 @@ export class MissionService {
     }
 
     this.missionTaskRepository.save(task);
+  }
+
+  async getStudentMissions(req : any, searchOption : MissionSearchOptionStudentDto) {
+    let student = await this.studentService.findOneByEmail(req.user.email);
+    if (student == null) {
+      throw new HttpException("Vous n'êtes pas un étudiant", HttpStatus.UNAUTHORIZED);
+    }
+    if (student.groupId == null) {
+      throw new HttpException("Vous n'avez pas de groupe", HttpStatus.BAD_REQUEST);
+    }
+    let missions = await this.missionRepository.find({ where: { groupId: student.groupId } })
+    if (searchOption.status) {
+      missions = missions.filter(mission => mission.status == searchOption.status)
+    }
+    return missions;
   }
 }

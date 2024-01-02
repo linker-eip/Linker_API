@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -26,6 +27,7 @@ import { GetMissionDetailsStudentDto } from './dto/get-mission-details-student.d
 import { GetMissionDetailsCompanyDto } from './dto/get-mission-details-company.dto';
 import { UpdateTaskStatusDto } from './dto/update-task-status-dto';
 import { GetMissionDto } from './dto/get-mission.dto';
+import { MissionSearchOptionStudentDto } from './dto/mission-search-option-student.dto';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
@@ -210,5 +212,18 @@ export class MissionController {
   })
   async getMissionDetailsStudent(@Param('missionId') missionId: number, @Req() req) {
     return await this.missionService.getMissionDetailsStudent(missionId, req);
+  }
+
+  @Get('student/missions')
+  @ApiOperation({
+    description: 'Get all missions for a student',
+    summary: 'Get all missions for a student',
+  })
+  @ApiOkResponse({
+    description: 'Get all missions for a student',
+    type: GetMissionDto,
+  })
+  async getStudentMissions(@Query() searchOption: MissionSearchOptionStudentDto, @Req() req) {
+    return await this.missionService.getStudentMissions(req, searchOption);
   }
 }
