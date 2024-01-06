@@ -11,10 +11,9 @@ import { SkillsModule } from './skills/skills.module';
 import { FileService } from '../filesystem/file.service';
 import { DocumentTransferService } from 'src/document-transfer/src/services/document-transfer.service';
 import { ConfigService } from '@nestjs/config';
-import { CompanyModule } from '../company/company.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([StudentUser, StudentProfile]), JobsModule, StudiesModule, SkillsModule, CompanyModule],
+  imports: [TypeOrmModule.forFeature([StudentUser, StudentProfile]), JobsModule, StudiesModule, SkillsModule],
   controllers: [StudentController],
   providers: [StudentService, FileService, DocumentTransferService, ConfigService],
   exports: [StudentService],
