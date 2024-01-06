@@ -226,4 +226,13 @@ export class MissionController {
   async getStudentMissions(@Query() searchOption: MissionSearchOptionStudentDto, @Req() req) {
     return await this.missionService.getStudentMissions(req, searchOption);
   }
+
+  @Post('company/invite/:missionId/:groupId')
+  @ApiOperation({
+    description: 'Invite a group to a mission',
+    summary: 'Invite a group to a mission',
+  })
+  async inviteGroup(@Param('missionId') missionId: number, @Param('groupId') groupId: number, @Req() req) {
+    return await this.missionService.inviteGroup(missionId, groupId, req);
+  }  
 }

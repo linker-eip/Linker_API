@@ -701,4 +701,48 @@ export class MissionService {
     }
     return missions;
   }
+
+  async inviteGroup(missionId: number, groupId: number, req: any) {
+    let mission = await this.findMissionById(missionId);
+    if (mission == null) {
+      throw new HttpException('Mission invalide', HttpStatus.NOT_FOUND);
+    }
+    let company = await this.companyService.findOne(req.user.email);
+    if (company == null) {
+      throw new HttpException(
+        "Vous n'êtes pas une entreprise",
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    if (mission.companyId != company.id) {
+      throw new HttpException(
+        'Cette mission ne vous appartient pas',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    let group = await this.groupService.findGroupById(groupId);
+    if (group == null) {
+      throw new HttpException('Groupe invalide', HttpStatus.NOT_FOUND);
+    }
+    if (mission.groupId != null) {
+      throw new HttpException(
+        'Cette mission est déjà acceptée par un groupe',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    let missionInvite = await this.missionInviteRepository.findOne({
+      where: { missionId, groupId },
+    });
+    if (missionInvite != null) {
+      throw new HttpException(
+        'Ce groupe a déjà été invité',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    missionInvite = new MissionInvite();
+    missionInvite.missionId = missionId;
+    missionInvite.groupId = groupId;
+    missionInvite.status = MissionInviteStatus.PENDING;
+    await this.missionInviteRepository.save(missionInvite);
+  }
 }
