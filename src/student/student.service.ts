@@ -15,6 +15,7 @@ import { UpdateJobsDto } from './jobs/dto/update-jobs.dto';
 import { UpdateStudiesDto } from './studies/dto/update-studies.dto';
 import { StudentSearchOptionDto } from './dto/student-search-option.dto';
 import { StudentSearchResponseDto, formatToStudentSearchResponseDto } from './dto/student-search-response.dto';
+import { CompanyService } from '../company/company.service';
 
 @Injectable()
 export class StudentService {
@@ -28,6 +29,7 @@ export class StudentService {
     private readonly studiesService: StudiesService,
     private readonly fileService: FileService,
     private readonly documentTransferService: DocumentTransferService,
+    private readonly companyService: CompanyService,
   ) {}
 
   async findAll(): Promise<StudentUser[]> {
@@ -374,5 +376,11 @@ export class StudentService {
         throw new Error();
       }
     }))
+  }
+
+  async getCompanyInfoByStudent(companyId: number) {
+    const companyProfile = await this.companyService.findCompanyProfileById(companyId);
+    if (!companyProfile) throw new HttpException('Invalid company', HttpStatus.NOT_FOUND);
+    return companyProfile;
   }
 }

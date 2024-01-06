@@ -33,6 +33,7 @@ import { UpdateJobsDto } from './jobs/dto/update-jobs.dto';
 import { UpdateStudiesDto } from './studies/dto/update-studies.dto';
 import { StudentSearchResponseDto, formatToStudentSearchResponseDto } from './dto/student-search-response.dto';
 import { StudentSearchOptionDto } from './dto/student-search-option.dto';
+import { CompanyProfileResponseDto } from '../company/dto/company-profile-response.dto';
 
 @Controller('api/student')
 @UseGuards(AuthGuard('jwt'))
@@ -202,5 +203,19 @@ export class StudentController {
     @Req() req,
   ): Promise<StudentSearchResponseDto[]> {
     return await this.studentService.findAllStudents(searchOption);
+  }
+
+  @Get('companyInfo/:companyId')
+  @ApiOperation({
+    description: 'Get company info',
+    summary: 'Get company info',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Get company info',
+    type: CompanyProfileResponseDto,
+  })
+  async getCompanyInfoByStudent(@Param('companyId') companyId: number) {
+    return this.studentService.getCompanyInfoByStudent(companyId);
   }
 }
