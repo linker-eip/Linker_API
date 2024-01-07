@@ -1,56 +1,69 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { Studies } from "../../student/studies/entity/studies.entity";
-import { Skills } from "../../student/skills/entity/skills.entity";
-import { Jobs } from "../../student/jobs/entity/jobs.entity";
+import { ApiProperty } from '@nestjs/swagger';
+import { Studies } from '../../student/studies/entity/studies.entity';
+import { Skills } from '../../student/skills/entity/skills.entity';
+import { Jobs } from '../../student/jobs/entity/jobs.entity';
+import { IsNumber, IsString } from 'class-validator';
 
 export class StudentProfileResponseDto {
-    @ApiProperty()
-    firstName: string;
+  @ApiProperty()
+  @IsString()
+  firstName: string;
 
-    @ApiProperty()
-    lastName: string;
+  @ApiProperty()
+  @IsString()
+  lastName: string;
 
-    @ApiProperty()
-    description: string;
+  @ApiProperty()
+  @IsString()
+  description: string;
 
-    @ApiProperty()
-    email: string;
+  @ApiProperty()
+  @IsString()
+  email: string;
 
-    @ApiProperty()
-    phone: string;
+  @ApiProperty()
+  @IsString()
+  phone: string;
 
-    @ApiProperty()
-    location: string;
+  @ApiProperty()
+  @IsString()
+  location: string;
 
-    @ApiProperty()
-    picture: string;
+  @ApiProperty()
+  @IsString()
+  picture: string;
 
-    @ApiProperty({type : Studies, isArray : true})
-    studies: Studies[];
+  @ApiProperty({ type: Studies, isArray: true })
+  studies: Studies[];
 
-    @ApiProperty({type : Skills, isArray : true})
-    skills: Skills[];
+  @ApiProperty({ type: Skills, isArray: true })
+  skills: Skills[];
 
-    @ApiProperty({type : Jobs, isArray : true})
-    jobs: Jobs[];
+  @ApiProperty({ type: Jobs, isArray: true })
+  jobs: Jobs[];
 
-    @ApiProperty()
-    website: string;
+  @ApiProperty()
+  @IsString()
+  website: string;
 
-    @ApiProperty()
-    note: number;
+  @ApiProperty()
+  @IsNumber()
+  note: number;
 }
 
 export class GetCompanySearchGroupsDto {
-    @ApiProperty()
-    id: number;
+  @ApiProperty()
+  @IsNumber()
+  id: number;
 
-    @ApiProperty()
-    name: string;
+  @ApiProperty()
+  @IsString()
+  name: string;
 
-    @ApiProperty()
-    description: string;
+  @ApiProperty()
+  @IsString()
+  description: string;
 
-    @ApiProperty()
-    studentsProfiles: StudentProfileResponseDto[];
+  @ApiProperty({ type: StudentProfileResponseDto, isArray: true })
+  studentsProfiles: StudentProfileResponseDto[];
 }
