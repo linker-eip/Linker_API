@@ -6,6 +6,7 @@ import { CreateGroupDto } from './dto/create-group-dto';
 import { UpdateGroupDto } from './dto/update-group-dto';
 import { GetGroupeResponse } from './dto/get-group-response-dto';
 import { GetInvitesResponse } from './dto/get-invites-response-dto';
+import { GetCompanySearchGroupsDto } from './dto/get-company-search-groups.dto';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
@@ -168,4 +169,20 @@ export class GroupController {
     async leaveGroup(@Req() req) {
         return await this.groupService.leaveGroup(req);
     }
+
+    @Get('/company/searchGroups')
+    @ApiOperation({
+        description: 'Get all groups',
+        summary: 'Get all groups',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Groups found',
+        type: GetCompanySearchGroupsDto,
+        isArray: true,
+    })
+    async getAllGroups(@Req() req): Promise<GetCompanySearchGroupsDto[]> {
+        return await this.groupService.getAllGroups(req);
+    }
+
 }

@@ -14,7 +14,10 @@ import { UpdateSkillDto } from './skills/dto/update-skill.dto';
 import { UpdateJobsDto } from './jobs/dto/update-jobs.dto';
 import { UpdateStudiesDto } from './studies/dto/update-studies.dto';
 import { StudentSearchOptionDto } from './dto/student-search-option.dto';
-import { StudentSearchResponseDto, formatToStudentSearchResponseDto } from './dto/student-search-response.dto';
+import {
+  StudentSearchResponseDto,
+  formatToStudentSearchResponseDto,
+} from './dto/student-search-response.dto';
 import { CompanyService } from '../company/company.service';
 
 @Injectable()
@@ -60,8 +63,23 @@ export class StudentService {
     });
   }
 
-  async findAllByIdIn(ids: number[]) : Promise<StudentUser[]> {
-    return this.studentRepository.findBy({id: In(ids)});
+  async findAllByIdIn(ids: number[]): Promise<StudentUser[]> {
+    return this.studentRepository.findBy({ id: In(ids) });
+  }
+
+  async findAllStudentsProfilesByStudentIds(studentIds: number[]) {
+    return await Promise.all(
+      studentIds.map(async (studentId) => {
+        try {
+          const studentProfile = await this.studentProfileRepository.findOneBy({
+            studentId: studentId,
+          });
+          return studentProfile;
+        } catch (e) {
+          throw new Error();
+        }
+      }),
+    );
   }
 
   async save(student: StudentUser): Promise<StudentUser> {
@@ -342,9 +360,9 @@ export class StudentService {
             });
           });
         }
-          qb.andWhere('studentUser.isActive = :isActive', {
-            isActive: true,
-          });
+        qb.andWhere('studentUser.isActive = :isActive', {
+          isActive: true,
+        });
 
         if (searchOption.lastName) {
           qb.andWhere('studentUser.lastName = :lastName', {
@@ -368,19 +386,29 @@ export class StudentService {
 
     const students = await studentsQuery.getMany();
 
-    return await Promise.all(students.map(async student => {
-      try {
-      let studentProfile = await this.studentProfileRepository.findOneBy({studentId: student.id})
-      return formatToStudentSearchResponseDto(student, studentProfile.picture);
-      } catch(e) {
-        throw new Error();
-      }
-    }))
+    return await Promise.all(
+      students.map(async (student) => {
+        try {
+          let studentProfile = await this.studentProfileRepository.findOneBy({
+            studentId: student.id,
+          });
+          return formatToStudentSearchResponseDto(
+            student,
+            studentProfile.picture,
+          );
+        } catch (e) {
+          throw new Error();
+        }
+      }),
+    );
   }
 
   async getCompanyInfoByStudent(companyId: number) {
-    const companyProfile = await this.companyService.findCompanyProfileById(companyId);
-    if (!companyProfile) throw new HttpException('Invalid company', HttpStatus.NOT_FOUND);
+    const companyProfile = await this.companyService.findCompanyProfileById(
+      companyId,
+    );
+    if (!companyProfile)
+      throw new HttpException('Invalid company', HttpStatus.NOT_FOUND);
     return companyProfile;
   }
 }

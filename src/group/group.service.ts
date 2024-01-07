@@ -11,6 +11,8 @@ import { NotificationType } from 'src/notifications/entity/Notification.entity';
 import { Request } from 'express';
 import { GroupInvite } from './entity/GroupInvite.entity';
 import { GetInvitesResponse } from './dto/get-invites-response-dto';
+import { CompanyService } from 'src/company/company.service';
+import { GetCompanySearchGroupsDto } from './dto/get-company-search-groups.dto';
 
 @Injectable()
 export class GroupService {
@@ -20,7 +22,8 @@ export class GroupService {
         @InjectRepository(GroupInvite)
         private readonly groupInviteRepository: Repository<GroupInvite>,
         private readonly studentService: StudentService,
-        private readonly notificationService: NotificationsService
+        private readonly notificationService: NotificationsService,
+        private readonly CompanyService: CompanyService
     ) { }
 
     async getUserGroup(req: any) : Promise<Group> {
@@ -311,5 +314,26 @@ export class GroupService {
 
         this.groupRepository.save(group)
         this.studentService.save(student);
+    }
+
+    async getAllGroups(req : any): Promise<GetCompanySearchGroupsDto[]> {
+        const company = await this.CompanyService.findOne(req.user.email);
+        if (!company)
+            throw new HttpException('Groupe invalide', HttpStatus.NOT_FOUND);
+        const groups = await this.groupRepository.find();
+        return Promise.all(groups.map(async it => {
+            let students = await this.studentService.findAllByIdIn(it.studentIds);
+            let studentProfiles = await Promise.all(students.map(async it => {
+                let studentProfile = await this.studentService.findStudentProfile(it.email);
+                return studentProfile;
+            }));
+            let dto: GetCompanySearchGroupsDto = {
+                id: it.id,
+                name: it.name,
+                description: it.description,
+                studentsProfiles: studentProfiles
+            }
+            return dto;
+        }));
     }
 }
