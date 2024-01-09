@@ -234,5 +234,18 @@ export class MissionController {
   })
   async inviteGroup(@Param('missionId') missionId: number, @Param('groupId') groupId: number, @Req() req) {
     return await this.missionService.inviteGroup(missionId, groupId, req);
-  }  
+  }
+
+  @Get('student/invitations')
+  @ApiOperation({
+    description: 'Get all invitations for a student',
+    summary: 'Get all invitations for a student',
+  })
+  @ApiOkResponse({
+    description: 'Get all invitations for a student',
+    type: GetMissionDto,
+  })
+  async getStudentInvitations(@Req() req) {
+    return await this.missionService.getMissionInvites(req);
+  }
 }

@@ -22,6 +22,7 @@ import { MissionTaskStatus } from './enum/mission-task-status.enum';
 import { StudentProfileResponseDto } from '../student/dto/student-profile-response.dto';
 import { UpdateTaskStatusDto } from './dto/update-task-status-dto';
 import { MissionSearchOptionStudentDto } from './dto/mission-search-option-student.dto';
+import { GetMissionDto } from './dto/get-mission.dto';
 
 @Injectable()
 export class MissionService {
@@ -35,8 +36,7 @@ export class MissionService {
     private readonly studentService: StudentService,
     @InjectRepository(MissionInvite)
     private readonly missionInviteRepository: Repository<MissionInvite>,
-
-  ) { }
+  ) {}
 
   async findMissionById(missionId: number): Promise<Mission> {
     const mission = await this.missionRepository.findOne({
@@ -518,7 +518,9 @@ export class MissionService {
   async getMissionDetailsStudent(missionId: number, req: any) {
     let mission = await this.findMissionById(missionId);
 
-    const studentUser = await this.studentService.findOneByEmail(req.user.email);
+    const studentUser = await this.studentService.findOneByEmail(
+      req.user.email,
+    );
     if (studentUser == null) {
       throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED);
     }
@@ -558,9 +560,7 @@ export class MissionService {
       const studentProfile = [];
       if (missionTask.studentId != null) {
         studentProfile.push(
-          await this.studentService.findStudentProfileByStudentId(
-            student.id,
-          ),
+          await this.studentService.findStudentProfileByStudentId(student.id),
         );
       }
       missionTaskArray.push({
@@ -637,68 +637,100 @@ export class MissionService {
   async affectTask(taskId: number, studentId: number, req: any) {
     let student = await this.studentService.findOneByEmail(req.user.email);
     let affectedStudent = await this.studentService.findOneById(studentId);
-    let task = await this.missionTaskRepository.findOne({ where: { id: taskId } })
+    let task = await this.missionTaskRepository.findOne({
+      where: { id: taskId },
+    });
     let group = await this.groupService.findGroupById(student.groupId);
     if (task == null) {
-      throw new HttpException("Tâche invalide", HttpStatus.NOT_FOUND);
+      throw new HttpException('Tâche invalide', HttpStatus.NOT_FOUND);
     }
     if (group == null) {
-      throw new HttpException("Vous n'avez pas de groupe", HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        "Vous n'avez pas de groupe",
+        HttpStatus.BAD_REQUEST,
+      );
     }
-    let mission = await this.missionRepository.findOne({ where: { id: task.missionId } })
-    if (mission == null || mission.groupId != student.groupId) {
-      throw new HttpException("Tâche invalide", HttpStatus.NOT_FOUND);
+    let mission = await this.missionRepository.findOne({
+      where: { id: task.missionId },
+    });
+    if (mission == null || mission.groupId != student.groupId) {
+      throw new HttpException('Tâche invalide', HttpStatus.NOT_FOUND);
     }
-
 
     if (affectedStudent == null || student.groupId != affectedStudent.groupId) {
-      throw new HttpException("Invalid student", HttpStatus.BAD_REQUEST);
+      throw new HttpException('Invalid student', HttpStatus.BAD_REQUEST);
     }
 
     if (student.id == group.leaderId || student.id == affectedStudent.id) {
       task.studentId = affectedStudent.id;
     } else {
-      throw new HttpException("Vous n'avez pas la permission d'affecter cette tâche", HttpStatus.FORBIDDEN);
-    }
-
-    this.missionTaskRepository.save(task)
-  }
-
-  async updateTaskStatus(taskId: number, body: UpdateTaskStatusDto, req: any) {
-    let student = await this.studentService.findOneByEmail(req.user.email);
-    let task = await this.missionTaskRepository.findOne({ where: { id: taskId } })
-    let group = await this.groupService.findGroupById(student.groupId);
-    if (task == null) {
-      throw new HttpException("Tâche invalide", HttpStatus.NOT_FOUND);
-    }
-    if (group == null) {
-      throw new HttpException("Vous n'avez pas de groupe", HttpStatus.BAD_REQUEST);
-    }
-
-    let mission = await this.missionRepository.findOne({ where: { id: task.missionId } })
-    if (mission == null || mission.groupId != student.groupId) {
-      throw new HttpException("Tâche invalide", HttpStatus.NOT_FOUND);
-    }
-    if (student.id == group.leaderId || student.id == task.studentId) {
-      task.status = body.status
-    } else {
-      throw new HttpException("Vous n'avez pas la permission de changer le statut de cette tâche", HttpStatus.FORBIDDEN);
+      throw new HttpException(
+        "Vous n'avez pas la permission d'affecter cette tâche",
+        HttpStatus.FORBIDDEN,
+      );
     }
 
     this.missionTaskRepository.save(task);
   }
 
-  async getStudentMissions(req : any, searchOption : MissionSearchOptionStudentDto) {
+  async updateTaskStatus(taskId: number, body: UpdateTaskStatusDto, req: any) {
+    let student = await this.studentService.findOneByEmail(req.user.email);
+    let task = await this.missionTaskRepository.findOne({
+      where: { id: taskId },
+    });
+    let group = await this.groupService.findGroupById(student.groupId);
+    if (task == null) {
+      throw new HttpException('Tâche invalide', HttpStatus.NOT_FOUND);
+    }
+    if (group == null) {
+      throw new HttpException(
+        "Vous n'avez pas de groupe",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    let mission = await this.missionRepository.findOne({
+      where: { id: task.missionId },
+    });
+    if (mission == null || mission.groupId != student.groupId) {
+      throw new HttpException('Tâche invalide', HttpStatus.NOT_FOUND);
+    }
+    if (student.id == group.leaderId || student.id == task.studentId) {
+      task.status = body.status;
+    } else {
+      throw new HttpException(
+        "Vous n'avez pas la permission de changer le statut de cette tâche",
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    this.missionTaskRepository.save(task);
+  }
+
+  async getStudentMissions(
+    req: any,
+    searchOption: MissionSearchOptionStudentDto,
+  ) {
     let student = await this.studentService.findOneByEmail(req.user.email);
     if (student == null) {
-      throw new HttpException("Vous n'êtes pas un étudiant", HttpStatus.UNAUTHORIZED);
+      throw new HttpException(
+        "Vous n'êtes pas un étudiant",
+        HttpStatus.UNAUTHORIZED,
+      );
     }
     if (student.groupId == null) {
-      throw new HttpException("Vous n'avez pas de groupe", HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        "Vous n'avez pas de groupe",
+        HttpStatus.BAD_REQUEST,
+      );
     }
-    let missions = await this.missionRepository.find({ where: { groupId: student.groupId } })
+    let missions = await this.missionRepository.find({
+      where: { groupId: student.groupId },
+    });
     if (searchOption.status) {
-      missions = missions.filter(mission => mission.status == searchOption.status)
+      missions = missions.filter(
+        (mission) => mission.status == searchOption.status,
+      );
     }
     return missions;
   }
@@ -745,5 +777,39 @@ export class MissionService {
     missionInvite.groupId = groupId;
     missionInvite.status = MissionInviteStatus.PENDING;
     await this.missionInviteRepository.save(missionInvite);
+  }
+
+  async getMissionInvites(req: any): Promise<GetMissionDto[]> {
+    const student = await this.studentService.findOneByEmail(req.user.email);
+    if (student == null) {
+      throw new HttpException(
+        "Vous n'êtes pas un étudiant",
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    const missionInvites = await this.missionInviteRepository.find({
+      where: { groupId: student.groupId, status: MissionInviteStatus.PENDING },
+    });
+    const missions = [];
+    for (let missionInvite of missionInvites) {
+      const mission = await this.findMissionById(missionInvite.missionId);
+      if (mission == null) {
+        throw new HttpException('Mission invalide', HttpStatus.NOT_FOUND);
+      }
+      const dto = new GetMissionDto();
+      dto.id = mission.id;
+      dto.name = mission.name;
+      dto.status = mission.status;
+      dto.description = mission.description;
+      dto.companyId = mission.companyId;
+      dto.groupId = mission.groupId;
+      dto.startOfMission = mission.startOfMission;
+      dto.endOfMission = mission.endOfMission;
+      dto.createdAt = mission.createdAt;
+      dto.amount = mission.amount;
+
+      missions.push(dto);
+    }
+    return missions;
   }
 }
