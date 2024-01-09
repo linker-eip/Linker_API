@@ -337,6 +337,7 @@ export class MissionService {
     }
 
     mission.groupId = groupId;
+    mission.status = MissionStatus.IN_PROGRESS;
     missionInvite.status = MissionInviteStatus.ACCEPTED;
 
     await this.missionRepository.save(mission);
