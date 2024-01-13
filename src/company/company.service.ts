@@ -68,7 +68,7 @@ export class CompanyService {
   }
 
   async findCompanyProfileById(id: number): Promise<CompanyProfile> {
-    return this.companyProfileRepository.findOne({ where: { id } });
+    return this.companyProfileRepository.findOne({ where: { id : id } });
   }
 
   async updateCompanyProfile(
