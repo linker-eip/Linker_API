@@ -25,6 +25,8 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { DocumentTransferModule } from './document-transfer/src/document-transfer.module';
 import { DocumentTransferService } from './document-transfer/src/services/document-transfer.service';
 import { DocumentTransferController } from './document-transfer/src/document-transfer.controller';
+import { Gateway } from './chat/gateway';
+import { GatewayModule } from './chat/gateway.module';
 
 @Module({
   imports: [
@@ -62,9 +64,10 @@ import { DocumentTransferController } from './document-transfer/src/document-tra
     InvoiceModule,
     GroupModule,
     NotificationsModule,
-    DocumentTransferModule
+    DocumentTransferModule,
+    GatewayModule 
   ],
   controllers: [FileController, SiretController, DocumentTransferController],
-  providers: [JwtStrategy, SiretService],
+  providers: [JwtStrategy, SiretService ],
 })
 export class AppModule {}
