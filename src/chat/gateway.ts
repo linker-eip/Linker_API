@@ -64,12 +64,12 @@ export class Gateway implements OnModuleInit {
         }
         let storedMessage = new Message();
         storedMessage.author = studentUser.id,
-        storedMessage.authorType = UserType.STUDENT_USER,
-        storedMessage.type = MessageType.GROUP,
-        storedMessage.content = message.content,
-        storedMessage.channelId = studentUser.groupId,
+            storedMessage.authorType = UserType.STUDENT_USER,
+            storedMessage.type = MessageType.GROUP,
+            storedMessage.content = message.content,
+            storedMessage.channelId = studentUser.groupId,
 
-        this.messageRepository.save(storedMessage)
+            this.messageRepository.save(storedMessage)
 
         this.server.to("GROUP_" + studentUser.groupId).emit("groupMessage", message)
 
@@ -81,8 +81,20 @@ export class Gateway implements OnModuleInit {
         if (studentUser == null) {
             socket.emit('error', { message: 'Unauthorized access' });
         }
-        let history = await this.messageRepository.findBy({type: MessageType.GROUP, channelId: studentUser.groupId})
+        let history = await this.messageRepository.findBy({ type: MessageType.GROUP, channelId: studentUser.groupId })
 
-        socket.emit("groupHistory", JSON.stringify(history))
+        let historyDto = await Promise.all(history.map(async (message) => {
+            let user = await this.studentService.findOneById(message.author);
+            return {
+                id: message.id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                picture: user.picture,
+                timestamp: message.timestamp,
+                content: message.content
+            };
+        }));
+        console.log(historyDto)
+        socket.emit("groupHistory", historyDto)
     }
 }
