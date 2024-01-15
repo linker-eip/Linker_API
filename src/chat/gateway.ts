@@ -51,7 +51,7 @@ export class Gateway implements OnModuleInit {
     }
 
     @SubscribeMessage('sendGroup')
-    onNewMessage(@MessageBody() body: any, @ConnectedSocket() socket: Socket) {
+    onNewGroupMessage(@MessageBody() body: any, @ConnectedSocket() socket: Socket) {
         const studentUser: StudentUser = this.studentUsers[socket.id]
         if (studentUser == null) {
             socket.emit('error', { message: 'Unauthorized access' });
@@ -73,5 +73,16 @@ export class Gateway implements OnModuleInit {
 
         this.server.to("GROUP_" + studentUser.groupId).emit("groupMessage", message)
 
+    }
+
+    @SubscribeMessage('groupHistory')
+    async onGroupHistory(@MessageBody() body: any, @ConnectedSocket() socket: Socket) {
+        const studentUser: StudentUser = this.studentUsers[socket.id]
+        if (studentUser == null) {
+            socket.emit('error', { message: 'Unauthorized access' });
+        }
+        let history = await this.messageRepository.findBy({type: MessageType.GROUP, channelId: studentUser.groupId})
+
+        socket.emit("groupHistory", JSON.stringify(history))
     }
 }
