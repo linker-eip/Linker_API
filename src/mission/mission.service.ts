@@ -550,7 +550,7 @@ export class MissionService {
       if (mission.groupId != studentUser.groupId) {
         throw new HttpException(
           "You can't see this mission you are not in the group",
-          HttpStatus.BAD_REQUEST,
+          HttpStatus.UNAUTHORIZED,
         );
       }
     }
