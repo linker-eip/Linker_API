@@ -10,17 +10,24 @@ import { StudiesDto } from 'src/student/studies/dto/studies.dto'
 import { Message, MessageType, UserType } from './entity/Message.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
+import { CompanyUser } from 'src/company/entity/CompanyUser.entity'
+import { Mission } from 'src/mission/entity/mission.entity'
 
 @WebSocketGateway()
 export class Gateway implements OnModuleInit {
     constructor(
         @InjectRepository(Message)
         private messageRepository: Repository<Message>,
+        @InjectRepository(CompanyUser)
+        private companyRepository: Repository<CompanyUser>,
+        @InjectRepository(Mission)
+        private missionRepository: Repository<Mission>,
         private readonly studentService: StudentService,
         private readonly jwtService: JwtService
     ) { }
 
     private studentUsers: Map<string, StudentUser> = new Map();
+    private companyUsers: Map<string, CompanyUser> = new Map();
 
     @WebSocketServer()
     server: Server
@@ -44,7 +51,27 @@ export class Gateway implements OnModuleInit {
                 }
                 this.studentUsers[socket.id] = student;
 
-                socket.join("GROUP_" + student.groupId)
+                if (student.groupId != null) {
+                    socket.join("GROUP_" + student.groupId)
+                }
+                const studentMissions = await this.missionRepository.findBy({ groupId: student.groupId })
+                studentMissions.forEach(mission => {
+                    socket.join("MISSION_" + mission.id)
+                })
+
+            } else if (jwtPayload.userType == "USER_COMPANY") {
+                const company = await this.companyRepository.findOneBy({ email: jwtPayload.email })
+                if (company == null) {
+                    socket.emit('error', { message: 'Unauthorized access' })
+                    socket.disconnect()
+                    return;
+                }
+                this.companyUsers[socket.id] = company;
+
+                const companyMissions = await this.missionRepository.findBy({ companyId: company.id })
+                companyMissions.forEach(mission => {
+                    socket.join("MISSION_" + mission.id)
+                })
             }
         })
 
@@ -55,6 +82,7 @@ export class Gateway implements OnModuleInit {
         const studentUser: StudentUser = this.studentUsers[socket.id]
         if (studentUser == null) {
             socket.emit('error', { message: 'Unauthorized access' });
+            return;
         }
         let message = {
             content: body.message,
@@ -80,6 +108,7 @@ export class Gateway implements OnModuleInit {
         const studentUser: StudentUser = this.studentUsers[socket.id]
         if (studentUser == null) {
             socket.emit('error', { message: 'Unauthorized access' });
+            return
         }
         let history = await this.messageRepository.findBy({ type: MessageType.GROUP, channelId: studentUser.groupId })
 
@@ -97,4 +126,146 @@ export class Gateway implements OnModuleInit {
         console.log(historyDto)
         socket.emit("groupHistory", historyDto)
     }
+
+    @SubscribeMessage('sendMission')
+    async onNewMissionpMessage(@MessageBody() body: any, @ConnectedSocket() socket: Socket) {
+        const studentUser: StudentUser = this.studentUsers[socket.id]
+        const companyUser: CompanyUser = this.companyUsers[socket.id]
+        let message;
+        let storedMessage = new Message();
+
+        if (body.id == null) {
+            socket.emit('error', { message: 'no mission id provided' })
+            return;
+        }
+
+        if (studentUser != null) {
+            let mission = await this.missionRepository.findOneBy({ id: body.id, groupId: studentUser.groupId })
+            if (mission == null) {
+                socket.emit('error', { message: 'mission not found' })
+                return;
+            }
+            message = {
+                content: body.message,
+                firstName: studentUser.firstName,
+                lastName: studentUser.lastName,
+                picture: studentUser.picture,
+                type: UserType.STUDENT_USER,
+                missionId: mission.id
+            }
+
+            storedMessage.author = studentUser.id
+            storedMessage.authorType = UserType.STUDENT_USER
+            storedMessage.type = MessageType.MISSION
+            storedMessage.content = message.content
+            storedMessage.channelId = mission.id
+        } else if (companyUser != null) {
+            let mission = await this.missionRepository.findOneBy({ id: body.id, companyId: companyUser.id })
+            if (mission == null) {
+                socket.emit('error', { message: 'mission not found' })
+                return;
+            }
+            message = {
+                content: body.message,
+                firstName: companyUser.companyName,
+                lastName: null,
+                picture: companyUser.picture,
+                type: UserType.COMPANY_USER,
+                missionId: mission.id
+            }
+
+            storedMessage.author = companyUser.id
+            storedMessage.authorType = UserType.COMPANY_USER
+            storedMessage.type = MessageType.MISSION
+            storedMessage.content = message.content
+            storedMessage.channelId = mission.id
+        }
+
+        this.messageRepository.save(storedMessage)
+
+        this.server.to("MISSION_" + storedMessage.channelId).emit("missionMessage", message)
+    }
+
+
+    @SubscribeMessage('missionHistory')
+    async onMissionHistory(@MessageBody() body: any, @ConnectedSocket() socket: Socket) {
+        const studentUser: StudentUser = this.studentUsers[socket.id]
+        const companyUser: CompanyUser = this.companyUsers[socket.id]
+        if (body.id == null) {
+            socket.emit('error', { message: 'no mission id provided' })
+            return;
+        }
+
+        if (studentUser != null) {
+            let mission = await this.missionRepository.findOneBy({ id: body.id, groupId: studentUser.groupId })
+            if (mission == null) {
+                socket.emit('error', { message: 'mission not found' })
+                return;
+            }
+
+            let history = await this.messageRepository.findBy({ type: MessageType.MISSION, channelId: mission.id })
+            let historyDto = await Promise.all(history.map(async (message) => {
+                let user;
+                if (message.authorType == UserType.STUDENT_USER) {
+                    user = await this.studentService.findOneById(message.author);
+                    return {
+                        id: message.id,
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        picture: user.picture,
+                        timestamp: message.timestamp,
+                        content: message.content
+                    };
+                } else {
+                    user = await this.companyRepository.findOneBy({id: message.author});
+                    return {
+                        id: message.id,
+                        firstName: user.companyName,
+                        lastName: null,
+                        picture: user.picture,
+                        timestamp: message.timestamp,
+                        content: message.content
+                    };
+                }
+
+            }));
+            socket.emit("missionHistory", historyDto)
+        } else if (companyUser != null) {
+            let mission = await this.missionRepository.findOneBy({ id: body.id, companyId: companyUser.id })
+            if (mission == null) {
+                socket.emit('error', { message: 'mission not found' })
+                return;
+            }
+
+            let history = await this.messageRepository.findBy({ type: MessageType.MISSION, channelId: mission.id })
+            let historyDto = await Promise.all(history.map(async (message) => {
+                let user;
+                if (message.authorType == UserType.STUDENT_USER) {
+                    user = await this.studentService.findOneById(message.author);
+                    return {
+                        id: message.id,
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        picture: user.picture,
+                        timestamp: message.timestamp,
+                        content: message.content
+                    };
+                } else {
+                    user = await this.companyRepository.findOneBy({id: message.author});
+                    return {
+                        id: message.id,
+                        firstName: user.companyName,
+                        lastName: null,
+                        picture: user.picture,
+                        timestamp: message.timestamp,
+                        content: message.content
+                    };
+                }
+
+            }));
+            socket.emit("missionHistory", historyDto)
+        }
+    }
 }
+
+

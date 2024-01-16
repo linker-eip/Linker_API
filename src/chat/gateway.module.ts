@@ -5,10 +5,12 @@ import { StudentModule } from "src/student/student.module";
 import { JwtModule } from "@nestjs/jwt";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Message } from "./entity/Message.entity";
+import { CompanyUser } from "src/company/entity/CompanyUser.entity";
+import { Mission } from "src/mission/entity/mission.entity";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Message]),
+        TypeOrmModule.forFeature([Message, CompanyUser, Mission]),
         StudentModule,
         JwtModule
     ],
