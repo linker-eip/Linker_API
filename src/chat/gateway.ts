@@ -214,7 +214,8 @@ export class Gateway implements OnModuleInit {
                         lastName: user.lastName,
                         picture: user.picture,
                         timestamp: message.timestamp,
-                        content: message.content
+                        content: message.content,
+                        type: UserType.STUDENT_USER
                     };
                 } else {
                     user = await this.companyRepository.findOneBy({id: message.author});
@@ -224,7 +225,8 @@ export class Gateway implements OnModuleInit {
                         lastName: null,
                         picture: user.picture,
                         timestamp: message.timestamp,
-                        content: message.content
+                        content: message.content,
+                        type: UserType.COMPANY_USER
                     };
                 }
 
@@ -248,7 +250,8 @@ export class Gateway implements OnModuleInit {
                         lastName: user.lastName,
                         picture: user.picture,
                         timestamp: message.timestamp,
-                        content: message.content
+                        content: message.content,
+                        type: UserType.STUDENT_USER,
                     };
                 } else {
                     user = await this.companyRepository.findOneBy({id: message.author});
@@ -258,7 +261,8 @@ export class Gateway implements OnModuleInit {
                         lastName: null,
                         picture: user.picture,
                         timestamp: message.timestamp,
-                        content: message.content
+                        content: message.content,
+                        type: UserType.COMPANY_USER
                     };
                 }
 
