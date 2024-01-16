@@ -533,18 +533,26 @@ export class MissionService {
       mission.companyId,
     );
 
+    const missionInvite = await this.missionInviteRepository.findOne({
+      where: { missionId, groupId: studentUser.groupId },
+    });
+
     if (mission.groupId == null) {
-      throw new HttpException(
-        "You can't see this mission",
-        HttpStatus.BAD_REQUEST,
-      );
+      if (missionInvite == null) {
+        throw new HttpException(
+          'You can only see details of your own missions',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
     }
 
-    if (mission.groupId != studentUser.groupId) {
-      throw new HttpException(
-        "You can't see this mission you are not in the group",
-        HttpStatus.BAD_REQUEST,
-      );
+    if (!missionInvite) {
+      if (mission.groupId != studentUser.groupId) {
+        throw new HttpException(
+          "You can't see this mission you are not in the group",
+          HttpStatus.BAD_REQUEST,
+        );
+      }
     }
 
     let groupStudents = [];
