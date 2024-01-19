@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginCompanyDto } from './dto/login-company.dto';
 import { CompanyService } from '../company/company.service';
-import { RegisterCompanyDto } from './dto/register-company.dto';
+import { RegisterCompanyDto, RegisterCompanyV2Dto } from './dto/register-company.dto';
 import { CompanyUser } from '../company/entity/CompanyUser.entity';
 import { ForgetPasswordDto } from '../auth/dto/forget-password.dto';
 import { SendMailDto } from '../mail/dto/send-mail.dto';
@@ -19,6 +19,7 @@ import axios from 'axios';
 import { StudentUser } from '../student/entity/StudentUser.entity';
 import { GoogleApiService } from './services/google-api-services';
 import * as crypto from 'crypto';
+import { SiretService } from 'src/siret/siret.service';
 
 @Injectable()
 export class AuthService {
@@ -28,6 +29,7 @@ export class AuthService {
     private readonly companyService: CompanyService,
     private readonly mailService: MailService,
     private readonly googleApiService: GoogleApiService,
+    private readonly siretService: SiretService,
   ) {}
 
   async hashPassword(password: string): Promise<string> {
@@ -118,6 +120,61 @@ export class AuthService {
     newUser.email = email;
     newUser.password = await this.hashPassword(password);
     newUser.companyName = name;
+    newUser.phoneNumber = phoneNumber;
+
+    const savedUser = await this.companyService.save(newUser);
+
+    const token = jwt.sign({ email: savedUser.email, userType: "USER_COMPANY" }, process.env.JWT_SECRET);
+
+    await this.companyService.updateCompanyProfile(
+      {
+        name: savedUser.companyName,
+        description: '',
+        email: savedUser.email,
+        phone: savedUser.phoneNumber,
+        address: '',
+        size: 0,
+        location: '',
+        activity: '',
+        speciality: '',
+        website: '',
+        picture: null,
+      },
+      savedUser,
+    );
+
+
+    return { token };
+  }
+
+  async registerCompanyv2(registerCompanyDto: RegisterCompanyV2Dto) {
+    const { email, password, siret, phoneNumber } = registerCompanyDto;
+
+    if (await this.companyService.findOne(email)) {
+      throw new HttpException('Un compte utilisant cette adresse e-mail existe déjà.', HttpStatus.UNAUTHORIZED)
+    }
+
+    if (await this.companyService.findOne(email)) {
+      throw new HttpException('Un compte utilisant cette adresse e-mail existe déjà.', HttpStatus.UNAUTHORIZED)
+    }
+
+    if (await this.companyService.findOneByPhoneNumber(phoneNumber)) {
+      throw new HttpException('Un compte utilisant ce numéro de téléphone existe déjà.', HttpStatus.UNAUTHORIZED)
+    }
+
+    let companyInfos;
+
+    try {
+      companyInfos = await this.siretService.searchCompanyFromSiret(registerCompanyDto.siret);
+    } catch (err) {
+      throw new HttpException('SIRET invalide', HttpStatus.BAD_REQUEST);
+    }
+
+
+    const newUser = new CompanyUser();
+    newUser.email = email;
+    newUser.password = await this.hashPassword(password);
+    newUser.companyName = companyInfos.uniteLegale.nomUniteLegale
     newUser.phoneNumber = phoneNumber;
 
     const savedUser = await this.companyService.save(newUser);
