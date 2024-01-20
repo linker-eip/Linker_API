@@ -411,4 +411,8 @@ export class StudentService {
       throw new HttpException('Invalid company', HttpStatus.NOT_FOUND);
     return companyProfile;
   }
+
+  async saveStudentProfile(studentProfile: StudentProfile) {
+    return this.studentProfileRepository.save(studentProfile);
+  }
 }

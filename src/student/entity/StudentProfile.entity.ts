@@ -51,4 +51,7 @@ export class StudentProfile {
 
   @Column({ type: 'float', nullable: true, default: 0 })
   note: number;
+
+  @Column({ type: 'int', nullable: true, default: 0 })
+  nbNotes: number;
 }

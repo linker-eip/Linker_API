@@ -456,12 +456,11 @@ export class GroupService {
             qb.orWhere(`group.description LIKE :${descriptionSearch}`, {
               [descriptionSearch]: `%${searchParam}%`,
             });
-
-            if (searchOption.groupName) {
-              qb.andWhere('group.name = :groupName', {
-                groupName: searchOption.groupName,
-              });
-            }
+          });
+        }
+        if (searchOption.groupName) {
+          qb.andWhere('group.name = :groupName', {
+            groupName: searchOption.groupName,
           });
         }
       }),
@@ -469,7 +468,6 @@ export class GroupService {
 
     const groups = await groupsQuery.getMany();
 
-    //const groups = await this.groupRepository.find();
     return Promise.all(
       groups.map(async (it) => {
         let students = await this.studentService.findAllByIdIn(it.studentIds);

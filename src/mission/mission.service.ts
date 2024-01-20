@@ -23,6 +23,8 @@ import { StudentProfileResponseDto } from '../student/dto/student-profile-respon
 import { UpdateTaskStatusDto } from './dto/update-task-status-dto';
 import { MissionSearchOptionStudentDto } from './dto/mission-search-option-student.dto';
 import { GetMissionDto } from './dto/get-mission.dto';
+import { CommentMissionDto } from './dto/comment-mission.dto';
+import { NoteMissionDto } from './dto/note-mission.dto';
 
 @Injectable()
 export class MissionService {
@@ -819,5 +821,120 @@ export class MissionService {
       missions.push(dto);
     }
     return missions;
+  }
+
+  async commentMission(missionId: number, body: CommentMissionDto, req: any) {
+    if (missionId == null)
+      throw new HttpException('Mission invalide', HttpStatus.NOT_FOUND);
+
+    const company = await this.companyService.findOne(req.user.email);
+    if (company == null) {
+      throw new HttpException(
+        "Vous n'êtes pas une entreprise",
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const mission = await this.findMissionById(missionId);
+    if (mission == null) {
+      throw new HttpException('Mission invalide', HttpStatus.NOT_FOUND);
+    }
+
+    if (mission.companyId != company.id) {
+      throw new HttpException(
+        'Cette mission ne vous appartient pas',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    if (mission.status != MissionStatus.FINISHED) {
+      throw new HttpException(
+        "Cette mission n'est pas terminée",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    mission.comments = body.comment;
+    await this.missionRepository.save(mission);
+  }
+
+  async noteGroup(missionId: number, body: NoteMissionDto, req: any) {
+    if (missionId == null)
+      throw new HttpException('Mission invalide', HttpStatus.NOT_FOUND);
+
+    const company = await this.companyService.findOne(req.user.email);
+    if (company == null) {
+      throw new HttpException(
+        "Vous n'êtes pas une entreprise",
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const mission = await this.findMissionById(missionId);
+    if (mission == null) {
+      throw new HttpException('Mission invalide', HttpStatus.NOT_FOUND);
+    }
+
+    if (mission.companyId != company.id) {
+      throw new HttpException(
+        'Cette mission ne vous appartient pas',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    if (mission.status != MissionStatus.FINISHED) {
+      throw new HttpException(
+        "Cette mission n'est pas terminée",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (mission.isNoted) {
+      throw new HttpException(
+        'Cette mission a déjà été notée',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (body.note < 0 || body.note > 5) {
+      throw new HttpException(
+        'La note doit être comprise entre 0 et 5',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const group = await this.groupService.findGroupById(mission.groupId);
+
+    if (group == null) {
+      throw new HttpException('Groupe invalide', HttpStatus.NOT_FOUND);
+    }
+
+    if (group.studentIds.length == 0) {
+      throw new HttpException(
+        'Vous ne pouvez pas noter un groupe vide',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    for (let studentId of group.studentIds) {
+      const studentProfile =
+        await this.studentService.findStudentProfileByStudentId(studentId);
+      if (studentProfile == null) {
+        throw new HttpException(
+          'Profil étudiant invalide',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      studentProfile.note =
+        (studentProfile.note * studentProfile.nbNotes + body.note) /
+        (studentProfile.nbNotes + 1);
+
+      studentProfile.nbNotes += 1;
+
+      await this.studentService.saveStudentProfile(studentProfile);
+      mission.isNoted = true;
+    }
+
+    await this.missionRepository.save(mission);
   }
 }

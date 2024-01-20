@@ -28,6 +28,8 @@ import { GetMissionDetailsCompanyDto } from './dto/get-mission-details-company.d
 import { UpdateTaskStatusDto } from './dto/update-task-status-dto';
 import { GetMissionDto } from './dto/get-mission.dto';
 import { MissionSearchOptionStudentDto } from './dto/mission-search-option-student.dto';
+import { CommentMissionDto } from './dto/comment-mission.dto';
+import { NoteMissionDto } from './dto/note-mission.dto';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
@@ -138,10 +140,16 @@ export class MissionController {
 
   @Put('task/:taskId/affect/:studentId')
   @ApiOperation({
-    description: 'Affect a student to a task - This route should be used by a student',
-    summary: 'Affect a student to a task - This route should be used by a student',
+    description:
+      'Affect a student to a task - This route should be used by a student',
+    summary:
+      'Affect a student to a task - This route should be used by a student',
   })
-  async affectTask(@Param('taskId') taskId: number, @Param('studentId') studentId: number, @Req() req) {
+  async affectTask(
+    @Param('taskId') taskId: number,
+    @Param('studentId') studentId: number,
+    @Req() req,
+  ) {
     return await this.missionService.affectTask(taskId, studentId, req);
   }
 
@@ -150,7 +158,11 @@ export class MissionController {
     description: 'Change task status - This route should be used by a student',
     summary: 'Change task status - This route should be used by a student',
   })
-  async updateTaskStatus(@Param('taskId') taskId: number, @Body() body: UpdateTaskStatusDto, @Req() req) {
+  async updateTaskStatus(
+    @Param('taskId') taskId: number,
+    @Body() body: UpdateTaskStatusDto,
+    @Req() req,
+  ) {
     return await this.missionService.updateTaskStatus(taskId, body, req);
   }
 
@@ -210,7 +222,10 @@ export class MissionController {
     description: 'Get mission details',
     type: GetMissionDetailsStudentDto,
   })
-  async getMissionDetailsStudent(@Param('missionId') missionId: number, @Req() req) {
+  async getMissionDetailsStudent(
+    @Param('missionId') missionId: number,
+    @Req() req,
+  ) {
     return await this.missionService.getMissionDetailsStudent(missionId, req);
   }
 
@@ -223,7 +238,10 @@ export class MissionController {
     description: 'Get all missions for a student',
     type: GetMissionDto,
   })
-  async getStudentMissions(@Query() searchOption: MissionSearchOptionStudentDto, @Req() req) {
+  async getStudentMissions(
+    @Query() searchOption: MissionSearchOptionStudentDto,
+    @Req() req,
+  ) {
     return await this.missionService.getStudentMissions(req, searchOption);
   }
 
@@ -232,7 +250,11 @@ export class MissionController {
     description: 'Invite a group to a mission',
     summary: 'Invite a group to a mission',
   })
-  async inviteGroup(@Param('missionId') missionId: number, @Param('groupId') groupId: number, @Req() req) {
+  async inviteGroup(
+    @Param('missionId') missionId: number,
+    @Param('groupId') groupId: number,
+    @Req() req,
+  ) {
     return await this.missionService.inviteGroup(missionId, groupId, req);
   }
 
@@ -247,5 +269,31 @@ export class MissionController {
   })
   async getStudentInvitations(@Req() req) {
     return await this.missionService.getMissionInvites(req);
+  }
+
+  @Put('company/comment/:missionId')
+  @ApiOperation({
+    description: 'Comment a mission',
+    summary: 'Comment a mission',
+  })
+  async commentMission(
+    @Param('missionId') missionId: number,
+    @Body() body: CommentMissionDto,
+    @Req() req,
+  ) {
+    return await this.missionService.commentMission(missionId, body, req);
+  }
+
+  @Put('company/note/:missionId')
+  @ApiOperation({
+    description: 'Note a group',
+    summary: 'Note a group',
+  })
+  async noteGroup(
+    @Param('missionId') missionId: number,
+    @Body() body: NoteMissionDto,
+    @Req() req,
+  ) {
+    return await this.missionService.noteGroup(missionId, body, req);
   }
 }

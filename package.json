@@ -54,6 +54,7 @@
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
     "sharp": "^0.32.6",
+    "socket.io": "^4.7.4",
     "swagger-ui-express": "^4.6.2",
     "typeorm": "^0.3.15"
   },

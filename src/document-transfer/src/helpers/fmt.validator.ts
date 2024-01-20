@@ -17,7 +17,7 @@ class FileMimeTypeValidator extends FileValidator<FileMimeTypeValidatorOptions> 
       return false;
     }
 
-    const fileType = await FileType.fromBuffer(file.buffer);
+    const fileType = await (FileType as any).fromBuffer(file.buffer);
     if (!fileType) {
       return false;
     }
