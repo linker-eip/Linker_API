@@ -212,6 +212,7 @@ export class GroupService {
       members: groupMemberDtos,
       leaderId: group.leaderId,
       isLeader: group.leaderId == student.id,
+      groupId: group.id,
     };
     return response;
   }
