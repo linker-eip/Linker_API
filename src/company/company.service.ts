@@ -122,4 +122,8 @@ export class CompanyService {
 
     return this.companyProfileRepository.save(companyProfile);
   }
+
+  async findCompanyProfileByCompanyId(companyId: number) {
+    return this.companyProfileRepository.findOne({ where: { companyId } });
+  }
 }

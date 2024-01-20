@@ -531,7 +531,7 @@ export class MissionService {
       throw new HttpException('Invalid mission', HttpStatus.NOT_FOUND);
     }
 
-    const companyProfile = await this.companyService.findCompanyProfileById(
+    const companyProfile = await this.companyService.findCompanyProfileByCompanyId(
       mission.companyId,
     );
 
