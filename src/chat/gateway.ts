@@ -51,6 +51,7 @@ export class Gateway implements OnModuleInit {
                     return;
                 }
                 this.studentUsers[socket.id] = student;
+                console.log("Le socketId: " + socket.id + "est bien associé à l'étudiant: " + student.firstName + " " + student.lastName)
 
                 if (student.groupId != null) {
                     socket.join("GROUP_" + student.groupId)
@@ -80,7 +81,9 @@ export class Gateway implements OnModuleInit {
 
     @SubscribeMessage('sendGroup')
     onNewGroupMessage(@MessageBody() body: any, @ConnectedSocket() socket: Socket) {
+        console.log("Le socketId est: " + socket.id)
         const studentUser: StudentUser = this.studentUsers[socket.id]
+        console.log("Et donc l'utilisateur est: " + studentUser ?? "null")
         if (studentUser == null) {
             socket.emit('error', { message: 'Unauthorized access' });
             return;
@@ -106,7 +109,9 @@ export class Gateway implements OnModuleInit {
 
     @SubscribeMessage('groupHistory')
     async onGroupHistory(@MessageBody() body: any, @ConnectedSocket() socket: Socket) {
+        console.log("Le socketId est: " + socket.id)
         const studentUser: StudentUser = this.studentUsers[socket.id]
+        console.log("Et donc l'utilisateur est: " + studentUser ?? "null")
         if (studentUser == null) {
             socket.emit('error', { message: 'Unauthorized access' });
             return
