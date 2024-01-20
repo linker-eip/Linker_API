@@ -42,6 +42,7 @@ export class Gateway implements OnModuleInit {
                 socket.emit('error', { message: 'Unauthorized access' });
                 socket.disconnect()
             }
+            if (jwtPayload == null || jwtPayload.userType == null)
             if (jwtPayload.userType == "USER_STUDENT") {
                 const student = await this.studentService.findOneByEmail(jwtPayload.email)
                 if (student == null) {
