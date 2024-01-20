@@ -42,38 +42,39 @@ export class Gateway implements OnModuleInit {
                 socket.emit('error', { message: 'Unauthorized access' });
                 socket.disconnect()
             }
-            if (jwtPayload == null || jwtPayload.userType == null)
-            if (jwtPayload.userType == "USER_STUDENT") {
-                const student = await this.studentService.findOneByEmail(jwtPayload.email)
-                if (student == null) {
-                    socket.emit('error', { message: 'Unauthorized access' });
-                    socket.disconnect()
-                    return;
-                }
-                this.studentUsers[socket.id] = student;
-                console.log("Le socketId: " + socket.id + "est bien associé à l'étudiant: " + student.firstName + " " + student.lastName)
+            if (jwtPayload != null && jwtPayload.userType != null) {
+                if (jwtPayload.userType == "USER_STUDENT") {
+                    const student = await this.studentService.findOneByEmail(jwtPayload.email)
+                    if (student == null) {
+                        socket.emit('error', { message: 'Unauthorized access' });
+                        socket.disconnect()
+                        return;
+                    }
+                    this.studentUsers[socket.id] = student;
+                    console.log("Le socketId: " + socket.id + "est bien associé à l'étudiant: " + student.firstName + " " + student.lastName)
 
-                if (student.groupId != null) {
-                    socket.join("GROUP_" + student.groupId)
-                }
-                const studentMissions = await this.missionRepository.findBy({ groupId: student.groupId })
-                studentMissions.forEach(mission => {
-                    socket.join("MISSION_" + mission.id)
-                })
+                    if (student.groupId != null) {
+                        socket.join("GROUP_" + student.groupId)
+                    }
+                    const studentMissions = await this.missionRepository.findBy({ groupId: student.groupId })
+                    studentMissions.forEach(mission => {
+                        socket.join("MISSION_" + mission.id)
+                    })
 
-            } else if (jwtPayload.userType == "USER_COMPANY") {
-                const company = await this.companyRepository.findOneBy({ email: jwtPayload.email })
-                if (company == null) {
-                    socket.emit('error', { message: 'Unauthorized access' })
-                    socket.disconnect()
-                    return;
-                }
-                this.companyUsers[socket.id] = company;
+                } else if (jwtPayload.userType == "USER_COMPANY") {
+                    const company = await this.companyRepository.findOneBy({ email: jwtPayload.email })
+                    if (company == null) {
+                        socket.emit('error', { message: 'Unauthorized access' })
+                        socket.disconnect()
+                        return;
+                    }
+                    this.companyUsers[socket.id] = company;
 
-                const companyMissions = await this.missionRepository.findBy({ companyId: company.id })
-                companyMissions.forEach(mission => {
-                    socket.join("MISSION_" + mission.id)
-                })
+                    const companyMissions = await this.missionRepository.findBy({ companyId: company.id })
+                    companyMissions.forEach(mission => {
+                        socket.join("MISSION_" + mission.id)
+                    })
+                }
             }
         })
 
