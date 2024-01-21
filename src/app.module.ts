@@ -18,6 +18,15 @@ import { MissionModule } from './mission/mission.module';
 import { SiretService } from './siret/siret.service';
 import { SiretController } from './siret/siret.controller';
 import { InvoiceModule } from './invoice/invoice.module';
+import { GroupController } from './group/group.controller';
+import { GroupService } from './group/group.service';
+import { GroupModule } from './group/group.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { DocumentTransferModule } from './document-transfer/src/document-transfer.module';
+import { DocumentTransferService } from './document-transfer/src/services/document-transfer.service';
+import { DocumentTransferController } from './document-transfer/src/document-transfer.controller';
+import { Gateway } from './chat/gateway';
+import { GatewayModule } from './chat/gateway.module';
 
 @Module({
   imports: [
@@ -52,9 +61,13 @@ import { InvoiceModule } from './invoice/invoice.module';
     AdminModule,
     FileModule,
     MissionModule,
-    InvoiceModule
+    InvoiceModule,
+    GroupModule,
+    NotificationsModule,
+    DocumentTransferModule,
+    GatewayModule 
   ],
-  controllers: [FileController, SiretController],
-  providers: [JwtStrategy, SiretService],
+  controllers: [FileController, SiretController, DocumentTransferController],
+  providers: [JwtStrategy, SiretService ],
 })
 export class AppModule {}

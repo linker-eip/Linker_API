@@ -33,4 +33,7 @@ export class CompanyProfileResponseDto {
 
   @ApiProperty()
   website: string;
+
+  @ApiProperty()
+  picture: string;
 }

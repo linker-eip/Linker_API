@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Brackets, In, Repository, SelectQueryBuilder } from 'typeorm';
 import { StudentUser } from './entity/StudentUser.entity';
 import { StudentProfile } from './entity/StudentProfile.entity';
 import { CreateStudentProfileDto } from './dto/create-student-profile.dto';
@@ -9,6 +9,16 @@ import { StudentProfileResponseDto } from './dto/student-profile-response.dto';
 import { JobsService } from './jobs/jobs.service';
 import { StudiesService } from './studies/studies.service';
 import { FileService } from '../filesystem/file.service';
+import { DocumentTransferService } from '../document-transfer/src/services/document-transfer.service';
+import { UpdateSkillDto } from './skills/dto/update-skill.dto';
+import { UpdateJobsDto } from './jobs/dto/update-jobs.dto';
+import { UpdateStudiesDto } from './studies/dto/update-studies.dto';
+import { StudentSearchOptionDto } from './dto/student-search-option.dto';
+import {
+  StudentSearchResponseDto,
+  formatToStudentSearchResponseDto,
+} from './dto/student-search-response.dto';
+import { CompanyService } from '../company/company.service';
 
 @Injectable()
 export class StudentService {
@@ -21,14 +31,20 @@ export class StudentService {
     private readonly jobsservice: JobsService,
     private readonly studiesService: StudiesService,
     private readonly fileService: FileService,
+    private readonly documentTransferService: DocumentTransferService,
+    private readonly companyService: CompanyService,
   ) {}
 
   async findAll(): Promise<StudentUser[]> {
     return this.studentRepository.find();
   }
 
-  async findOne(email: string): Promise<StudentUser | undefined> {
-    return this.studentRepository.findOne({ where: { email } });
+  async findOneByEmail(email: string): Promise<StudentUser | undefined> {
+    return this.studentRepository.findOne({ where: { email: email } });
+  }
+
+  async findOneById(studentId: number): Promise<StudentUser | undefined> {
+    return this.studentRepository.findOne({ where: { id: studentId } });
   }
 
   async findOneByResetPasswordToken(
@@ -39,15 +55,36 @@ export class StudentService {
     });
   }
 
-  async findOneByVerificationKey(key: string): Promise<StudentUser | undefined> {
+  async findOneByVerificationKey(
+    key: string,
+  ): Promise<StudentUser | undefined> {
     return this.studentRepository.findOne({
       where: { verificationKey: key },
-    })
+    });
   }
 
-    async save(student: StudentUser): Promise<StudentUser> {
-        return this.studentRepository.save(student);
-    }
+  async findAllByIdIn(ids: number[]): Promise<StudentUser[]> {
+    return this.studentRepository.findBy({ id: In(ids) });
+  }
+
+  async findAllStudentsProfilesByStudentIds(studentIds: number[]) {
+    return await Promise.all(
+      studentIds.map(async (studentId) => {
+        try {
+          const studentProfile = await this.studentProfileRepository.findOneBy({
+            studentId: studentId,
+          });
+          return studentProfile;
+        } catch (e) {
+          throw new Error();
+        }
+      }),
+    );
+  }
+
+  async save(student: StudentUser): Promise<StudentUser> {
+    return this.studentRepository.save(student);
+  }
 
   async findStudentProfile(email: string) {
     const profile = await this.studentProfileRepository.findOne({
@@ -117,7 +154,10 @@ export class StudentService {
     }
 
     if (picture) {
-      studentProfile.picture = await this.fileService.storeFile(picture);
+      const [width, height] = [500, 500];
+      const url = await this.documentTransferService.uploadFile(picture);
+
+      studentProfile.picture = url;
     }
 
     if (CreateStudentProfile.studies !== null) {
@@ -153,7 +193,7 @@ export class StudentService {
 
     await this.studentProfileRepository.save(studentProfile);
 
-    return studentProfile;
+    return this.findStudentProfile(req.email);
   }
 
   async findStudentProfileByStudentId(Studentid: number) {
@@ -162,5 +202,217 @@ export class StudentService {
     });
     if (!profile) throw new Error(`Could not find student profile`);
     return profile;
+  }
+
+  async updateSkill(skillId: number, body: UpdateSkillDto, req: any) {
+    const studentProfile = await this.studentProfileRepository.findOne({
+      where: { email: req.email },
+    });
+    if (!studentProfile) {
+      throw new HttpException(
+        'Invalid student profile',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const skill = await this.skillsService.findSkillById(skillId);
+    if (!skill) {
+      throw new HttpException('Invalid skill', HttpStatus.NOT_FOUND);
+    }
+
+    await this.skillsService.updateSkill(skillId, body);
+
+    return this.findStudentProfile(req.email);
+  }
+
+  async updateJob(jobId: number, body: UpdateJobsDto, req: any) {
+    const studentProfile = await this.studentProfileRepository.findOne({
+      where: { email: req.email },
+    });
+    if (!studentProfile) {
+      throw new HttpException(
+        'Invalid student profile',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const job = await this.jobsservice.findJobById(jobId);
+    if (!job) {
+      throw new HttpException('Invalid job', HttpStatus.NOT_FOUND);
+    }
+
+    await this.jobsservice.updateJob(jobId, body);
+
+    return this.findStudentProfile(req.email);
+  }
+
+  async updateStudies(studiesId: number, body: UpdateStudiesDto, req: any) {
+    const studentProfile = await this.studentProfileRepository.findOne({
+      where: { email: req.email },
+    });
+    if (!studentProfile) {
+      throw new HttpException(
+        'Invalid student profile',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const studies = await this.studiesService.findStudieById(studiesId);
+    if (!studies) {
+      throw new HttpException('Invalid studies', HttpStatus.NOT_FOUND);
+    }
+
+    await this.studiesService.updateStudie(studiesId, body);
+
+    return this.findStudentProfile(req.email);
+  }
+
+  async deleteSkill(skillId: number, req: any) {
+    const studentProfile = await this.studentProfileRepository.findOne({
+      where: { email: req.email },
+    });
+    if (!studentProfile) {
+      throw new HttpException(
+        'Invalid student profile',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const skill = await this.skillsService.findSkillById(skillId);
+    if (!skill) {
+      throw new HttpException('Invalid skill', HttpStatus.NOT_FOUND);
+    }
+
+    await this.skillsService.deleteSkill(skillId);
+
+    return this.findStudentProfile(req.email);
+  }
+
+  async deleteJob(jobId: number, req: any) {
+    const studentProfile = await this.studentProfileRepository.findOne({
+      where: { email: req.email },
+    });
+    if (!studentProfile) {
+      throw new HttpException(
+        'Invalid student profile',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    const job = await this.jobsservice.findJobById(jobId);
+    if (!job) {
+      throw new HttpException('Invalid job', HttpStatus.NOT_FOUND);
+    }
+
+    await this.jobsservice.deleteJob(jobId);
+
+    return this.findStudentProfile(req.email);
+  }
+
+  async deleteStudies(studiesId: number, req: any) {
+    const studentProfile = await this.studentProfileRepository.findOne({
+      where: { email: req.email },
+    });
+    if (!studentProfile) {
+      throw new HttpException(
+        'Invalid student profile',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    const studies = await this.studiesService.findStudieById(studiesId);
+    if (!studies) {
+      throw new HttpException('Invalid studies', HttpStatus.NOT_FOUND);
+    }
+
+    await this.studiesService.deleteStudie(studiesId);
+
+    return this.findStudentProfile(req.email);
+  }
+
+  async findAllStudents(
+    searchOption: StudentSearchOptionDto,
+  ): Promise<StudentSearchResponseDto[]> {
+    const { searchString } = searchOption;
+
+    let studentsQuery: SelectQueryBuilder<StudentUser> =
+      this.studentRepository.createQueryBuilder('studentUser');
+
+    studentsQuery = studentsQuery.andWhere(
+      new Brackets((qb) => {
+        if (searchString && searchString.trim().length > 0) {
+          const searchParams = searchString
+            .trim()
+            .split(',')
+            .map((elem) => elem.trim());
+
+          searchParams.forEach((searchParam, index) => {
+            const emailSearch = `emailSearch${index}`;
+            const firstNameSearch = `firstNameSearch${index}`;
+            const lastNameSearch = `lastNameSearch${index}`;
+
+            qb.orWhere(`studentUser.email LIKE :${emailSearch}`, {
+              [emailSearch]: `%${searchParam}%`,
+            });
+            qb.orWhere(`studentUser.firstName LIKE :${firstNameSearch}`, {
+              [firstNameSearch]: `%${searchParam}%`,
+            });
+            qb.orWhere(`studentUser.lastName LIKE :${lastNameSearch}`, {
+              [lastNameSearch]: `%${searchParam}%`,
+            });
+          });
+        }
+        qb.andWhere('studentUser.isActive = :isActive', {
+          isActive: true,
+        });
+
+        if (searchOption.lastName) {
+          qb.andWhere('studentUser.lastName = :lastName', {
+            lastName: searchOption.lastName,
+          });
+        }
+
+        if (searchOption.firstName) {
+          qb.andWhere('studentUser.firstName = :firstName', {
+            firstName: searchOption.firstName,
+          });
+        }
+
+        if (searchOption.email) {
+          qb.andWhere('studentUser.email = :email', {
+            email: searchOption.email,
+          });
+        }
+      }),
+    );
+
+    const students = await studentsQuery.getMany();
+
+    return await Promise.all(
+      students.map(async (student) => {
+        try {
+          let studentProfile = await this.studentProfileRepository.findOneBy({
+            studentId: student.id,
+          });
+          return formatToStudentSearchResponseDto(
+            student,
+            studentProfile.picture,
+          );
+        } catch (e) {
+          throw new Error();
+        }
+      }),
+    );
+  }
+
+  async getCompanyInfoByStudent(companyId: number) {
+    const companyProfile = await this.companyService.findCompanyProfileById(
+      companyId,
+    );
+    if (!companyProfile)
+      throw new HttpException('Invalid company', HttpStatus.NOT_FOUND);
+    return companyProfile;
+  }
+
+  async saveStudentProfile(studentProfile: StudentProfile) {
+    return this.studentProfileRepository.save(studentProfile);
   }
 }

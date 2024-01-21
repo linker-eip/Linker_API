@@ -6,10 +6,11 @@ import { JwtService } from '@nestjs/jwt';
 import { CompanyModule } from '../company/company.module';
 import { MailModule } from '../mail/mail.module';
 import { GoogleApiService } from './services/google-api-services';
+import { SiretService } from 'src/siret/siret.service';
 
 @Module({
   imports: [StudentModule, CompanyModule, MailModule],
   controllers: [AuthController],
-  providers: [AuthService, JwtService, GoogleApiService],
+  providers: [AuthService, JwtService, GoogleApiService, SiretService],
 })
 export class AuthModule {}

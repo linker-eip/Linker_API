@@ -26,8 +26,8 @@ export class Mission {
   @Column({ type: 'int', nullable: true })
   companyId: number;
 
-  @Column('simple-array', { nullable: true })
-  studentsIds: number[];
+  @Column({ type: 'int', nullable: true })
+  groupId: number;
 
   @Column({ type: 'timestamp' })
   startOfMission: Date;
@@ -40,4 +40,13 @@ export class Mission {
 
   @Column({ type: 'float', nullable: false })
   amount: number;
+
+  @Column({ type: 'varchar', length: 1024, nullable: true })
+  skills: string;
+
+  @Column({ type: 'varchar', length: 4096, nullable: true })
+  comments: string;
+
+  @Column({ type: 'boolean', nullable: true, default: false })
+  isNoted: boolean;
 }

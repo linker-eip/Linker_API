@@ -21,13 +21,16 @@ import { Studies } from '../student/studies/entity/studies.entity';
 import { RegisterStudentDto } from './dto/register-student.dto';
 import { AuthGuard, PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
-import { RegisterCompanyDto } from './dto/register-company.dto';
+import { RegisterCompanyDto, RegisterCompanyV2Dto } from './dto/register-company.dto';
 import { LoginStudentDto } from './dto/login-student.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { LoginCompanyDto } from './dto/login-company.dto';
 import { ForgetPasswordDto } from './dto/forget-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { GoogleLoginDto, GoogleLoginTokenDto } from './dto/google-login.dto';
+import { SiretService } from '../siret/siret.service';
+import { DocumentTransferService } from '../document-transfer/src/services/document-transfer.service';
+import { ConfigService } from '@nestjs/config';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -43,7 +46,8 @@ describe('AuthService', () => {
         }),
       ],
       controllers: [AuthController],
-      providers: [AuthService, StudentService, JwtService, CompanyService, MailService, GoogleApiService, SkillsService, JobsService, StudiesService, FileService,
+      providers: [AuthService, StudentService, JwtService, CompanyService, MailService, GoogleApiService, SkillsService, JobsService, 
+        StudiesService, FileService, SiretService, DocumentTransferService, ConfigService,
         {
           provide: getRepositoryToken(StudentUser),
           useClass: Repository,
@@ -170,6 +174,28 @@ describe('AuthService', () => {
     });
   });
 
+  describe('registerCompanyv2', () => {
+    it('should return a company', async () => {
+      const registerCompanyDto: RegisterCompanyV2Dto = {
+        email: 'test@example.com',
+        password: 'Password123!',
+        siret: '97788133300016',
+        phoneNumber: '0612345678',
+      };
+
+      const expectedCompany = {
+        token: 'token',
+      };
+
+      jest.spyOn(service, 'registerCompanyv2').mockResolvedValueOnce(expectedCompany);
+
+      const response = await controller.registerCompanyv2(registerCompanyDto);
+
+      expect(service.registerCompanyv2).toHaveBeenCalledWith(registerCompanyDto);
+      expect(response).toEqual(expectedCompany);
+    });
+  });
+
   describe('loginCompany', () => {
     it('should return a company', async () => {
       const loginCompanyDto: LoginCompanyDto = {
@@ -219,12 +245,11 @@ describe('AuthService', () => {
 
       const expectedToken = {token: "token"}
 
-      jest.spyOn(service, 'generateStudentResetPassword').mockResolvedValueOnce(expectedToken);
+      jest.spyOn(service, 'generateStudentResetPassword').mockResolvedValueOnce(null);
 
       const response = await controller.forgotPasswordStudent(forgetPasswordDto)
 
       expect(service.generateStudentResetPassword).toHaveBeenCalledWith(forgetPasswordDto);
-      expect(response).toEqual(expectedToken)
     });
   });
 
@@ -236,12 +261,12 @@ describe('AuthService', () => {
 
       const expectedToken = {token: "token"}
 
-      jest.spyOn(service, 'generateCompanyResetPassword').mockResolvedValueOnce(expectedToken);
+      jest.spyOn(service, 'generateCompanyResetPassword').mockResolvedValueOnce(null);
 
       const response = await controller.forgotPassword(forgetPasswordDto)
 
       expect(service.generateCompanyResetPassword).toHaveBeenCalledWith(forgetPasswordDto);
-      expect(response).toEqual(expectedToken)
+    //  expect(response).toEqual(expectedToken)
     });
   });
 

@@ -13,6 +13,26 @@ import { CompanyProfile } from "../company/entity/CompanyProfile.entity";
 import { CreateMissionDto } from "./dto/create-mission-dto";
 import { MissionStatus } from "./enum/mission-status.enum";
 import { UpdateMissionDto } from "./dto/update-mission-dto";
+import { MissionTask } from "./entity/mission-task.entity";
+import { GroupService } from "../group/group.service";
+import { StudentService } from "../student/student.service";
+import { MissionInvite } from "./entity/mission-invite.entity";
+import { Group } from "../group/entity/Group.entity";
+import { GroupInvite } from "../group/entity/GroupInvite.entity";
+import { NotificationsService } from "../notifications/notifications.service";
+import { StudentUser } from "../student/entity/StudentUser.entity";
+import { StudentProfile } from "../student/entity/StudentProfile.entity";
+import { SkillsService } from "../student/skills/skills.service";
+import { JobsService } from "../student/jobs/jobs.service";
+import { StudiesService } from "../student/studies/studies.service";
+import { DocumentTransferService } from "../document-transfer/src/services/document-transfer.service";
+import { Notification } from "../notifications/entity/Notification.entity";
+import { Skills } from "../student/skills/entity/skills.entity";
+import { Jobs } from "../student/jobs/entity/jobs.entity";
+import { Studies } from "../student/studies/entity/studies.entity";
+import { ConfigService } from "@nestjs/config";
+import { UpdateTaskStatusDto } from "./dto/update-task-status-dto";
+import { MissionTaskStatus } from "./enum/mission-task-status.enum";
 
 describe('MissionService', () => {
   let service: MissionService;
@@ -28,7 +48,8 @@ describe('MissionService', () => {
         }),
       ],
       controllers: [MissionController],
-      providers: [MissionService, FileService, CompanyService,
+      providers: [MissionService, FileService, CompanyService, GroupService, StudentService, 
+        NotificationsService, StudentService, SkillsService, JobsService, StudiesService, DocumentTransferService, ConfigService,
         {
           provide: getRepositoryToken(Mission),
           useClass: Repository,
@@ -39,7 +60,41 @@ describe('MissionService', () => {
         },        {
           provide: getRepositoryToken(CompanyProfile),
           useClass: Repository,
-        }],
+        },
+      {
+        provide: getRepositoryToken(MissionTask),
+        useClass: Repository,
+      },{
+        provide: getRepositoryToken(MissionInvite),
+        useClass: Repository,
+      },{
+        provide: getRepositoryToken(Group),
+        useClass: Repository,
+      },{
+        provide: getRepositoryToken(GroupInvite),
+        useClass: Repository,
+      },
+      {
+        provide: getRepositoryToken(StudentUser),
+        useClass: Repository,
+      },
+      {
+        provide: getRepositoryToken(StudentProfile),
+        useClass: Repository,
+      },{
+        provide: getRepositoryToken(Notification),
+        useClass: Repository,
+      },{
+        provide: getRepositoryToken(Skills),
+        useClass: Repository,
+      },{
+        provide: getRepositoryToken(Jobs),
+        useClass: Repository,
+      },{
+        provide: getRepositoryToken(Studies),
+        useClass: Repository,
+      },
+    ],
     })
     .overrideGuard(AuthGuard('jwt'))
     .useValue({ canActivate: jest.fn(() => true) })
@@ -57,6 +112,7 @@ describe('MissionService', () => {
         startOfMission: null,
         endOfMission: null,
         amount: 100,
+        skills: "Skills"
       };
 
       const req = {
@@ -76,7 +132,10 @@ describe('MissionService', () => {
         studentsIds: [],
         status: MissionStatus.PENDING,
         companyId: 1,
-
+        skills: "Skills",
+        groupId: null,
+        comments: null,
+        isNoted: false,
       };
 
       jest.spyOn(service, 'createMission').mockResolvedValueOnce(expectedMission);
@@ -113,6 +172,8 @@ describe('MissionService', () => {
         startOfMission: null,
         endOfMission: null,
         amount: 150,
+        skills: null,
+        groupId: null,
       };
 
       const req = {
@@ -132,6 +193,10 @@ describe('MissionService', () => {
         studentsIds: [],
         status: MissionStatus.PENDING,
         companyId: 1,
+        groupId: null,
+        skills: "Skills",
+        comments: null,
+        isNoted: false,
 
       };
 
@@ -163,6 +228,10 @@ describe('MissionService', () => {
         studentsIds: [],
         status: MissionStatus.PENDING,
         companyId: 1,
+        skills: "Skills",
+        groupId: null,
+        comments: null,
+        isNoted: false,
 
       }];
 
@@ -175,6 +244,52 @@ describe('MissionService', () => {
     });
   });
 
+  describe('affectTask', () => {
+    it('should affect task to a student', async () => {
+      const req = {
+        user : {
+          email: "test@example.com",
+        }
+      }
+
+      const taskId = 1;
+      const studentId = 1;
+
+      const expectedResponse = null;
+
+      jest.spyOn(service, 'affectTask').mockResolvedValueOnce(expectedResponse);
+
+      const response = await controller.affectTask(taskId, studentId, req);
+
+      expect(service.affectTask).toHaveBeenCalledWith(taskId, studentId, req);
+      expect(response).toEqual(expectedResponse);
+    });
+  });
+
+  describe('updateTaskStatus', () => {
+    it('should update task status', async () => {
+      const req = {
+        user : {
+          email: "test@example.com",
+        }
+      }
+
+      const dto: UpdateTaskStatusDto = {
+        status: MissionTaskStatus.PENDING
+      }
+
+      const taskId = 1;
+
+      const expectedResponse = null;
+
+      jest.spyOn(service, 'updateTaskStatus').mockResolvedValueOnce(expectedResponse);
+
+      const response = await controller.updateTaskStatus(taskId, dto, req);
+
+      expect(service.updateTaskStatus).toHaveBeenCalledWith(taskId, dto, req);
+      expect(response).toEqual(expectedResponse);
+    });
+  });
 
   it('should be defined', () => {
     expect(service).toBeDefined();

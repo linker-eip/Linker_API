@@ -79,7 +79,8 @@ describe('CompanyService', () => {
             size: 50,
             activity: "",
             speciality: "IT",
-            company: null
+            company: null,
+            picture:"",
           };
     
           jest.spyOn(service, 'findCompanyProfile').mockResolvedValueOnce(expectedProfile);
@@ -128,7 +129,8 @@ describe('CompanyService', () => {
             size: 50,
             activity: "Example Activity",
             speciality: "IT",
-            company: null
+            company: null,
+            picture:"",
           };
     
           jest.spyOn(service, 'updateCompanyProfile').mockResolvedValueOnce(expectedProfile);

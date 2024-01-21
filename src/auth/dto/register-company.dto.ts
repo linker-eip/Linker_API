@@ -32,3 +32,35 @@ export class RegisterCompanyDto {
   phoneNumber: string;
   
 }
+
+export class RegisterCompanyV2Dto {
+  @ApiProperty({ description: "Adresse email de l'utilisateur" })
+  @IsEmail({}, { message: "L'email doit être une adresse email valide" })
+  @IsNotEmpty({ message: "L'email ne doit pas être vide" })
+  @IsString({ message: "L'email doit être une chaîne de caractères" })
+  @IsDefined({ message: "L'email doit être défini" })
+  email: string;
+  
+  @ApiProperty({ description: "Mot de passe de l'utilisateur" })
+  @IsNotEmpty({ message: "Le mot de passe ne doit pas être vide" })
+  @IsString({ message: "Le mot de passe doit être une chaîne de caractères" })
+  @IsDefined({ message: "Le mot de passe doit être défini" })
+  @MinLength(8, { message: "Le mot de passe doit contenir au moins 8 caractères" })
+  @Matches(/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/, {
+    message: 'Le mot de passe est trop faible',
+  })
+  password: string;
+  
+  @ApiProperty({ description: "Numero de siret" })
+  @IsNotEmpty({ message: "Le siret ne doit pas être vide" })
+  @IsString({ message: "Le siret doit être une chaîne de caractères" })
+  @IsDefined({ message: "Le siret doit être défini" })
+  siret: string;
+  
+  @ApiProperty({ description: "Numéro de téléphone de l'utilisateur" })
+  @IsNotEmpty({ message: "Le numéro de téléphone ne doit pas être vide" })
+  @IsString({ message: "Le numéro de téléphone doit être une chaîne de caractères" })
+  @IsDefined({ message: "Le numéro de téléphone doit être défini" })
+  phoneNumber: string;
+  
+}

@@ -17,7 +17,7 @@ import { RegisterStudentDto } from './dto/register-student.dto';
 import { LoginCompanyDto } from './dto/login-company.dto';
 import { LoginCompanyResponseDto } from './dto/login-company-response.dto';
 import { RegisterCompanyResponseDto } from './dto/register-company-response.dto';
-import { RegisterCompanyDto } from './dto/register-company.dto';
+import { RegisterCompanyDto, RegisterCompanyV2Dto } from './dto/register-company.dto';
 import { ForgetPasswordDto } from '../auth/dto/forget-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgetPasswordResponseDto } from './dto/forget-password-response.dto';
@@ -68,6 +68,20 @@ export class AuthController {
   })
   async registerCompany(@Body() registerCompanyDto: RegisterCompanyDto) {
     return await this.authService.registerCompany(registerCompanyDto);
+  }
+
+  @Post('company/register/v2')
+  @ApiOperation({
+    description: 'Company register',
+    summary: 'Allow a company to create an account',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Company registered',
+    type: RegisterCompanyResponseDto,
+  })
+  async registerCompanyv2(@Body() registerCompanyDto: RegisterCompanyV2Dto) {
+    return await this.authService.registerCompanyv2(registerCompanyDto);
   }
 
   @Post('student/login')

@@ -67,16 +67,6 @@ export class MissionController {
         );
         let students: any[] = [];
 
-        if (mission.studentsIds) {
-          students = await Promise.all(
-            mission.studentsIds.map(async (studentId) => {
-              return await this.userAdminService.findOneStudentById(studentId);
-            }),
-          );
-        } else {
-          students = [];
-        }
-
         return formatToMissionAdminDto(mission, company, students);
       }),
     );
@@ -111,16 +101,6 @@ export class MissionController {
       mission.companyId,
     );
     let students: any[] = [];
-
-    if (mission.studentsIds) {
-      students = await Promise.all(
-        mission.studentsIds.map(async (studentId) => {
-          return await this.userAdminService.findOneStudentById(studentId);
-        }),
-      );
-    } else {
-      students = [];
-    }
     return formatToMissionAdminDto(mission, company, students);
   }
 
