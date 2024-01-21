@@ -35,6 +35,7 @@ export class Gateway implements OnModuleInit {
     onModuleInit() {
         this.server.on('connection', async (socket: Socket) => {
             let jwtPayload;
+            console.log(socket.request.headers)
             try {
                 const jwt = socket.request.headers['authorization'].split(' ')[1]
                 jwtPayload = this.jwtService.verify(jwt, { secret: process.env.JWT_SECRET })
