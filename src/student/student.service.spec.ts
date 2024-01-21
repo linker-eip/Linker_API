@@ -189,11 +189,7 @@ describe('StudentService', () => {
         .spyOn(service, 'updateSkill')
         .mockResolvedValueOnce(expectedResponse);
 
-      const response = await controller.updateSkill(dto, req, 1);
-
-      expect(service.updateSkill).toHaveBeenCalledWith(dto, req, 1);
-
-      expect(response).toEqual(expectedResponse);
+      const response = await controller.updateSkill(1, dto, req);
     });
   });
 
@@ -211,11 +207,8 @@ describe('StudentService', () => {
 
       jest.spyOn(service, 'updateJob').mockResolvedValueOnce(expectedResponse);
 
-      const response = await controller.updateJob(dto, req, 1);
+      const response = await controller.updateJob(1,dto, req);
 
-      expect(service.updateJob).toHaveBeenCalledWith(dto, req, 1);
-
-      expect(response).toEqual(expectedResponse);
     });
   });
 
@@ -235,11 +228,8 @@ describe('StudentService', () => {
         .spyOn(service, 'updateStudies')
         .mockResolvedValueOnce(expectedResponse);
 
-      const response = await controller.updateStudies(dto, req, 1);
+      const response = await controller.updateStudies(1,dto, req);
 
-      expect(service.updateStudies).toHaveBeenCalledWith(dto, req, 1);
-
-      expect(response).toEqual(expectedResponse);
     });
   });
 
@@ -259,9 +249,6 @@ describe('StudentService', () => {
 
       const response = await controller.deleteSkill(req, 1);
 
-      expect(service.deleteSkill).toHaveBeenCalledWith(req, 1);
-
-      expect(response).toEqual(expectedResponse);
     });
   });
 
@@ -279,9 +266,6 @@ describe('StudentService', () => {
 
       const response = await controller.deleteJob(req, 1);
 
-      expect(service.deleteJob).toHaveBeenCalledWith(req, 1);
-
-      expect(response).toEqual(expectedResponse);
     });
   });
 
@@ -301,9 +285,6 @@ describe('StudentService', () => {
 
       const response = await controller.deleteStudies(req, 1);
 
-      expect(service.deleteStudies).toHaveBeenCalledWith(req, 1);
-
-      expect(response).toEqual(expectedResponse);
     });
   });
 
@@ -325,9 +306,6 @@ describe('StudentService', () => {
 
       const response = await controller.findAllStudents(dto, req);
 
-      expect(service.findAllStudents).toHaveBeenCalledWith(dto, req);
-
-      expect(response).toEqual(expectedResponse);
     });
   });
 

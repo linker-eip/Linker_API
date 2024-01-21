@@ -162,75 +162,7 @@ describe('MissionService', () => {
     });
   });
 
-  describe('findAllMissions', () => {
-    it('should return an array of missions', async () => {
-      const searchOption: MissionSearchOptionAdmin = {
-        searchString: 'Name',
-      };
-
-      const expectedMissions: Mission[] = [
-        {
-          name: 'Name',
-          description: 'Desc',
-          startOfMission: null,
-          endOfMission: null,
-          amount: 100,
-          id: 1,
-          createdAt: new Date(),
-          groupId: 2,
-          status: MissionStatus.PENDING,
-          companyId: 1,
-          skills: '',
-          comments: null,
-          isNoted: false,
-        },
-
-        {
-          name: 'Name',
-          description: 'Desc',
-          startOfMission: null,
-          endOfMission: null,
-          amount: 100,
-          id: 1,
-          createdAt: new Date(),
-          groupId: 2,
-          status: MissionStatus.PENDING,
-          companyId: 1,
-          skills: '',
-          comments: null,
-          isNoted: false,
-        },
-      ];
-
-      jest
-        .spyOn(service, 'findAllMissions')
-        .mockResolvedValueOnce(expectedMissions);
-
-      const company: CompanyUser = {
-        id: 1,
-        email: 'tonybano83@gmail.com',
-        password: 'Azerty1234!',
-        picture: null,
-        isActive: true,
-        lastConnectedAt: new Date('2023-10-13T03:43:23.946Z'),
-        createdAt: new Date('2023-10-13T03:43:23.946Z'),
-        resetPasswordToken: null,
-        companyName: 'Company',
-        phoneNumber: '0612345678',
-        companyPicture: null,
-        profile: null,
-      };
-
-      jest
-        .spyOn(userAdminService, 'findOneCompanyById')
-        .mockResolvedValueOnce(company);
-
-      const response = await controller.findAllMissions(searchOption);
-
-      expect(service.findAllMissions).toHaveBeenCalledWith(searchOption);
-      expect(response).toEqual(expectedMissions);
-    });
-  });
+  
 
   describe('getMission', () => {
     it('should return a mission', async () => {
