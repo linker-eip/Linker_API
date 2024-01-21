@@ -86,7 +86,9 @@ describe('MissionService', () => {
         groupId: null,
         status: MissionStatus.PENDING,
         companyId: 1,
-        skills: ""
+        skills: "",
+        comments: null,
+        isNoted: false,
       };
 
       jest
@@ -145,6 +147,8 @@ describe('MissionService', () => {
         status: MissionStatus.PENDING,
         companyId: 1,
         skills: "",
+        comments: null,
+        isNoted: false,
       };
 
       jest
@@ -237,7 +241,9 @@ describe('MissionService', () => {
         groupId: 2,
         status: MissionStatus.PENDING,
         companyId: 1,
-        skills: ""
+        skills: "",
+        comments: null,
+        isNoted: false,
       };
 
       const expectedResponse: missionAdminResponseDto = {

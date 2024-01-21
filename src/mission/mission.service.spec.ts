@@ -132,6 +132,8 @@ describe('MissionService', () => {
         companyId: 1,
         skills: "Skills",
         groupId: null,
+        comments: null,
+        isNoted: false,
       };
 
       jest.spyOn(service, 'createMission').mockResolvedValueOnce(expectedMission);
@@ -190,7 +192,9 @@ describe('MissionService', () => {
         status: MissionStatus.PENDING,
         companyId: 1,
         groupId: null,
-        skills: "Skills"
+        skills: "Skills",
+        comments: null,
+        isNoted: false,
 
       };
 
@@ -223,7 +227,9 @@ describe('MissionService', () => {
         status: MissionStatus.PENDING,
         companyId: 1,
         skills: "Skills",
-        groupId: null
+        groupId: null,
+        comments: null,
+        isNoted: false,
 
       }];
 
