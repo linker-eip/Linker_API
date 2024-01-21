@@ -35,6 +35,7 @@ export class Gateway implements OnModuleInit {
     onModuleInit() {
         this.server.on('connection', async (socket: Socket) => {
             let jwtPayload;
+            console.log(socket.request.headers)
             try {
                 const jwt = socket.request.headers['authorization'].split(' ')[1]
                 jwtPayload = this.jwtService.verify(jwt, { secret: process.env.JWT_SECRET })
@@ -121,11 +122,12 @@ export class Gateway implements OnModuleInit {
 
         let historyDto = await Promise.all(history.map(async (message) => {
             let user = await this.studentService.findOneById(message.author);
+            let profile = await this.studentService.findStudentProfile(user.email)
             return {
                 id: message.id,
                 firstName: user.firstName,
                 lastName: user.lastName,
-                picture: user.picture,
+                picture: profile.picture,
                 timestamp: message.timestamp,
                 content: message.content
             };

@@ -10,9 +10,9 @@ import {
   UseGuards,
   UseInterceptors,
   Delete,
-  HttpStatus, 
+  HttpStatus,
   MaxFileSizeValidator,
-  Query
+  Query,
 } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { Get } from '@nestjs/common';
@@ -27,11 +27,17 @@ import { CreateStudentProfileDto } from './dto/create-student-profile.dto';
 import { StudentProfileResponseDto } from './dto/student-profile-response.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { FileMimeTypeValidator, SupportedImageMimeTypes } from 'src/document-transfer/src/helpers/fmt.validator';
+import {
+  FileMimeTypeValidator,
+  SupportedImageMimeTypes,
+} from 'src/document-transfer/src/helpers/fmt.validator';
 import { UpdateSkillDto } from './skills/dto/update-skill.dto';
 import { UpdateJobsDto } from './jobs/dto/update-jobs.dto';
 import { UpdateStudiesDto } from './studies/dto/update-studies.dto';
-import { StudentSearchResponseDto, formatToStudentSearchResponseDto } from './dto/student-search-response.dto';
+import {
+  StudentSearchResponseDto,
+  formatToStudentSearchResponseDto,
+} from './dto/student-search-response.dto';
 import { StudentSearchOptionDto } from './dto/student-search-option.dto';
 import { CompanyProfileResponseDto } from '../company/dto/company-profile-response.dto';
 
@@ -42,19 +48,19 @@ import { CompanyProfileResponseDto } from '../company/dto/company-profile-respon
 export class StudentController {
   constructor(private readonly studentService: StudentService) {}
 
-    @Get('profile')
-    @ApiOperation({
-      description: 'Get student profile',
-      summary: 'Get student profile',
-    })
-    @ApiResponse({
-      status: 200,
-      description: 'Get student profile',
-      type: StudentProfileResponseDto,
-    })
-    async getStudentProfile(@Req() req) {
-      return this.studentService.findStudentProfile(req.user.email);
-    }
+  @Get('profile')
+  @ApiOperation({
+    description: 'Get student profile',
+    summary: 'Get student profile',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Get student profile',
+    type: StudentProfileResponseDto,
+  })
+  async getStudentProfile(@Req() req) {
+    return this.studentService.findStudentProfile(req.user.email);
+  }
 
   @Put('profile')
   @ApiOperation({
@@ -65,23 +71,24 @@ export class StudentController {
     status: 200,
     description: 'Update student profile',
     type: StudentProfileResponseDto,
-    })
-    @UseInterceptors(FileInterceptor('picture'))
-    async updateStudentProfile(
-      @UploadedFile(
-        new ParseFilePipe({
-          fileIsRequired: false,
-          errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
-          validators: [
-            new MaxFileSizeValidator({
-              maxSize: 3_500_000,
-            }),
-            new FileTypeValidator({
-              fileType: 'image/jpeg',
-            }),
-          ]
-        })
-      ) picture,
+  })
+  @UseInterceptors(FileInterceptor('picture'))
+  async updateStudentProfile(
+    @UploadedFile(
+      new ParseFilePipe({
+        fileIsRequired: false,
+        errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+        validators: [
+          new MaxFileSizeValidator({
+            maxSize: 3_500_000,
+          }),
+          new FileTypeValidator({
+            fileType: 'image/jpeg',
+          }),
+        ],
+      }),
+    )
+    picture,
     @Req() req,
     @Body() CreateStudentProfile: CreateStudentProfileDto,
   ) {
@@ -103,9 +110,9 @@ export class StudentController {
     type: StudentProfileResponseDto,
   })
   async updateSkill(
+    @Param('id') id: number,
     @Body() body: UpdateSkillDto,
     @Req() req,
-    @Param('id') id: number,
   ) {
     return this.studentService.updateSkill(id, body, req.user);
   }
@@ -121,9 +128,9 @@ export class StudentController {
     type: StudentProfileResponseDto,
   })
   async updateJob(
+    @Param('id') id: number,
     @Body() body: UpdateJobsDto,
     @Req() req,
-    @Param('id') id: number,
   ) {
     return this.studentService.updateJob(id, body, req.user);
   }
@@ -139,9 +146,9 @@ export class StudentController {
     type: StudentProfileResponseDto,
   })
   async updateStudies(
+    @Param('id') id: number,
     @Body() body: UpdateStudiesDto,
     @Req() req,
-    @Param('id') id: number,
   ) {
     return this.studentService.updateStudies(id, body, req.user);
   }
