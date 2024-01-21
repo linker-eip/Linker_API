@@ -86,7 +86,7 @@ describe('MissionService', () => {
         groupId: null,
         status: MissionStatus.PENDING,
         companyId: 1,
-        skills: "",
+        skills: '',
         comments: null,
         isNoted: false,
       };
@@ -146,7 +146,7 @@ describe('MissionService', () => {
         groupId: 2,
         status: MissionStatus.PENDING,
         companyId: 1,
-        skills: "",
+        skills: '',
         comments: null,
         isNoted: false,
       };
@@ -162,7 +162,7 @@ describe('MissionService', () => {
     });
   });
 
-  /*describe('findAllMissions', () => {
+  describe('findAllMissions', () => {
     it('should return an array of missions', async () => {
       const searchOption: MissionSearchOptionAdmin = {
         searchString: 'Name',
@@ -177,21 +177,28 @@ describe('MissionService', () => {
           amount: 100,
           id: 1,
           createdAt: new Date(),
-          studentsIds: [],
+          groupId: 2,
           status: MissionStatus.PENDING,
           companyId: 1,
+          skills: '',
+          comments: null,
+          isNoted: false,
         },
+
         {
           name: 'Name',
           description: 'Desc',
           startOfMission: null,
           endOfMission: null,
           amount: 100,
-          id: 2,
+          id: 1,
           createdAt: new Date(),
-          studentsIds: [],
+          groupId: 2,
           status: MissionStatus.PENDING,
           companyId: 1,
+          skills: '',
+          comments: null,
+          isNoted: false,
         },
       ];
 
@@ -214,17 +221,16 @@ describe('MissionService', () => {
         profile: null,
       };
 
-        jest
-            .spyOn(userAdminService, 'findOneCompanyById')
-            .mockResolvedValueOnce(company);
+      jest
+        .spyOn(userAdminService, 'findOneCompanyById')
+        .mockResolvedValueOnce(company);
 
-        const response = await controller.findAllMissions(searchOption);
+      const response = await controller.findAllMissions(searchOption);
 
-        expect(service.findAllMissions).toHaveBeenCalledWith(searchOption);
-        expect(response).toEqual(expectedMissions);
-
+      expect(service.findAllMissions).toHaveBeenCalledWith(searchOption);
+      expect(response).toEqual(expectedMissions);
     });
-  });*/
+  });
 
   describe('getMission', () => {
     it('should return a mission', async () => {
@@ -241,7 +247,7 @@ describe('MissionService', () => {
         groupId: 2,
         status: MissionStatus.PENDING,
         companyId: 1,
-        skills: "",
+        skills: '',
         comments: null,
         isNoted: false,
       };
