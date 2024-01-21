@@ -122,11 +122,12 @@ export class Gateway implements OnModuleInit {
 
         let historyDto = await Promise.all(history.map(async (message) => {
             let user = await this.studentService.findOneById(message.author);
+            let profile = await this.studentService.findStudentProfile(user.email)
             return {
                 id: message.id,
                 firstName: user.firstName,
                 lastName: user.lastName,
-                picture: user.picture,
+                picture: profile.picture,
                 timestamp: message.timestamp,
                 content: message.content
             };
