@@ -21,7 +21,7 @@ import { Studies } from '../student/studies/entity/studies.entity';
 import { RegisterStudentDto } from './dto/register-student.dto';
 import { AuthGuard, PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
-import { RegisterCompanyDto } from './dto/register-company.dto';
+import { RegisterCompanyDto, RegisterCompanyV2Dto } from './dto/register-company.dto';
 import { LoginStudentDto } from './dto/login-student.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { LoginCompanyDto } from './dto/login-company.dto';
@@ -170,6 +170,28 @@ describe('AuthService', () => {
       const response = await controller.registerCompany(registerCompanyDto);
 
       expect(service.registerCompany).toHaveBeenCalledWith(registerCompanyDto);
+      expect(response).toEqual(expectedCompany);
+    });
+  });
+
+  describe('registerCompanyv2', () => {
+    it('should return a company', async () => {
+      const registerCompanyDto: RegisterCompanyV2Dto = {
+        email: 'test@example.com',
+        password: 'Password123!',
+        siret: '97788133300016',
+        phoneNumber: '0612345678',
+      };
+
+      const expectedCompany = {
+        token: 'token',
+      };
+
+      jest.spyOn(service, 'registerCompanyv2').mockResolvedValueOnce(expectedCompany);
+
+      const response = await controller.registerCompanyv2(registerCompanyDto);
+
+      expect(service.registerCompanyv2).toHaveBeenCalledWith(registerCompanyDto);
       expect(response).toEqual(expectedCompany);
     });
   });

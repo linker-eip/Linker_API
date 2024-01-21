@@ -31,6 +31,8 @@ import { Skills } from "../student/skills/entity/skills.entity";
 import { Jobs } from "../student/jobs/entity/jobs.entity";
 import { Studies } from "../student/studies/entity/studies.entity";
 import { ConfigService } from "@nestjs/config";
+import { UpdateTaskStatusDto } from "./dto/update-task-status-dto";
+import { MissionTaskStatus } from "./enum/mission-task-status.enum";
 
 describe('MissionService', () => {
   let service: MissionService;
@@ -242,6 +244,52 @@ describe('MissionService', () => {
     });
   });
 
+  describe('affectTask', () => {
+    it('should affect task to a student', async () => {
+      const req = {
+        user : {
+          email: "test@example.com",
+        }
+      }
+
+      const taskId = 1;
+      const studentId = 1;
+
+      const expectedResponse = null;
+
+      jest.spyOn(service, 'affectTask').mockResolvedValueOnce(expectedResponse);
+
+      const response = await controller.affectTask(taskId, studentId, req);
+
+      expect(service.affectTask).toHaveBeenCalledWith(taskId, studentId, req);
+      expect(response).toEqual(expectedResponse);
+    });
+  });
+
+  describe('updateTaskStatus', () => {
+    it('should update task status', async () => {
+      const req = {
+        user : {
+          email: "test@example.com",
+        }
+      }
+
+      const dto: UpdateTaskStatusDto = {
+        status: MissionTaskStatus.PENDING
+      }
+
+      const taskId = 1;
+
+      const expectedResponse = null;
+
+      jest.spyOn(service, 'updateTaskStatus').mockResolvedValueOnce(expectedResponse);
+
+      const response = await controller.updateTaskStatus(taskId, dto, req);
+
+      expect(service.updateTaskStatus).toHaveBeenCalledWith(taskId, dto, req);
+      expect(response).toEqual(expectedResponse);
+    });
+  });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
