@@ -16,6 +16,11 @@ import { Jobs } from "./jobs/entity/jobs.entity";
 import { Studies } from "./studies/entity/studies.entity";
 import { Request } from "express";
 import { StudentProfileResponseDto } from "./dto/student-profile-response.dto";
+import { DocumentTransferService } from "../document-transfer/src/services/document-transfer.service";
+import { CompanyService } from "../company/company.service";
+import { ConfigService } from "@nestjs/config";
+import { CompanyUser } from "../company/entity/CompanyUser.entity";
+import { CompanyProfile } from "../company/entity/CompanyProfile.entity";
 
 describe('StudentService', () => {
     let service: StudentService;
@@ -31,7 +36,7 @@ describe('StudentService', () => {
           }),
         ],
         controllers: [StudentController],
-        providers: [StudentService, FileService, SkillsService, JobsService, StudiesService,
+        providers: [StudentService, FileService, SkillsService, JobsService, StudiesService, DocumentTransferService, CompanyService, ConfigService,
           {
             provide: getRepositoryToken(StudentUser),
             useClass: Repository,
@@ -50,7 +55,14 @@ describe('StudentService', () => {
           }, {
             provide: getRepositoryToken(StudentProfile),
             useClass: Repository
-          }],
+          },        {
+            provide: getRepositoryToken(CompanyUser),
+            useClass: Repository,
+          },
+          {
+            provide: getRepositoryToken(CompanyProfile),
+            useClass: Repository,
+          },],
       })
       .overrideGuard(AuthGuard('jwt'))
       .useValue({ canActivate: jest.fn(() => true) })

@@ -86,6 +86,7 @@ describe('UserAdminService', () => {
           isVerified: true,
           verificationKey: '',
           missionsIds: [],
+          groupId: null,
         },
         {
           id: 2,
@@ -101,6 +102,7 @@ describe('UserAdminService', () => {
           isVerified: true,
           verificationKey: '',
           missionsIds: [],
+          groupId: 1,
         },
       ];
 
@@ -263,6 +265,7 @@ describe('UserAdminService', () => {
         verificationKey: '',
         resetPasswordToken: null,
         missionsIds: [],
+        groupId: null,
       };
 
       jest.spyOn(service, 'findOneStudentById').mockResolvedValueOnce(student);
@@ -305,6 +308,7 @@ describe('UserAdminService', () => {
         verificationKey: '',
         resetPasswordToken: null,
         missionsIds: [],
+        groupId: null,
       };
 
       jest.spyOn(service, 'findOneStudentById').mockResolvedValueOnce(student);

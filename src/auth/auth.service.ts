@@ -19,7 +19,7 @@ import axios from 'axios';
 import { StudentUser } from '../student/entity/StudentUser.entity';
 import { GoogleApiService } from './services/google-api-services';
 import * as crypto from 'crypto';
-import { SiretService } from 'src/siret/siret.service';
+import { SiretService } from '../siret/siret.service';
 
 @Injectable()
 export class AuthService {

@@ -72,7 +72,7 @@ describe('MissionService', () => {
         endOfMission: null,
         amount: 100,
         companyId: 1,
-        studentsIds: [1, 2],
+        groupId: null,
       };
 
       const expectedMission: Mission = {
@@ -83,9 +83,10 @@ describe('MissionService', () => {
         amount: 100,
         id: 1,
         createdAt: new Date(),
-        studentsIds: [1, 2],
+        groupId: null,
         status: MissionStatus.PENDING,
         companyId: 1,
+        skills: ""
       };
 
       jest
@@ -129,7 +130,7 @@ describe('MissionService', () => {
         amount: 100,
         companyId: 1,
         status: MissionStatus.PENDING,
-        studentsIds: [1, 2],
+        groupId: 2,
       };
 
       const expectedMission: Mission = {
@@ -140,9 +141,10 @@ describe('MissionService', () => {
         amount: 100,
         id: 1,
         createdAt: new Date(),
-        studentsIds: [1, 2],
+        groupId: 2,
         status: MissionStatus.PENDING,
         companyId: 1,
+        skills: "",
       };
 
       jest
@@ -232,9 +234,10 @@ describe('MissionService', () => {
         amount: 100,
         id: 1,
         createdAt: new Date(),
-        studentsIds: [],
+        groupId: 2,
         status: MissionStatus.PENDING,
         companyId: 1,
+        skills: ""
       };
 
       const expectedResponse: missionAdminResponseDto = {

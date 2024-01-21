@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateGroupDto } from './dto/create-group-dto';
-import { StudentService } from 'src/student/student.service';
+import { StudentService } from '../student/student.service';
 import { Group } from './entity/Group.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
@@ -9,12 +9,12 @@ import {
   GetGroupeResponse,
   groupMembersDto,
 } from './dto/get-group-response-dto';
-import { NotificationsService } from 'src/notifications/notifications.service';
-import { NotificationType } from 'src/notifications/entity/Notification.entity';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationType } from '../notifications/entity/Notification.entity';
 import { Request } from 'express';
 import { GroupInvite } from './entity/GroupInvite.entity';
 import { GetInvitesResponse } from './dto/get-invites-response-dto';
-import { CompanyService } from 'src/company/company.service';
+import { CompanyService } from '../company/company.service';
 import { GetCompanySearchGroupsDto } from './dto/get-company-search-groups.dto';
 import { CompanySearchGroupsFilterDto } from './dto/company-search-groups-filter.dto';
 

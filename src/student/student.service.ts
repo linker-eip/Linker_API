@@ -9,7 +9,7 @@ import { StudentProfileResponseDto } from './dto/student-profile-response.dto';
 import { JobsService } from './jobs/jobs.service';
 import { StudiesService } from './studies/studies.service';
 import { FileService } from '../filesystem/file.service';
-import { DocumentTransferService } from 'src/document-transfer/src/services/document-transfer.service';
+import { DocumentTransferService } from '../document-transfer/src/services/document-transfer.service';
 import { UpdateSkillDto } from './skills/dto/update-skill.dto';
 import { UpdateJobsDto } from './jobs/dto/update-jobs.dto';
 import { UpdateStudiesDto } from './studies/dto/update-studies.dto';

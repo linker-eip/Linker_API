@@ -24,6 +24,15 @@ import { Document } from '../documents/entity/document.entity';
 import { DocumentTypeEnum } from '../documents/enum/document-type.enum';
 import { DocumentUserEnum } from '../documents/enum/document-user.enum';
 import { InvoiceController } from './invoice.controller';
+import { MissionTask } from '../mission/entity/mission-task.entity';
+import { GroupService } from '../group/group.service';
+import { MissionInvite } from '../mission/entity/mission-invite.entity';
+import { DocumentTransferService } from '../document-transfer/src/services/document-transfer.service';
+import { Group } from '../group/entity/Group.entity';
+import { GroupInvite } from '../group/entity/GroupInvite.entity';
+import { NotificationsService } from '../notifications/notifications.service';
+import { ConfigService } from '@nestjs/config';
+import { Notification } from '../notifications/entity/Notification.entity';
 
 describe('InvoiceService', () => {
   let service: InvoiceService;
@@ -46,6 +55,10 @@ describe('InvoiceService', () => {
         JobsService,
         StudiesService,
         FileService,
+        GroupService,
+        DocumentTransferService,
+        NotificationsService,
+        ConfigService,
         {
           provide: getRepositoryToken(Mission),
           useClass: Repository,
@@ -80,6 +93,25 @@ describe('InvoiceService', () => {
         },
         {
           provide: getRepositoryToken(Jobs),
+          useClass: Repository,
+        },        {
+          provide: getRepositoryToken(MissionTask),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(MissionInvite),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(Group),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(GroupInvite),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(Notification),
           useClass: Repository,
         },
       ],
