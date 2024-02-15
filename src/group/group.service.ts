@@ -327,6 +327,7 @@ export class GroupService {
         let response: GetInvitesResponse = {
           id: group.id,
           name: group.name,
+          description: group.description,
           picture: group.picture,
           leaderName: leader.firstName + ' ' + leader.lastName,
         };

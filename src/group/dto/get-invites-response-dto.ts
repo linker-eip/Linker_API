@@ -9,6 +9,9 @@ export class GetInvitesResponse {
     name: string;
 
     @ApiProperty()
+    description: string;
+
+    @ApiProperty()
     picture: string;
 
     @ApiProperty()
