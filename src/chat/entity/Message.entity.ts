@@ -7,6 +7,7 @@ export enum UserType {
 export enum MessageType {
     GROUP,
     MISSION,
+    PREMISSION,
 }
 
 @Entity()
@@ -23,8 +24,8 @@ export class Message {
     @Column({ type: 'enum', enum: MessageType, nullable: false })
     type: MessageType;
 
-    @Column({ type: 'int', nullable: false })
-    channelId: number;
+    @Column({ type: 'varchar', nullable: false })
+    channelId: string;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     timestamp: Date;
