@@ -13,7 +13,7 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { NotificationType } from '../notifications/entity/Notification.entity';
 import { Request } from 'express';
 import { GroupInvite } from './entity/GroupInvite.entity';
-import { GetInvitesResponse } from './dto/get-invites-response-dto';
+import { GetInvitesResponse, GetPersonnalInvitesResponse } from './dto/get-invites-response-dto';
 import { CompanyService } from '../company/company.service';
 import { GetCompanySearchGroupsDto } from './dto/get-company-search-groups.dto';
 import { CompanySearchGroupsFilterDto } from './dto/company-search-groups-filter.dto';
@@ -281,7 +281,7 @@ export class GroupService {
     }
   }
 
-  async getGroupInvites(req: any): Promise<GetInvitesResponse[]> {
+  async getGroupInvites(req: any): Promise<GetPersonnalInvitesResponse[]> {
     let group = await this.getUserGroup(req);
     let student = await this.studentService.findOneByEmail(req.user.email);
 
@@ -299,11 +299,10 @@ export class GroupService {
         let userProfile = await this.studentService.findStudentProfile(
           user.email,
         );
-        let groupInviteResponse: GetInvitesResponse = {
+        let groupInviteResponse: GetPersonnalInvitesResponse = {
           id: user.id,
           name: user.firstName + ' ' + user.lastName,
           picture: userProfile.picture,
-          leaderName: null,
         };
         return groupInviteResponse;
       }),
@@ -327,6 +326,7 @@ export class GroupService {
         let response: GetInvitesResponse = {
           id: group.id,
           name: group.name,
+          description: group.description,
           picture: group.picture,
           leaderName: leader.firstName + ' ' + leader.lastName,
         };

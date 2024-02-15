@@ -158,6 +158,7 @@ export class StudentService {
       const url = await this.documentTransferService.uploadFile(picture);
 
       studentProfile.picture = url;
+      user.picture = url;
     }
 
     if (CreateStudentProfile.studies !== null) {
