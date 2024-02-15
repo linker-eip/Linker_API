@@ -49,7 +49,7 @@ export class StudentProfile {
   @JoinColumn({ name: 'studentId' })
   student: StudentUser;
 
-  @Column({ type: 'float', nullable: true, default: 0 })
+  @Column({ type: 'float', nullable: true, default: null })
   note: number;
 
   @Column({ type: 'int', nullable: true, default: 0 })
