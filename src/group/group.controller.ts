@@ -21,7 +21,7 @@ import { GroupService } from './group.service';
 import { CreateGroupDto } from './dto/create-group-dto';
 import { UpdateGroupDto } from './dto/update-group-dto';
 import { GetGroupeResponse } from './dto/get-group-response-dto';
-import { GetInvitesResponse } from './dto/get-invites-response-dto';
+import { GetInvitesResponse, GetPersonnalInvitesResponse } from './dto/get-invites-response-dto';
 import { GetCompanySearchGroupsDto } from './dto/get-company-search-groups.dto';
 import { CompanySearchGroupsFilterDto } from './dto/company-search-groups-filter.dto';
 
@@ -127,14 +127,14 @@ export class GroupController {
   @ApiResponse({
     status: 200,
     description: 'Successfully got invites',
-    type: GetInvitesResponse,
+    type: GetPersonnalInvitesResponse,
     isArray: true,
   })
   @ApiResponse({
     status: 400,
     description: 'You are not the group leader',
   })
-  async getGroupInvites(@Req() req): Promise<GetInvitesResponse[]> {
+  async getGroupInvites(@Req() req): Promise<GetPersonnalInvitesResponse[]> {
     return await this.groupService.getGroupInvites(req);
   }
 

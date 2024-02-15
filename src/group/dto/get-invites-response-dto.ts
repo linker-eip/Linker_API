@@ -17,3 +17,16 @@ export class GetInvitesResponse {
     @ApiProperty()
     leaderName: string;
 }
+
+export class GetPersonnalInvitesResponse {
+    @ApiProperty()
+    id: number;
+
+    @ApiProperty()
+    name: string;
+
+
+    @ApiProperty()
+    picture: string;
+
+}
