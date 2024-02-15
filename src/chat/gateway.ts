@@ -13,7 +13,7 @@ import { Repository } from 'typeorm'
 import { CompanyUser } from 'src/company/entity/CompanyUser.entity'
 import { Mission } from 'src/mission/entity/mission.entity'
 
-@WebSocketGateway()
+@WebSocketGateway({cors: true})
 export class Gateway implements OnModuleInit {
     constructor(
         @InjectRepository(Message)
