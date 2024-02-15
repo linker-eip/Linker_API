@@ -180,6 +180,31 @@ export class GroupController {
     return await this.groupService.leaveGroup(req);
   }
 
+  @Delete('/eject/:userId')
+  @ApiOperation({
+    description: 'Eject member from your group (only possible as a leader)',
+    summary: 'Eject member from your group (only possible as a leader)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Membre éjecté',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Mission en cours',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Vous devez être chef de groupe',
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Vous n'avez pas de groupe",
+  })
+  async ejectMember(@Req() req, @Param('userId') userId) {
+    return await this.groupService.ejectMember(req, userId);
+  }
+
   @Get('/company/searchGroups')
   @ApiOperation({
     description: 'Get all groups',

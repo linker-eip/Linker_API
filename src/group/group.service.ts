@@ -3,7 +3,7 @@ import { CreateGroupDto } from './dto/create-group-dto';
 import { StudentService } from '../student/student.service';
 import { Group } from './entity/Group.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
+import { MoreThan, ILike, Brackets, Not, Repository, SelectQueryBuilder, And, Equal } from 'typeorm';
 import { UpdateGroupDto } from './dto/update-group-dto';
 import {
   GetGroupeResponse,
@@ -17,6 +17,8 @@ import { GetInvitesResponse, GetPersonnalInvitesResponse } from './dto/get-invit
 import { CompanyService } from '../company/company.service';
 import { GetCompanySearchGroupsDto } from './dto/get-company-search-groups.dto';
 import { CompanySearchGroupsFilterDto } from './dto/company-search-groups-filter.dto';
+import { Mission } from 'src/mission/entity/mission.entity';
+import { MissionStatus } from 'src/mission/enum/mission-status.enum';
 
 @Injectable()
 export class GroupService {
@@ -25,6 +27,8 @@ export class GroupService {
     private readonly groupRepository: Repository<Group>,
     @InjectRepository(GroupInvite)
     private readonly groupInviteRepository: Repository<GroupInvite>,
+    @InjectRepository(Mission)
+    private readonly missionRepository: Repository<Mission>,
     private readonly studentService: StudentService,
     private readonly notificationService: NotificationsService,
     private readonly CompanyService: CompanyService,
@@ -410,6 +414,7 @@ export class GroupService {
       );
     }
 
+
     let group = await this.getUserGroup(req);
 
     if (student.id == group.leaderId) {
@@ -424,6 +429,62 @@ export class GroupService {
 
     this.groupRepository.save(group);
     this.studentService.save(student);
+  }
+
+  async ejectMember(req: any, userId: any) {
+    let student = await this.studentService.findOneByEmail(req.user.email);
+
+    if (student.groupId == null) {
+      throw new HttpException(
+        "Vous n'avez pas de groupe",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (student.id == userId) {
+      throw new HttpException(
+        "Vous ne pouvez pas vous éjecter vous même",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    let group = await this.getUserGroup(req);
+
+    if (student.id != group.leaderId) {
+      throw new HttpException(
+        'Vous devez être chef de groupe pour éjecter un membre',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    let member = await this.studentService.findOneById(userId);
+
+    if (member == null || member.groupId != student.groupId) {
+      throw new HttpException(
+        "Cet étudiant n'a pas été trouvé",
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    let missions = await this.missionRepository
+    .createQueryBuilder("mission")
+    .where("mission.groupId = :groupId", { groupId: group.id })
+    .andWhere("mission.status IN (:...statuses)", { statuses: [MissionStatus.IN_PROGRESS, MissionStatus.ACCEPTED, MissionStatus.PROVISIONED] })
+    .getMany();
+    if (missions.length > 0) {
+      throw new HttpException(
+        'Vous ne pouvez pas éjecter un membre si une mission est en cours',
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    group.studentIds = group.studentIds.filter((it) => it != member.id);
+    member.groupId = null;
+
+    this.groupRepository.save(group);
+    this.studentService.save(member);
+
+    return HttpStatus.OK
   }
 
   async getAllGroups(
