@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
@@ -228,5 +229,19 @@ export class AuthController {
   @ApiOperation({ summary: 'Disable company account' })
   async disableCompanyAccount(@Req() req) {
     return this.authService.disableCompanyAccount(req)
+  }
+
+  @Delete('student/delete')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Delete student account' })
+  async deleteStudentAccount(@Req() req) {
+    return this.authService.deleteStudentAccount(req)
+  }
+
+  @Delete('company/delete')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Delete company account' })
+  async deleteCompanyAccount(@Req() req) {
+    return this.authService.deleteCompanyAccount(req)
   }
 }

@@ -698,4 +698,53 @@ export class AuthService {
 
     return;
   }
+
+  async deleteStudentAccount(req) {
+    const student = await this.studentService.findOneByEmail(req.user.email);
+    if (!student) {
+      throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED);
+    }
+
+    const isInGroup = await this.groupService.checkIfStudentIsInGroup(student);
+    if (isInGroup) {
+      throw new HttpException(
+        'Vous ne pouvez pas supprimer votre compte si vous êtes dans un groupe',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const sendMailDto = new SendMailDto();
+    sendMailDto.to = student.email;
+    sendMailDto.subject = 'Compte supprimé';
+    sendMailDto.text =
+      'Votre compte Linker a été supprimé définitivement suite à votre demande.';
+    this.mailService.sendMail(sendMailDto);
+    await this.studentService.deleteStudent(student);
+    return;
+  }
+
+  async deleteCompanyAccount(req) {
+    const company = await this.companyService.findOne(req.user.email);
+    if (!company) {
+      throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
+    }
+
+    const hasMissions = await this.missionService.getCompanyMissions(req);
+    if (hasMissions.length > 0) {
+      throw new HttpException(
+        'Vous ne pouvez pas supprimer votre compte si vous avez des missions en cours',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const sendMailDto = new SendMailDto();
+    sendMailDto.to = company.email;
+    sendMailDto.subject = 'Compte supprimé';
+    sendMailDto.text =
+      'Votre compte Linker a été supprimé définitivement suite à votre demande.';
+    this.mailService.sendMail(sendMailDto);
+    await this.companyService.deleteCompany(company);
+
+    return;
+  }
 }

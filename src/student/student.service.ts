@@ -416,4 +416,15 @@ export class StudentService {
   async saveStudentProfile(studentProfile: StudentProfile) {
     return this.studentProfileRepository.save(studentProfile);
   }
+
+  async deleteStudent(student: any) {
+    const studentProfile = await this.studentProfileRepository.findOne({
+      where: { studentId: student.id },
+    });
+    if (studentProfile) {
+      await this.studentProfileRepository.remove(studentProfile);
+    }
+
+    return this.studentRepository.remove(student);
+  }
 }
