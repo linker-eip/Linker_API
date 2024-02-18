@@ -27,6 +27,7 @@ import { DocumentTransferService } from './document-transfer/src/services/docume
 import { DocumentTransferController } from './document-transfer/src/document-transfer.controller';
 import { Gateway } from './chat/gateway';
 import { GatewayModule } from './chat/gateway.module';
+import { ContactModule } from './contact/contact.module';
 
 @Module({
   imports: [
@@ -65,7 +66,8 @@ import { GatewayModule } from './chat/gateway.module';
     GroupModule,
     NotificationsModule,
     DocumentTransferModule,
-    GatewayModule 
+    GatewayModule,
+    ContactModule 
   ],
   controllers: [FileController, SiretController, DocumentTransferController],
   providers: [JwtStrategy, SiretService ],

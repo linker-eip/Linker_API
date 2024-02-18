@@ -10,7 +10,7 @@ export class MailService {
 
   async sendMail(sendMailDto: SendMailDto): Promise<void> {
     await this.transporter.sendMail({
-      from: 'tony.tynoz1609@gmail.com',
+      from: 'linkercontactclient@gmail.com',
       to: sendMailDto.to,
       subject: sendMailDto.subject,
       text: sendMailDto.text,
