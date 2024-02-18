@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { StudentService } from '../student/student.service';
 import { CompanyService } from '../company/company.service';
+import { UpdateNotificationsDto } from './dto/update-notifications.dto';
 
 @Injectable()
 export class NotificationsService {
@@ -41,10 +42,10 @@ export class NotificationsService {
         return notifications
     }
 
-    async updateNotificationsStatus(req: any, ids: number[]) {
-        console.log(req.user, ids);
+    async updateNotificationsStatus(req: any, dto: UpdateNotificationsDto) {
+        console.log(req.user, dto);
         let user = null;
-        let notifications = await this.notificationRepository.findBy({ id: In(ids) });
+        let notifications = await this.notificationRepository.findBy({ id: In(dto.ids) });
 
         if (req.user.userType == "USER_STUDENT") {
             user = await this.studentService.findOneByEmail(req.user.email);
