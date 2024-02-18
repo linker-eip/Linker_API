@@ -42,6 +42,7 @@ export class NotificationsService {
     }
 
     async updateNotificationsStatus(req: any, ids: number[]) {
+        console.log(req.user, ids);
         let user = null;
         let notifications = await this.notificationRepository.findBy({ id: In(ids) });
 
