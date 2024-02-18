@@ -150,7 +150,8 @@ export class MissionService {
     if (company == null) {
       throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
     }
-    return this.findAllByCompanyId(company.id);
+    const missions =  await this.findAllByCompanyId(company.id);
+    return missions;
   }
 
   async createMissionTask(

@@ -5,6 +5,7 @@ import {
   HttpException,
   HttpStatus,
   Post,
+  Put,
   Query,
   Req,
   UseGuards,
@@ -213,5 +214,19 @@ export class AuthController {
   @ApiOperation({ summary: 'Gives the type of the user' })
   async getUserType(@Req() req) {
     return req.user.userType
+  }
+
+  @Put('student/disable')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Disable student account' })
+  async disableStudentAccount(@Req() req) {
+    return this.authService.disableStudentAccount(req)
+  }
+
+  @Put('company/disable')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Disable company account' })
+  async disableCompanyAccount(@Req() req) {
+    return this.authService.disableCompanyAccount(req)
   }
 }
