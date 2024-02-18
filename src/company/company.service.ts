@@ -68,7 +68,7 @@ export class CompanyService {
   }
 
   async findCompanyProfileById(id: number): Promise<CompanyProfile> {
-    return this.companyProfileRepository.findOne({ where: { companyId : id } });
+    return this.companyProfileRepository.findOne({ where: { companyId: id } });
   }
 
   async updateCompanyProfile(
@@ -125,5 +125,15 @@ export class CompanyService {
 
   async findCompanyProfileByCompanyId(companyId: number) {
     return this.companyProfileRepository.findOne({ where: { companyId } });
+  }
+
+  async deleteCompany(company: any) {
+    const companyProfile = await this.companyProfileRepository.findOne({
+      where: { companyId: company.id },
+    });
+    if (companyProfile) {
+      await this.companyProfileRepository.remove(companyProfile);
+    }
+    return this.companyRepository.remove(company);
   }
 }
