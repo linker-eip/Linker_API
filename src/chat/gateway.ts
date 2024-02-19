@@ -311,7 +311,7 @@ export class Gateway implements OnModuleInit {
                 socket.emit('error', { message: 'you are not in a group' })
                 return;
             }
-            let mission = await this.missionRepository.findOneBy({ id: body.id, status: MissionStatus.PENDING })
+            let mission = await this.missionRepository.findOneBy({ id: body.missionId, status: MissionStatus.PENDING })
             if (mission == null) {
                 socket.emit('error', { message: 'mission not found' })
                 return;
@@ -337,7 +337,7 @@ export class Gateway implements OnModuleInit {
                 return;
             }
 
-            let mission = await this.missionRepository.findOneBy({ id: body.id, companyId: companyUser.id })
+            let mission = await this.missionRepository.findOneBy({ id: body.missionId, companyId: companyUser.id })
             if (mission == null) {
                 socket.emit('error', { message: 'mission not found' })
                 return;
@@ -378,7 +378,7 @@ export class Gateway implements OnModuleInit {
                 socket.emit('error', { message: 'you are not in a group' })
                 return;
             }
-            let mission = await this.missionRepository.findOneBy({ id: body.id, status: MissionStatus.PENDING })
+            let mission = await this.missionRepository.findOneBy({ id: body.missionId, status: MissionStatus.PENDING })
             if (mission == null) {
                 socket.emit('error', { message: 'mission not found' })
                 return;
@@ -419,7 +419,7 @@ export class Gateway implements OnModuleInit {
                 socket.emit('error', { message: 'no group id provided' })
                 return;
             }
-            let mission = await this.missionRepository.findOneBy({ id: body.id, status: MissionStatus.PENDING })
+            let mission = await this.missionRepository.findOneBy({ id: body.missionId, status: MissionStatus.PENDING })
             if (mission == null) {
                 socket.emit('error', { message: 'mission not found' })
                 return;
