@@ -28,4 +28,14 @@ export class ContactAdminService {
     contact.isTreated = updateContactDto.isTreated;
     return await this.contactRepository.save(contact);
   }
+
+  async delete(id: number): Promise<Contact> {
+    const contact = await this.contactRepository.findOne({ where: { id: id } });
+
+    if (!contact) {
+      throw new NotFoundException(`CONTACT_NOT_FOUND`);
+    }
+
+    return await this.contactRepository.remove(contact);
+  }
 }

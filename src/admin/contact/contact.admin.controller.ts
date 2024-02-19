@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Put } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ContactAdminService } from './contact.admin.service';
 import { UpdateContactDto } from './dto/update-contact.dto';
@@ -16,5 +16,10 @@ export class ContactAdminController {
   @Put('/:id')
   async update(@Body() updateContactDto : UpdateContactDto, @Param('id') id: number){
     return await this.contactAdminService.update(id, updateContactDto);
+  }
+
+  @Delete('/:id')
+  async delete(@Param('id') id: number){
+    return await this.contactAdminService.delete(id);
   }
 }

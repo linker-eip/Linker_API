@@ -44,7 +44,7 @@ export class StudentService {
   }
 
   async findOneById(studentId: number): Promise<StudentUser | undefined> {
-    return this.studentRepository.findOne({ where: { id: studentId } });
+    return this.studentRepository.findOne({ where: { id: studentId  } });
   }
 
   async findOneByResetPasswordToken(
