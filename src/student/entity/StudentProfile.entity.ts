@@ -36,8 +36,8 @@ export class StudentProfile {
   @OneToMany(() => Studies, (studies) => studies.studentProfile)
   studies: Studies[];
 
-  @OneToMany(() => Skills, (skills) => skills.studentProfile)
-  skills: Skills[];
+  @Column({ nullable: true })
+  skills: string;
 
   @OneToMany(() => Jobs, (jobs) => jobs.studentProfile)
   jobs: Jobs[];

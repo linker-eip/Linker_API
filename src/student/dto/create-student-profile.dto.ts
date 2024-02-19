@@ -1,11 +1,33 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber, IsOptional, IsString } from "class-validator";
+import { IsArray, IsNumber, IsOptional, IsString } from "class-validator";
 import { Studies } from "../studies/entity/studies.entity";
 import { Skills } from "../skills/entity/skills.entity";
 import { Jobs } from "../jobs/entity/jobs.entity";
 import { StudiesDto } from "../studies/dto/studies.dto";
 import { SkillsDto } from "../skills/dto/skills.dto";
 import { JobsDto } from "../jobs/dto/jobs.dto";
+
+export class UpdateSkillsDto {
+  @IsArray()
+  @IsOptional()
+  Development: string[];
+
+  @IsArray()
+  @IsOptional()
+  "No-code": string[];
+
+  @IsArray()
+  @IsOptional()
+  "Design & Produit": string[];
+
+  @IsArray()
+  @IsOptional()
+  Data: string[];
+
+  @IsArray()
+  @IsOptional()
+  "Marketing & Sales": string[];
+}
 
 export class CreateStudentProfileDto {
   @ApiProperty({ description: "Prénom de l'utilisateur" })
@@ -46,9 +68,9 @@ export class CreateStudentProfileDto {
   @IsOptional()
   studies?: Studies[];
   
-  @ApiProperty({ description: "Compétences de l'utilisateur", type: SkillsDto, isArray: true })
+  @ApiProperty({ description: "Compétences de l'utilisateur", type: UpdateSkillsDto})
   @IsOptional()
-  skills?: Skills[];
+  skills?: UpdateSkillsDto;
   
   @ApiProperty({ description: "Emplois de l'utilisateur", type: JobsDto, isArray: true })
   @IsOptional()

@@ -5,6 +5,7 @@ import { Jobs } from '../jobs/entity/jobs.entity';
 import { StudiesDto } from '../studies/dto/studies.dto';
 import { SkillsDto } from '../skills/dto/skills.dto';
 import { JobsDto } from '../jobs/dto/jobs.dto';
+import { UpdateSkillsDto } from './create-student-profile.dto';
 
 export class StudentProfileResponseDto {
   @ApiProperty()
@@ -34,8 +35,8 @@ export class StudentProfileResponseDto {
   @ApiProperty({type : StudiesDto, isArray : true})
   studies: Studies[];
 
-  @ApiProperty({type : SkillsDto, isArray : true})
-  skills: Skills[];
+  @ApiProperty({type : UpdateSkillsDto})
+  skills: UpdateSkillsDto;
 
   @ApiProperty({type : JobsDto, isArray : true})
   jobs: Jobs[];

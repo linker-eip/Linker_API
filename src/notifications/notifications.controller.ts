@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Req, UseGuards } from '@nes
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { NotificationsService } from './notifications.service';
+import { UpdateNotificationsDto } from './dto/update-notifications.dto';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
@@ -24,8 +25,8 @@ export class NotificationsController {
         description: 'Update notifications status',
         summary: 'Update notifications status'
     })
-    async updateNotificationsStatus(@Req() req, @Body() ids: number[]) {
-        return await this.notificationService.updateNotificationsStatus(req, ids)
+    async updateNotificationsStatus(@Req() req, @Body() dto: UpdateNotificationsDto) {
+        return await this.notificationService.updateNotificationsStatus(req, dto)
     }
 
     @Delete(':id')

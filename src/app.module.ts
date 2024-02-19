@@ -28,6 +28,7 @@ import { DocumentTransferController } from './document-transfer/src/document-tra
 import { Gateway } from './chat/gateway';
 import { GatewayModule } from './chat/gateway.module';
 import { ContactModule } from './contact/contact.module';
+import { SkillsModule } from './student/skills/skills.module';
 
 @Module({
   imports: [
@@ -66,8 +67,9 @@ import { ContactModule } from './contact/contact.module';
     GroupModule,
     NotificationsModule,
     DocumentTransferModule,
+    ContactModule,
     GatewayModule,
-    ContactModule 
+    SkillsModule
   ],
   controllers: [FileController, SiretController, DocumentTransferController],
   providers: [JwtStrategy, SiretService ],
