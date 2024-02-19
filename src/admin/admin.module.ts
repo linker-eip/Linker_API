@@ -8,6 +8,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AdminGuard } from './guards/admin/admin.guard';
 import { MissionModule } from './mission/mission.module';
 import { DocumentAdminModule } from './document/document.admin.module';
+import { ContactAdminModule } from './contact/contact-admin.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { DocumentAdminModule } from './document/document.admin.module';
     AuthAdminModule,
     MissionModule,
     DocumentAdminModule,
+    ContactAdminModule
   ],
   providers: [AdminService],
   exports: [AdminService],

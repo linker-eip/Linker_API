@@ -27,6 +27,7 @@ import { DocumentTransferService } from './document-transfer/src/services/docume
 import { DocumentTransferController } from './document-transfer/src/document-transfer.controller';
 import { Gateway } from './chat/gateway';
 import { GatewayModule } from './chat/gateway.module';
+import { ContactModule } from './contact/contact.module';
 import { SkillsModule } from './student/skills/skills.module';
 
 @Module({
@@ -66,7 +67,8 @@ import { SkillsModule } from './student/skills/skills.module';
     GroupModule,
     NotificationsModule,
     DocumentTransferModule,
-    GatewayModule ,
+    ContactModule,
+    GatewayModule,
     SkillsModule
   ],
   controllers: [FileController, SiretController, DocumentTransferController],
