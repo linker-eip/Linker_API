@@ -127,7 +127,7 @@ export class UserAdminService {
         location: '',
         picture: null,
         studies: [],
-        skills:null,
+        skills:{"Development":[],"No-code":[],"Design & Produit":[],"Data":[],"Marketing & Sales":[]},
         jobs: [],
         website: '',
       },
