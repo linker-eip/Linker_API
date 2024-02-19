@@ -127,7 +127,7 @@ export class UserAdminService {
         location: '',
         picture: null,
         studies: [],
-        skills: [],
+        skills:null,
         jobs: [],
         website: '',
       },
@@ -159,7 +159,7 @@ export class UserAdminService {
     studentProfile.phone = CreateStudentProfile.phone;
     studentProfile.location = CreateStudentProfile.location;
     studentProfile.studies = CreateStudentProfile.studies;
-    studentProfile.skills = CreateStudentProfile.skills;
+    //studentProfile.skills = CreateStudentProfile.skills;
     studentProfile.website = CreateStudentProfile.website;
     return this.studentProfileRepository.save(studentProfile);
   }

@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, In, Repository, SelectQueryBuilder } from 'typeorm';
 import { StudentUser } from './entity/StudentUser.entity';
 import { StudentProfile } from './entity/StudentProfile.entity';
-import { CreateStudentProfileDto } from './dto/create-student-profile.dto';
+import { CreateStudentProfileDto, UpdateSkillsDto } from './dto/create-student-profile.dto';
 import { SkillsService } from './skills/skills.service';
 import { StudentProfileResponseDto } from './dto/student-profile-response.dto';
 import { JobsService } from './jobs/jobs.service';
@@ -19,6 +19,7 @@ import {
   formatToStudentSearchResponseDto,
 } from './dto/student-search-response.dto';
 import { CompanyService } from '../company/company.service';
+import { SkillList } from './skills/consts/skills-list';
 
 @Injectable()
 export class StudentService {
@@ -33,7 +34,7 @@ export class StudentService {
     private readonly fileService: FileService,
     private readonly documentTransferService: DocumentTransferService,
     private readonly companyService: CompanyService,
-  ) {}
+  ) { }
 
   async findAll(): Promise<StudentUser[]> {
     return this.studentRepository.find();
@@ -86,12 +87,22 @@ export class StudentService {
     return this.studentRepository.save(student);
   }
 
+  mapSkillToDto(json: any): UpdateSkillsDto {
+    let dto: UpdateSkillsDto = new UpdateSkillsDto();
+    json = JSON.parse(json);
+    dto.Data = json.skills['Data'];
+    dto['Design & Produit'] = json.skills['Design & Produit'];
+    dto.Development = json.skills['Development'];
+    dto['Marketing & Sales'] = json.skills['Marketing & Sales'];
+    dto['No-code'] = json.skills['No-code'];
+    return dto;
+  }
+
   async findStudentProfile(email: string) {
     const profile = await this.studentProfileRepository.findOne({
       where: { email },
     });
     if (!profile) throw new Error(`Could not find student profile`);
-    const skills = await this.skillsService.findSkills(profile.id);
     const jobs = await this.jobsservice.findJobs(profile.id);
     const studies = await this.studiesService.findStudies(profile.id);
     return {
@@ -103,7 +114,7 @@ export class StudentService {
       location: profile.location,
       picture: profile.picture,
       studies: studies,
-      skills: skills,
+      skills: this.mapSkillToDto(profile.skills),
       jobs: jobs,
       website: profile.website,
       note: profile.note,
@@ -171,13 +182,83 @@ export class StudentService {
     }
 
     if (CreateStudentProfile.skills !== null) {
-      for (let i = 0; i < CreateStudentProfile?.skills?.length; i++) {
-        await this.skillsService.addSkill(
-          studentProfile,
-          CreateStudentProfile.skills[i],
-        );
+      var skillResult = {
+        "skills": {
+          "Development": [],
+          "No-Code": [],
+          "Design & Produit": [],
+          "Data": [],
+          "Marketing & Sales": [],
+        }
       }
+      if (CreateStudentProfile.skills.Data) {
+        for (let i = 0; i < CreateStudentProfile.skills.Data.length; i++) {
+          var skill = CreateStudentProfile.skills.Data[i]
+          if (!SkillList.skills.Data.includes(skill)) {
+            throw new HttpException(
+              'Invalid skill : ' + skill,
+              HttpStatus.BAD_REQUEST,
+            );
+          }
+          skillResult.skills.Data.push(skill);
+        }
+      }
+      if (CreateStudentProfile.skills.Development) {
+
+        for (let i = 0; i < CreateStudentProfile.skills.Development.length; i++) {
+          var skill = CreateStudentProfile.skills.Development[i]
+          if (!SkillList.skills.Development.includes(skill)) {
+            throw new HttpException(
+              'Invalid skill : ' + skill,
+              HttpStatus.BAD_REQUEST,
+            );
+          }
+          skillResult.skills.Development.push(skill);
+        }
+      }
+      if (CreateStudentProfile.skills['No-code']) {
+
+        for (let i = 0; i < CreateStudentProfile.skills['No-code'].length; i++) {
+          var skill = CreateStudentProfile.skills['No-code'][i]
+          if (!SkillList.skills['No-code'].includes(skill)) {
+            throw new HttpException(
+              'Invalid skill : ' + skill,
+              HttpStatus.BAD_REQUEST,
+            );
+          }
+          skillResult.skills['No-Code'].push(skill);
+        }
+      }
+      if (CreateStudentProfile.skills['Design & Produit']) {
+
+        for (let i = 0; i < CreateStudentProfile.skills['Design & Produit'].length; i++) {
+          var skill = CreateStudentProfile.skills['Design & Produit'][i]
+          if (!SkillList.skills['Design & Produit'].includes(skill)) {
+            throw new HttpException(
+              'Invalid skill : ' + skill,
+              HttpStatus.BAD_REQUEST,
+            );
+          }
+          skillResult.skills['Design & Produit'].push(skill);
+        }
+      }
+      if (CreateStudentProfile.skills['Marketing & Sales']) {
+
+        for (let i = 0; i < CreateStudentProfile.skills['Marketing & Sales'].length; i++) {
+          var skill = CreateStudentProfile.skills['Marketing & Sales'][i]
+          if (!SkillList.skills['Marketing & Sales'].includes(skill)) {
+            throw new HttpException(
+              'Invalid skill : ' + skill,
+              HttpStatus.BAD_REQUEST,
+            );
+          }
+          skillResult.skills['Marketing & Sales'].push(skill);
+        }
+      }
+      studentProfile.skills = JSON.stringify(skillResult)
     }
+
+
 
     if (CreateStudentProfile.jobs !== null) {
       for (let i = 0; i < CreateStudentProfile?.jobs?.length; i++) {
