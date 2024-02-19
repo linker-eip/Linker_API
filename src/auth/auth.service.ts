@@ -260,14 +260,13 @@ export class AuthService {
       };
     }
 
-    if (!student.isActive) {
-      student.isActive = true;
-      this.studentService.save(student);
-    }
-
     if (
       await this.comparePassword(loginStudentDto.password, student.password)
     ) {
+      if (!student.isActive) {
+        student.isActive = true;
+        this.studentService.save(student);
+      }
       const token = jwt.sign(
         { email: student.email, userType: 'USER_STUDENT' },
         process.env.JWT_SECRET,
@@ -291,6 +290,10 @@ export class AuthService {
     if (
       await this.comparePassword(loginCompanyDto.password, company.password)
     ) {
+      if (!company.isActive) {
+        company.isActive = true;
+        this.companyService.save(company);
+      }
       const token = jwt.sign(
         { email: company.email, userType: 'USER_COMPANY' },
         process.env.JWT_SECRET,
