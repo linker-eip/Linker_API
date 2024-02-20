@@ -181,7 +181,7 @@ export class StudentService {
       }
     }
 
-    if (CreateStudentProfile.skills !== null) {
+    if (CreateStudentProfile.skills !== undefined && CreateStudentProfile.skills !== null) {
       var skillResult = {
         "skills": {
           "Development": [],
