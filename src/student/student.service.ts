@@ -181,6 +181,7 @@ export class StudentService {
       }
     }
 
+    console.log(CreateStudentProfile)
     if (CreateStudentProfile.skills !== null) {
       var skillResult = {
         "skills": {
