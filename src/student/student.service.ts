@@ -94,7 +94,7 @@ export class StudentService {
     dto['Design & Produit'] = json.skills['Design & Produit'];
     dto.Development = json.skills['Development'];
     dto['Marketing & Sales'] = json.skills['Marketing & Sales'];
-    dto['No-code'] = json.skills['No-code'];
+    dto['No-code'] = json.skills['No-Code'];
     return dto;
   }
 
