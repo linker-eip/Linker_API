@@ -249,6 +249,13 @@ export class GroupService {
       );
     }
 
+    if (invitedStudent.isActive == false) {
+      throw new HttpException(
+        "Cet étudiant n'est pas actif",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     if (invitedStudent.groupId != null) {
       throw new HttpException(
         'Cet étudiant a déjà un groupe',
