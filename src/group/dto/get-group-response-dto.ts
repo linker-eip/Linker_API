@@ -38,5 +38,7 @@ export class GetGroupeResponse {
 
     @ApiProperty()
     groupId: number;
-}
 
+    @ApiProperty()
+    isActive: boolean;
+}

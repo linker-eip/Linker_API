@@ -150,6 +150,9 @@ export class GroupService {
     if (updateGroupDto.picture != null) {
       group.picture = updateGroupDto.picture;
     }
+    if (updateGroupDto.isActive != null) {
+      group.isActive = updateGroupDto.isActive;
+    }
     await this.groupRepository.save(group);
     return await this.findGroupById(group.id);
   }
@@ -229,6 +232,7 @@ export class GroupService {
       leaderId: group.leaderId,
       isLeader: group.leaderId == student.id,
       groupId: group.id,
+      isActive: group.isActive,
     };
     return response;
   }
