@@ -5,6 +5,10 @@ import { In, Repository } from 'typeorm';
 import { StudentService } from '../student/student.service';
 import { CompanyService } from '../company/company.service';
 import { UpdateNotificationsDto } from './dto/update-notifications.dto';
+import { StudentPreferences } from 'src/student/entity/StudentPreferences.entity';
+import { MailService } from 'src/mail/mail.service';
+import { SendMailDto } from 'src/mail/dto/send-mail.dto';
+import { CompanyPreferences } from 'src/company/entity/CompanyPreferences.entity';
 
 @Injectable()
 export class NotificationsService {
@@ -12,8 +16,12 @@ export class NotificationsService {
     constructor(
         @InjectRepository(Notification)
         private notificationRepository: Repository<Notification>,
-
+        @InjectRepository(StudentPreferences)
+        private studentPreferencesRepository: Repository<StudentPreferences>,
+        @InjectRepository(CompanyPreferences)
+        private companyPreferencesRepository: Repository<CompanyPreferences>,
         private readonly studentService: StudentService,
+        private readonly mailService: MailService,
         private readonly companyService: CompanyService,
     ) { }
 
@@ -22,8 +30,35 @@ export class NotificationsService {
         notification.title = title;
         notification.text = text;
         notification.type = type;
-        if (studentId != null) notification.studentId = studentId;
-        if (companyId != null) notification.companyId = companyId;
+        if (studentId != null) {
+            notification.studentId = studentId;
+            const studentPref = await this.studentPreferencesRepository.findOne({ where: { studentId: studentId } })
+            const student = await this.studentService.findOneById(studentId)
+            if ((type == NotificationType.DOCUMENT && studentPref.mailNotifDocument)
+                || (type == NotificationType.GROUP && studentPref.mailNotifGroup)
+                || (type == NotificationType.MESSAGE && studentPref.mailNotifMessage)
+                || (type == NotificationType.MISSION && studentPref.mailNotifMission)) {
+                const mailDto = new SendMailDto()
+                mailDto.subject = "Nouvelle notification Linker : " + title
+                mailDto.text = "Vous avez reçu une nouvelle notification sur votre compte Linker. \n\n" + text
+                mailDto.to = student.email
+                this.mailService.sendMail(mailDto)
+            }
+        }
+        if (companyId != null) {
+            notification.companyId = companyId;
+            const companypref = await this.companyPreferencesRepository.findOne({ where: { companyId: companyId } })
+            const company = await this.companyService.findCompanyById(companyId)
+            if ((type == NotificationType.DOCUMENT && companypref.mailNotifDocument)
+                || (type == NotificationType.MESSAGE && companypref.mailNotifMessage)
+                || (type == NotificationType.MISSION && companypref.mailNotifMission)) {
+                const mailDto = new SendMailDto()
+                mailDto.subject = "Nouvelle notification Linker : " + title
+                mailDto.text = "Vous avez reçu une nouvelle notification sur votre compte Linker. \n\n" + text
+                mailDto.to = company.email
+                this.mailService.sendMail(mailDto)
+                }
+        }
 
         this.notificationRepository.save(notification)
     }
@@ -43,7 +78,6 @@ export class NotificationsService {
     }
 
     async updateNotificationsStatus(req: any, dto: UpdateNotificationsDto) {
-        console.log(req.user, dto);
         let user = null;
         let notifications = await this.notificationRepository.findBy({ id: In(dto.ids) });
 

@@ -20,14 +20,20 @@ import {
 } from './dto/student-search-response.dto';
 import { CompanyService } from '../company/company.service';
 import { SkillList } from './skills/consts/skills-list';
+import { StudentPreferences } from './entity/StudentPreferences.entity';
+import { UpdatePreferencesDto } from './dto/update-preferences.dto';
 
 @Injectable()
 export class StudentService {
+
+
   constructor(
     @InjectRepository(StudentUser)
     private studentRepository: Repository<StudentUser>,
     @InjectRepository(StudentProfile)
     private studentProfileRepository: Repository<StudentProfile>,
+    @InjectRepository(StudentPreferences)
+    private studentPreferencesRepository: Repository<StudentPreferences>,
     private readonly skillsService: SkillsService,
     private readonly jobsservice: JobsService,
     private readonly studiesService: StudiesService,
@@ -45,7 +51,7 @@ export class StudentService {
   }
 
   async findOneById(studentId: number): Promise<StudentUser | undefined> {
-    return this.studentRepository.findOne({ where: { id: studentId  } });
+    return this.studentRepository.findOne({ where: { id: studentId } });
   }
 
   async findOneByResetPasswordToken(
@@ -507,5 +513,34 @@ export class StudentService {
     }
 
     return this.studentRepository.remove(student);
+  }
+
+  async createPref() {
+    const students = await this.studentRepository.find();
+
+    for (const student of students) {
+      const prefs = new StudentPreferences()
+      prefs.studentId = student.id;
+      this.studentPreferencesRepository.save(prefs)
+    }
+  }
+
+  async updatePreferences(req: any, updatePreferencesDto: UpdatePreferencesDto) {
+    const student = await this.studentRepository.findOne({ where: { email: req.user.email } })
+
+    const existingPreferences = await this.studentPreferencesRepository.findOneBy({studentId: student.id})
+
+    if (!existingPreferences) {
+      throw new HttpException(
+        'Preferences not found',
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    Object.assign(existingPreferences, updatePreferencesDto);
+
+    await this.studentPreferencesRepository.save(existingPreferences);
+
+    return existingPreferences;
   }
 }

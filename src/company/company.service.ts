@@ -63,6 +63,10 @@ export class CompanyService {
     return this.companyProfileRepository.save(CompanyProfileObj);
   }
 
+  async findCompanyById(companyId: number): Promise<CompanyUser> {
+    return this.companyRepository.findOne({where: {id: companyId}})
+  }
+
   async findCompanyProfile(email: string): Promise<CompanyProfile> {
     return this.companyProfileRepository.findOne({ where: { email } });
   }
