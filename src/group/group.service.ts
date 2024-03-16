@@ -595,7 +595,7 @@ export class GroupService {
         groupMember = true;
       }
     });
-    console.log(groupMember);
+    (groupMember);
 
     if (groupMember) {
       return true;

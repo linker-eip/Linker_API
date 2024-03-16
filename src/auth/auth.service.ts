@@ -30,10 +30,15 @@ import * as crypto from 'crypto';
 import { SiretService } from '../siret/siret.service';
 import { GroupService } from '../group/group.service';
 import { MissionService } from '../mission/mission.service';
+import { StudentPreferences } from 'src/student/entity/StudentPreferences.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @InjectRepository(StudentPreferences)
+    private studentPreferencesRepository: Repository<StudentPreferences>,
     private readonly studentService: StudentService,
     private readonly jwtService: JwtService,
     private readonly companyService: CompanyService,
@@ -79,6 +84,10 @@ export class AuthService {
     newUser.verificationKey = randomBytes.toString('hex').slice(0, 32);
 
     const savedUser = await this.studentService.save(newUser);
+
+    const userPref = new StudentPreferences()
+    userPref.studentId = savedUser.id
+    await this.studentPreferencesRepository.save(userPref)
 
     const token = jwt.sign(
       { email: savedUser.email, userType: 'USER_STUDENT' },

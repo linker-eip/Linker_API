@@ -526,11 +526,9 @@ export class StudentService {
   }
 
   async updatePreferences(req: any, updatePreferencesDto: UpdatePreferencesDto) {
-    const student = await this.studentRepository.findOne({ where: { email: req.email } })
+    const student = await this.studentRepository.findOne({ where: { email: req.user.email } })
 
-    const existingPreferences = await this.studentPreferencesRepository.findOne({
-      where: { studentId: student.id },
-    });
+    const existingPreferences = await this.studentPreferencesRepository.findOneBy({studentId: student.id})
 
     if (!existingPreferences) {
       throw new HttpException(
@@ -539,10 +537,8 @@ export class StudentService {
       );
     }
 
-    // Update the existing preferences with the new values from the DTO
     Object.assign(existingPreferences, updatePreferencesDto);
 
-    // Save the updated preferences back to the database
     await this.studentPreferencesRepository.save(existingPreferences);
 
     return existingPreferences;

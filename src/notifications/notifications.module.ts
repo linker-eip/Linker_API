@@ -5,14 +5,17 @@ import { Notification } from './entity/Notification.entity';
 import { NotificationsController } from './notifications.controller';
 import { StudentModule } from 'src/student/student.module';
 import { CompanyModule } from 'src/company/company.module';
+import { StudentPreferences } from 'src/student/entity/StudentPreferences.entity';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Notification]),
+    TypeOrmModule.forFeature([Notification, StudentPreferences]),
     StudentModule,
     CompanyModule,
+    MailModule
   ],
-  providers: [NotificationsService],
+  providers: [NotificationsService,],
   exports: [NotificationsService],
   controllers: [NotificationsController]
 })

@@ -9,9 +9,11 @@ import { GoogleApiService } from './services/google-api-services';
 import { SiretService } from 'src/siret/siret.service';
 import { GroupModule } from '../group/group.module';
 import { MissionModule } from '../mission/mission.module';
+import { StudentPreferences } from 'src/student/entity/StudentPreferences.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [StudentModule, CompanyModule, MailModule, GroupModule, MissionModule],
+  imports: [TypeOrmModule.forFeature([StudentPreferences]),StudentModule, CompanyModule, MailModule, GroupModule, MissionModule],
   controllers: [AuthController],
   providers: [AuthService, JwtService, GoogleApiService, SiretService],
 })
