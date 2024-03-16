@@ -13,6 +13,7 @@ import {
   HttpStatus,
   MaxFileSizeValidator,
   Query,
+  Post,
 } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { Get } from '@nestjs/common';
@@ -40,6 +41,7 @@ import {
 } from './dto/student-search-response.dto';
 import { StudentSearchOptionDto } from './dto/student-search-option.dto';
 import { CompanyProfileResponseDto } from '../company/dto/company-profile-response.dto';
+import { UpdatePreferencesDto } from './dto/update-preferences.dto';
 
 @Controller('api/student')
 @UseGuards(AuthGuard('jwt'))
@@ -224,5 +226,15 @@ export class StudentController {
   })
   async getCompanyInfoByStudent(@Param('companyId') companyId: number) {
     return this.studentService.getCompanyInfoByStudent(companyId);
+  }
+
+  @Post('createPref')
+  async createPref() {
+    return this.studentService.createPref()
+  }
+
+  @Put('preferences')
+  async updatePreferences(@Req() req, @Body() updatePreferencesDto: UpdatePreferencesDto) {
+    return this.studentService.updatePreferences(req, updatePreferencesDto)
   }
 }
