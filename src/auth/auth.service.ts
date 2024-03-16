@@ -33,12 +33,15 @@ import { MissionService } from '../mission/mission.service';
 import { StudentPreferences } from 'src/student/entity/StudentPreferences.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CompanyPreferences } from 'src/company/entity/CompanyPreferences.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(StudentPreferences)
     private studentPreferencesRepository: Repository<StudentPreferences>,
+    @InjectRepository(CompanyPreferences)
+    private companyPreferencesRepository: Repository<CompanyPreferences>,
     private readonly studentService: StudentService,
     private readonly jwtService: JwtService,
     private readonly companyService: CompanyService,
@@ -230,6 +233,10 @@ export class AuthService {
     newUser.phoneNumber = phoneNumber;
 
     const savedUser = await this.companyService.save(newUser);
+
+    const companyPrefs = new CompanyPreferences()
+    companyPrefs.companyId = savedUser.id;
+    await this.companyPreferencesRepository.save(companyPrefs)
 
     const token = jwt.sign(
       { email: savedUser.email, userType: 'USER_COMPANY' },
