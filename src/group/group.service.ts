@@ -553,12 +553,15 @@ export class GroupService {
             groupName: searchOption.groupName,
           });
         }
+        qb.andWhere('group.isActive = true', {
+          isActive: true,
+        });
       }),
     );
 
     const groups = await groupsQuery.getMany();
 
-    return Promise.all(
+    const dtos = Promise.all(
       groups.map(async (it) => {
         let students = await this.studentService.findAllByIdIn(it.studentIds);
         let studentProfiles = await Promise.all(
@@ -578,6 +581,18 @@ export class GroupService {
         return dto;
       }),
     );
+
+    let filteredGroups = await dtos;
+
+    if (searchOption.skills) {
+      filteredGroups = filterGroupsBySkills(filteredGroups, searchOption.skills);
+    }
+
+    if (searchOption.size) {
+      filteredGroups = filterGroupBySize(filteredGroups, searchOption.size);
+    }
+
+    return filteredGroups;
   }
 
   async checkIfStudentIsInGroup(student: any) {
@@ -607,4 +622,23 @@ export class GroupService {
 
     return false;
   }
+}
+
+
+function filterGroupsBySkills(dto: GetCompanySearchGroupsDto[], skillsString: string): GetCompanySearchGroupsDto[] {
+
+  const skillsArray = skillsString.split(',').map(skill => skill.trim().toLowerCase());
+
+  const filteredGroups = dto.filter(group => {
+    return group.studentsProfiles.some(studentProfile => {
+      const studentSkills = Object.values(studentProfile.skills).flat().map(skill => skill.toLowerCase());
+      return skillsArray.some(skill => studentSkills.includes(skill));
+    });
+  });
+
+  return filteredGroups;
+}
+
+function filterGroupBySize(dto: GetCompanySearchGroupsDto[], size: number): GetCompanySearchGroupsDto[] {
+  return dto.filter(group => group.studentsProfiles.length >= size);
 }
