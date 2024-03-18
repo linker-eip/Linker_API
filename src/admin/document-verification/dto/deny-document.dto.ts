@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNumber, IsString } from 'class-validator';
-import { DocumentStatus } from 'src/company/enum/CompanyDocument.enum';
+import { CompanyDocumentType, DocumentStatus } from 'src/company/enum/CompanyDocument.enum';
 import { StudentDocumentType } from 'src/student/enum/StudentDocument.enum';
 
-export class DenyDocumentDto {
+export class DenyDocumentStudentDto {
     @ApiProperty({required: true})
     @IsNumber()
     studentId: number;
@@ -11,6 +11,20 @@ export class DenyDocumentDto {
     @ApiProperty()
     @IsEnum(StudentDocumentType)
     documentType: StudentDocumentType;
+
+    @ApiProperty()
+    @IsString()
+    comment: string;
+}
+
+export class DenyDocumentCompanyDto {
+    @ApiProperty({required: true})
+    @IsNumber()
+    companyId: number;
+
+    @ApiProperty()
+    @IsEnum(StudentDocumentType)
+    documentType: CompanyDocumentType;
 
     @ApiProperty()
     @IsString()

@@ -1,31 +1,42 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { GetDocumentStatusResponseDto } from './dto/get-document-response.dto';
+import { GetDocumentStatusCompanyResponseDto, GetDocumentStatusStudentsResponseDto } from './dto/get-document-response.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { StudentDocument } from 'src/student/entity/StudentDocuments.entity';
 import { Repository } from 'typeorm';
-import { ValidateDocumentDto } from './dto/validate-document.dto';
+import { ValidateDocumentCompanyDto, ValidateDocumentStudentDto } from './dto/validate-document.dto';
 import { DocumentStatus } from 'src/student/enum/StudentDocument.enum';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { NotificationType } from 'src/notifications/entity/Notification.entity';
-import { DenyDocumentDto } from './dto/deny-document.dto';
+import { DenyDocumentCompanyDto, DenyDocumentStudentDto } from './dto/deny-document.dto';
+import { CompanyDocument } from 'src/company/entity/CompanyDocument.entity';
 
 @Injectable()
 export class DocumentVerificationService {
     constructor(
         @InjectRepository(StudentDocument)
         private readonly studentDocumentRepository: Repository<StudentDocument>,
+        @InjectRepository(CompanyDocument)
+        private readonly companyDocumentRepository: Repository<CompanyDocument>,
         private readonly notificationService: NotificationsService
     ) {}
 
-    async getAllDocuments(): Promise<GetDocumentStatusResponseDto>{
+    async getAllDocumentsStudent(): Promise<GetDocumentStatusStudentsResponseDto>{
         const documents = await this.studentDocumentRepository.find();
-        const dto = new GetDocumentStatusResponseDto
+        const dto = new GetDocumentStatusStudentsResponseDto
 
         Object.assign(dto, documents)
         return dto
     }
 
-    async validateDocument(dto: ValidateDocumentDto) {
+    async getAllDocumentsCompany(): Promise<GetDocumentStatusCompanyResponseDto>{
+        const documents = await this.companyDocumentRepository.find();
+        const dto = new GetDocumentStatusCompanyResponseDto
+
+        Object.assign(dto, documents)
+        return dto
+    }
+
+    async validateDocumentStudent(dto: ValidateDocumentStudentDto) {
         const document = await this.studentDocumentRepository.findOne({where: {studentId: dto.studentId, documentType: dto.documentType}})
         if (!document) {
             throw new HttpException("Document invalide", HttpStatus.BAD_REQUEST);
@@ -36,7 +47,7 @@ export class DocumentVerificationService {
         this.notificationService.createNotification("Document validé", "Votre document " + document.documentType + " a bien été validé par Linker.", NotificationType.DOCUMENT, dto.studentId, null)
     }
 
-    async denyDocument(dto: DenyDocumentDto) {
+    async denyDocumentStudent(dto: DenyDocumentStudentDto) {
         const document = await this.studentDocumentRepository.findOne({where: {studentId: dto.studentId, documentType: dto.documentType}})
         if (!document) {
             throw new HttpException("Document invalide", HttpStatus.BAD_REQUEST);
@@ -46,5 +57,28 @@ export class DocumentVerificationService {
         this.studentDocumentRepository.save(document);
 
         this.notificationService.createNotification("Document refusé", "Votre document " + document.documentType + " a été refusé par Linker. (" + dto.comment + ")", NotificationType.DOCUMENT, dto.studentId, null)
+    }
+
+    async validateDocumentCompany(dto: ValidateDocumentCompanyDto) {
+        const document = await this.companyDocumentRepository.findOne({where: {companyId: dto.companyId, documentType: dto.documentType}})
+        if (!document) {
+            throw new HttpException("Document invalide", HttpStatus.BAD_REQUEST);
+        }
+        document.status = DocumentStatus.VERIFIED;
+        this.companyDocumentRepository.save(document);
+
+        this.notificationService.createNotification("Document validé", "Votre document " + document.documentType + " a bien été validé par Linker.", NotificationType.DOCUMENT, null, dto.companyId)
+    }
+
+    async denyDocumentCompany(dto: DenyDocumentCompanyDto) {
+        const document = await this.companyDocumentRepository.findOne({where: {companyId: dto.companyId, documentType: dto.documentType}})
+        if (!document) {
+            throw new HttpException("Document invalide", HttpStatus.BAD_REQUEST);
+        }
+        document.status = DocumentStatus.DENIED;
+        document.comment = dto.comment;
+        this.companyDocumentRepository.save(document);
+
+        this.notificationService.createNotification("Document refusé", "Votre document " + document.documentType + " a été refusé par Linker. (" + dto.comment + ")", NotificationType.DOCUMENT, null, dto.companyId)
     }
 }
