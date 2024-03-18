@@ -9,6 +9,9 @@ import { AdminGuard } from './guards/admin/admin.guard';
 import { MissionModule } from './mission/mission.module';
 import { DocumentAdminModule } from './document/document.admin.module';
 import { ContactAdminModule } from './contact/contact-admin.module';
+import { DocumentVerificationController } from './document-verification/document-verification.controller';
+import { DocumentVerificationService } from './document-verification/document-verification.service';
+import { DocumentVerificationModule } from './document-verification/document-verification.module';
 
 @Module({
   imports: [
@@ -17,9 +20,11 @@ import { ContactAdminModule } from './contact/contact-admin.module';
     AuthAdminModule,
     MissionModule,
     DocumentAdminModule,
-    ContactAdminModule
+    ContactAdminModule,
+    DocumentVerificationModule
   ],
-  providers: [AdminService],
+  providers: [AdminService,],
   exports: [AdminService],
+  controllers: [],
 })
 export class AdminModule {}
