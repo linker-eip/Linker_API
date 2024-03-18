@@ -13,9 +13,10 @@ import { DocumentTransferService } from 'src/document-transfer/src/services/docu
 import { ConfigService } from '@nestjs/config';
 import { CompanyModule } from '../company/company.module';
 import { StudentPreferences } from './entity/StudentPreferences.entity';
+import { StudentDocument } from './entity/StudentDocuments.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([StudentUser, StudentProfile, StudentPreferences]), JobsModule, StudiesModule, SkillsModule, CompanyModule],
+  imports: [TypeOrmModule.forFeature([StudentUser, StudentProfile, StudentPreferences, StudentDocument]), JobsModule, StudiesModule, SkillsModule, CompanyModule],
   controllers: [StudentController],
   providers: [StudentService, FileService, DocumentTransferService, ConfigService],
   exports: [StudentService],
