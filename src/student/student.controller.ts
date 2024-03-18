@@ -42,13 +42,16 @@ import {
 import { StudentSearchOptionDto } from './dto/student-search-option.dto';
 import { CompanyProfileResponseDto } from '../company/dto/company-profile-response.dto';
 import { UpdatePreferencesDto } from './dto/update-preferences.dto';
+import { UploadStudentDocumentDto } from './dto/upload-student-document.dto';
+import { DocumentStatus } from './enum/StudentDocument.enum';
+import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
 
 @Controller('api/student')
 @UseGuards(AuthGuard('jwt'))
 @ApiTags('Student')
 @ApiBearerAuth()
 export class StudentController {
-  constructor(private readonly studentService: StudentService) {}
+  constructor(private readonly studentService: StudentService) { }
 
   @Get('profile')
   @ApiOperation({
@@ -237,4 +240,61 @@ export class StudentController {
   async updatePreferences(@Req() req, @Body() updatePreferencesDto: UpdatePreferencesDto) {
     return this.studentService.updatePreferences(req, updatePreferencesDto)
   }
+
+  @Post('documentVerification')
+  @ApiOperation({
+    description: 'Upload student document',
+    summary: 'Upload student document',
+  })
+  @ApiOkResponse({
+    status: 201,
+    description: 'Document uploaded successfully',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Document is already validated',
+  })
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadStudentDocument(
+    @UploadedFile(
+      new ParseFilePipe({
+        fileIsRequired: true,
+        errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+        validators: [
+          new MaxFileSizeValidator({
+            maxSize: 3_500_000,
+          }),
+          new FileTypeValidator({
+            fileType: 'application/pdf',
+          }),
+        ],
+      }),
+    )
+    file,
+    @Req() req,
+    @Body() uploadStudentDocument: UploadStudentDocumentDto,
+  ) {
+    return this.studentService.uploadStudentDocument(
+      file,
+      uploadStudentDocument,
+      req.user,
+    );
+  }
+
+  @Get('documentStatus')
+  @ApiOperation({
+    description: 'Get all documents statuses',
+    summary: 'Get all documents statuses',
+  })
+  @ApiOkResponse({
+    description: 'Get all documents statuses',
+    type: DocumentStatusResponseDto,
+    isArray: true,
+  })
+  async getDocumentStatus(
+    @Req() req,
+  ): Promise<DocumentStatusResponseDto[]> {
+    return await this.studentService.getDocumentStatus(req.user);
+  }
 }
+

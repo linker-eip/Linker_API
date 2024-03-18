@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpCode, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, In, Repository, SelectQueryBuilder } from 'typeorm';
 import { StudentUser } from './entity/StudentUser.entity';
@@ -22,10 +22,13 @@ import { CompanyService } from '../company/company.service';
 import { SkillList } from './skills/consts/skills-list';
 import { StudentPreferences } from './entity/StudentPreferences.entity';
 import { UpdatePreferencesDto } from './dto/update-preferences.dto';
+import { UploadStudentDocumentDto } from './dto/upload-student-document.dto';
+import { StudentDocument } from './entity/StudentDocuments.entity';
+import { DocumentStatus } from './enum/StudentDocument.enum';
+import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
 
 @Injectable()
 export class StudentService {
-
 
   constructor(
     @InjectRepository(StudentUser)
@@ -34,6 +37,8 @@ export class StudentService {
     private studentProfileRepository: Repository<StudentProfile>,
     @InjectRepository(StudentPreferences)
     private studentPreferencesRepository: Repository<StudentPreferences>,
+    @InjectRepository(StudentDocument)
+    private studentDocumentRepository: Repository<StudentDocument>,
     private readonly skillsService: SkillsService,
     private readonly jobsservice: JobsService,
     private readonly studiesService: StudiesService,
@@ -528,7 +533,7 @@ export class StudentService {
   async updatePreferences(req: any, updatePreferencesDto: UpdatePreferencesDto) {
     const student = await this.studentRepository.findOne({ where: { email: req.user.email } })
 
-    const existingPreferences = await this.studentPreferencesRepository.findOneBy({studentId: student.id})
+    const existingPreferences = await this.studentPreferencesRepository.findOneBy({ studentId: student.id })
 
     if (!existingPreferences) {
       throw new HttpException(
@@ -542,5 +547,52 @@ export class StudentService {
     await this.studentPreferencesRepository.save(existingPreferences);
 
     return existingPreferences;
+  }
+
+  async uploadStudentDocument(file: any, UploadStudentDocument: UploadStudentDocumentDto, user: any) {
+    let student;
+    student = await this.findOneByEmail(user.email)
+    if (!student) {
+      throw new HttpException("Invalid student", HttpStatus.UNAUTHORIZED)
+    }
+
+    let studentDocument = await this.studentDocumentRepository.findOne({ where: { studentId: student.id, documentType: UploadStudentDocument.documentType } })
+
+    if (studentDocument != null) {
+      if (studentDocument.status == DocumentStatus.VERIFIED) {
+        throw new HttpException("Ce fichier a déjà été validé", HttpStatus.CONFLICT)
+      }
+    } else {
+      studentDocument = new StudentDocument()
+    }
+
+    const url = await this.documentTransferService.uploadFileNotImage(file);
+
+    studentDocument.file = url
+    studentDocument.studentId = student.id;
+    studentDocument.comment = "";
+    studentDocument.documentType = UploadStudentDocument.documentType;
+    studentDocument.status = DocumentStatus.PENDING;
+
+    this.studentDocumentRepository.save(studentDocument);
+  }
+
+  async getDocumentStatus(user: any): Promise<DocumentStatusResponseDto[]> {
+    const student = await this.findOneByEmail(user.email);
+    if (!student) {
+      throw new HttpException("Invalid student", HttpStatus.UNAUTHORIZED)
+    }
+
+    const documentStatuses = await this.studentDocumentRepository.findBy({ studentId: student.id })
+
+    const documentStatusesResponse = documentStatuses.map(doc => {
+      const it = new DocumentStatusResponseDto()
+      it.documentType = doc.documentType
+      it.status = doc.status
+      it.comment = doc.comment
+      return it
+    })
+
+    return documentStatusesResponse
   }
 }
