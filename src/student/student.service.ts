@@ -549,13 +549,12 @@ export class StudentService {
 
   async uploadStudentDocument(file: any, UploadStudentDocument: UploadStudentDocumentDto, user: any) {
     let student;
-    try {
-      student = await this.findOneByEmail(user.email)
-    } catch (err) {
+    student = await this.findOneByEmail(user.email)
+    if (!student) {
       throw new HttpException("Invalid student", HttpStatus.UNAUTHORIZED)
     }
 
-    let studentDocument = await this.studentDocumentRepository.findOne({where: {studentId: student.id, documentType: UploadStudentDocument.documentType}})
+    let studentDocument = await this.studentDocumentRepository.findOne({ where: { studentId: student.id, documentType: UploadStudentDocument.documentType } })
 
     if (studentDocument != null) {
       if (studentDocument.status == DocumentStatus.VERIFIED) {
