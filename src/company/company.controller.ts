@@ -26,6 +26,7 @@ import {
 import { CompanyProfileResponseDto } from './dto/company-profile-response.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadCompanyDocumentDto } from './dto/upload-company-document.dto';
+import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
 
 @Controller('api/company')
 @UseGuards(AuthGuard('jwt'))
@@ -106,5 +107,21 @@ export class CompanyController {
       uploadCompanyDocument,
       req.user,
     );
+  }
+
+  @Get('documentStatus')
+  @ApiOperation({
+    description: 'Get all documents statuses',
+    summary: 'Get all documents statuses',
+  })
+  @ApiOkResponse({
+    description: 'Get all documents statuses',
+    type: DocumentStatusResponseDto,
+    isArray: true,
+  })
+  async getDocumentStatus(
+    @Req() req,
+  ): Promise<DocumentStatusResponseDto[]> {
+    return await this.companyService.getDocumentStatus(req.user);
   }
 }

@@ -8,9 +8,11 @@ import { CompanyDocument } from './entity/CompanyDocument.entity';
 import { UploadCompanyDocumentDto } from './dto/upload-company-document.dto';
 import { DocumentStatus } from './enum/CompanyDocument.enum';
 import { DocumentTransferService } from 'src/document-transfer/src/services/document-transfer.service';
+import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
 
 @Injectable()
 export class CompanyService {
+
   constructor(
     @InjectRepository(CompanyUser)
     private companyRepository: Repository<CompanyUser>,
@@ -147,7 +149,7 @@ export class CompanyService {
 
   async uploadCompanyDocument(file: any, uploadCompanyDocument: UploadCompanyDocumentDto, user: any) {
     let company;
-      company = await this.companyRepository.findOne({ where: { email: user.email } })
+    company = await this.companyRepository.findOne({ where: { email: user.email } })
     if (!company) {
       throw new HttpException("Invalid company", HttpStatus.UNAUTHORIZED)
     }
@@ -171,5 +173,24 @@ export class CompanyService {
     companyDocument.status = DocumentStatus.PENDING;
 
     this.companyDocumentRepository.save(companyDocument);
+  }
+
+  async getDocumentStatus(user: any): Promise<DocumentStatusResponseDto[]> {
+    const company = await this.companyRepository.findOne({ where: { email: user.email } });
+    if (!company) {
+      throw new HttpException("Invalid company", HttpStatus.UNAUTHORIZED)
+    }
+
+    const documentStatuses = await this.companyDocumentRepository.findBy({ companyId: company.id })
+
+    const documentStatusesResponse = documentStatuses.map(doc => {
+      const it = new DocumentStatusResponseDto()
+      it.documentType = doc.documentType
+      it.status = doc.status
+      it.comment = doc.comment
+      return it
+    })
+
+    return documentStatusesResponse
   }
 }
