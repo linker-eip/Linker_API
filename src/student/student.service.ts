@@ -25,9 +25,11 @@ import { UpdatePreferencesDto } from './dto/update-preferences.dto';
 import { UploadStudentDocumentDto } from './dto/upload-student-document.dto';
 import { StudentDocument } from './entity/StudentDocuments.entity';
 import { DocumentStatus } from './enum/StudentDocument.enum';
+import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
 
 @Injectable()
 export class StudentService {
+
   constructor(
     @InjectRepository(StudentUser)
     private studentRepository: Repository<StudentUser>,
@@ -573,5 +575,24 @@ export class StudentService {
     studentDocument.status = DocumentStatus.PENDING;
 
     this.studentDocumentRepository.save(studentDocument);
+  }
+
+  async getDocumentStatus(user: any): Promise<DocumentStatusResponseDto[]> {
+    const student = await this.findOneByEmail(user.email);
+    if (!student) {
+      throw new HttpException("Invalid student", HttpStatus.UNAUTHORIZED)
+    }
+
+    const documentStatuses = await this.studentDocumentRepository.findBy({ studentId: student.id })
+
+    const documentStatusesResponse = documentStatuses.map(doc => {
+      const it = new DocumentStatusResponseDto()
+      it.documentType = doc.documentType
+      it.status = doc.status
+      it.comment = doc.comment
+      return it
+    })
+
+    return documentStatusesResponse
   }
 }

@@ -43,6 +43,8 @@ import { StudentSearchOptionDto } from './dto/student-search-option.dto';
 import { CompanyProfileResponseDto } from '../company/dto/company-profile-response.dto';
 import { UpdatePreferencesDto } from './dto/update-preferences.dto';
 import { UploadStudentDocumentDto } from './dto/upload-student-document.dto';
+import { DocumentStatus } from './enum/StudentDocument.enum';
+import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
 
 @Controller('api/student')
 @UseGuards(AuthGuard('jwt'))
@@ -278,4 +280,21 @@ export class StudentController {
       req.user,
     );
   }
+
+  @Get('documentStatus')
+  @ApiOperation({
+    description: 'Get all documents statuses',
+    summary: 'Get all documents statuses',
+  })
+  @ApiOkResponse({
+    description: 'Get all documents statuses',
+    type: DocumentStatusResponseDto,
+    isArray: true,
+  })
+  async getDocumentStatus(
+    @Req() req,
+  ): Promise<DocumentStatusResponseDto[]> {
+    return await this.studentService.getDocumentStatus(req.user);
+  }
 }
+
