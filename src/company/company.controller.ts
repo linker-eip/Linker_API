@@ -124,4 +124,9 @@ export class CompanyController {
   ): Promise<DocumentStatusResponseDto[]> {
     return await this.companyService.getDocumentStatus(req.user);
   }
+
+  @Post('createPref')
+  async createPref() {
+    return this.companyService.createPref()
+  }
 }

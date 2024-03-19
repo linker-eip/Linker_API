@@ -9,6 +9,7 @@ import { UploadCompanyDocumentDto } from './dto/upload-company-document.dto';
 import { DocumentStatus } from './enum/CompanyDocument.enum';
 import { DocumentTransferService } from 'src/document-transfer/src/services/document-transfer.service';
 import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
+import { CompanyPreferences } from './entity/CompanyPreferences.entity';
 
 @Injectable()
 export class CompanyService {
@@ -20,6 +21,8 @@ export class CompanyService {
     private companyProfileRepository: Repository<CompanyProfile>,
     @InjectRepository(CompanyDocument)
     private companyDocumentRepository: Repository<CompanyDocument>,
+    @InjectRepository(CompanyPreferences)
+    private companyPreferencesRepository: Repository<CompanyPreferences>,
     private readonly documentTransferService: DocumentTransferService,
 
   ) { }
@@ -192,5 +195,15 @@ export class CompanyService {
     })
 
     return documentStatusesResponse
+  }
+
+  async createPref() {
+    const companies = await this.companyRepository.find();
+
+    for (const company of companies) {
+      const prefs = new CompanyPreferences()
+      prefs.companyId = company.id;
+      this.companyPreferencesRepository.save(prefs)
+    }
   }
 }

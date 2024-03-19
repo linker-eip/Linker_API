@@ -7,10 +7,11 @@ import { CompanyProfile } from '../company/entity/CompanyProfile.entity';
 import { CompanyDocument } from './entity/CompanyDocument.entity';
 import { DocumentTransferService } from 'src/document-transfer/src/services/document-transfer.service';
 import { ConfigService } from '@nestjs/config';
+import { CompanyPreferences } from './entity/CompanyPreferences.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([CompanyUser, CompanyProfile, CompanyDocument]),
+    TypeOrmModule.forFeature([CompanyUser, CompanyProfile, CompanyDocument, CompanyPreferences]),
   ],
   providers: [CompanyService, DocumentTransferService, ConfigService],
   controllers: [CompanyController],
