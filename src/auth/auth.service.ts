@@ -755,7 +755,7 @@ export class AuthService {
         HttpStatus.UNAUTHORIZED,
       );
     }
-
+ 
     const sendMailDto = new SendMailDto();
     sendMailDto.to = company.email;
     sendMailDto.subject = 'Compte supprimé';
