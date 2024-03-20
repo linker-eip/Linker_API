@@ -23,7 +23,7 @@ export class DenyDocumentCompanyDto {
     companyId: number;
 
     @ApiProperty()
-    @IsEnum(StudentDocumentType)
+    @IsEnum(CompanyDocumentType)
     documentType: CompanyDocumentType;
 
     @ApiProperty()
