@@ -435,6 +435,10 @@ export class AuthService {
     );
 
     if (existingUser) {
+      if (!existingUser.isActive) {
+        existingUser.isActive = true;
+        this.studentService.save(existingUser);
+      }
       const token = jwt.sign(
         { email: existingUser.email, userType: 'USER_STUDENT' },
         process.env.JWT_SECRET,
@@ -486,10 +490,15 @@ export class AuthService {
     );
 
     if (existingUser) {
+      if (!existingUser.isActive) {
+        existingUser.isActive = true;
+        this.studentService.save(existingUser);
+      }
       const token = jwt.sign(
         { email: existingUser.email, userType: 'USER_STUDENT' },
         process.env.JWT_SECRET,
       );
+
       return { token };
     } else {
       const newUser = new StudentUser();
@@ -561,6 +570,10 @@ export class AuthService {
     );
 
     if (existingUser) {
+      if (!existingUser.isActive) {
+        existingUser.isActive = true;
+        this.companyService.save(existingUser);
+      }
       const token = jwt.sign(
         { email: existingUser.email, userType: 'USER_COMPANY' },
         process.env.JWT_SECRET,
@@ -610,6 +623,10 @@ export class AuthService {
     const existingUser = await this.companyService.findOne(userinfos.email);
 
     if (existingUser) {
+      if (!existingUser.isActive) {
+        existingUser.isActive = true;
+        this.companyService.save(existingUser);
+      }
       const token = jwt.sign(
         { email: existingUser.email, userType: 'USER_COMPANY' },
         process.env.JWT_SECRET,
