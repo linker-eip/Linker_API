@@ -19,6 +19,6 @@ export class ValidateDocumentCompanyDto {
     companyId: number;
 
     @ApiProperty()
-    @IsEnum(StudentDocumentType)
+    @IsEnum(CompanyDocumentType)
     documentType: CompanyDocumentType;
 }
