@@ -220,6 +220,18 @@ export class AuthController {
   @Put('student/disable')
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Disable student account' })
+  @ApiResponse({
+    status: 200,
+    description: 'Student account disabled',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Account already disabled',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Vous ne pouvez pas désactiver votre compte si vous êtes dans un groupe',
+  })
   async disableStudentAccount(@Req() req) {
     return this.authService.disableStudentAccount(req)
   }
@@ -227,6 +239,18 @@ export class AuthController {
   @Put('company/disable')
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Disable company account' })
+  @ApiResponse({
+    status: 200,
+    description: 'Company account disabled',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Account already disabled',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Vous ne pouvez pas désactiver votre compte si vous avez des missions en cours',
+  })
   async disableCompanyAccount(@Req() req) {
     return this.authService.disableCompanyAccount(req)
   }
@@ -234,6 +258,10 @@ export class AuthController {
   @Delete('student/delete')
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Delete student account' })
+  @ApiResponse({
+    status: 401,
+    description: 'Vous ne pouvez pas supprimer votre compte si vous êtes dans un groupe',
+  })
   async deleteStudentAccount(@Req() req) {
     return this.authService.deleteStudentAccount(req)
   }
@@ -241,6 +269,10 @@ export class AuthController {
   @Delete('company/delete')
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Delete company account' })
+  @ApiResponse({
+    status: 401,
+    description: 'Vous ne pouvez pas supprimer votre compte si vous avez des missions en cours',
+  })
   async deleteCompanyAccount(@Req() req) {
     return this.authService.deleteCompanyAccount(req)
   }
