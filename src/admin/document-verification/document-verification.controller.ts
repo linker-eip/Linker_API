@@ -33,7 +33,7 @@ export class DocumentVerificationController {
     })
     @ApiOkResponse({
         isArray: true,
-        type: GetDocumentStatusStudentsResponseDto
+        type: GetDocumentStatusCompanyResponseDto
     })
     async getAllDocumentsCompany(): Promise<GetDocumentStatusCompanyResponseDto> {
         return this.documentVerificationService.getAllDocumentsCompany();
