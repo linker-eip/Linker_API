@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { DocumentVerificationService } from './document-verification.service';
-import { GetDocumentStatusStudentsResponseDto } from './dto/get-document-response.dto';
+import { GetDocumentStatusCompanyResponseDto, GetDocumentStatusStudentsResponseDto } from './dto/get-document-response.dto';
 import { ValidateDocumentCompanyDto, ValidateDocumentStudentDto } from './dto/validate-document.dto';
 import { DenyDocumentCompanyDto, DenyDocumentStudentDto } from './dto/deny-document.dto';
 
@@ -15,8 +15,8 @@ export class DocumentVerificationController {
 
     @Get('students')
     @ApiOperation({
-        description: 'Get all documents to be verified',
-        summary: 'Create a mission',
+        description: 'Get all documents to be verified (students)',
+        summary: 'Get all documents to be verified (students)',
     })
     @ApiOkResponse({
         isArray: true,
@@ -24,6 +24,19 @@ export class DocumentVerificationController {
     })
     async getAllDocuments(): Promise<GetDocumentStatusStudentsResponseDto> {
         return this.documentVerificationService.getAllDocumentsStudent();
+    }
+
+    @Get('company')
+    @ApiOperation({
+        description: 'Get all documents to be verified (company)',
+        summary: 'Get all documents to be verified (company)',
+    })
+    @ApiOkResponse({
+        isArray: true,
+        type: GetDocumentStatusStudentsResponseDto
+    })
+    async getAllDocumentsCompany(): Promise<GetDocumentStatusCompanyResponseDto> {
+        return this.documentVerificationService.getAllDocumentsCompany();
     }
 
     @Post('students/validate')
