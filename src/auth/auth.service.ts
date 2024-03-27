@@ -167,6 +167,10 @@ export class AuthService {
 
     const savedUser = await this.companyService.save(newUser);
 
+    const companyPrefs = new CompanyPreferences()
+    companyPrefs.companyId = savedUser.id;
+    await this.companyPreferencesRepository.save(companyPrefs)
+
     const token = jwt.sign(
       { email: savedUser.email, userType: 'USER_COMPANY' },
       process.env.JWT_SECRET,
