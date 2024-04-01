@@ -24,6 +24,6 @@ export class Studies {
   @Column()
   description: string;
 
-  @ManyToOne(() => StudentProfile, (studentProfile) => studentProfile.studies)
+  @ManyToOne(() => StudentProfile, (studentProfile) => studentProfile.studies, { onDelete: 'CASCADE', cascade: true})
   studentProfile: StudentProfile;
 }

@@ -26,6 +26,8 @@ import { UploadStudentDocumentDto } from './dto/upload-student-document.dto';
 import { StudentDocument } from './entity/StudentDocuments.entity';
 import { DocumentStatus } from './enum/StudentDocument.enum';
 import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
+import { Jobs } from './jobs/entity/jobs.entity';
+import { Studies } from './studies/entity/studies.entity';
 
 @Injectable()
 export class StudentService {
@@ -39,6 +41,10 @@ export class StudentService {
     private studentPreferencesRepository: Repository<StudentPreferences>,
     @InjectRepository(StudentDocument)
     private studentDocumentRepository: Repository<StudentDocument>,
+    @InjectRepository(Jobs)
+    private jobsRepository: Repository<Jobs>,
+    @InjectRepository(Studies)
+    private studiesRepository: Repository<Studies>,
     private readonly skillsService: SkillsService,
     private readonly jobsservice: JobsService,
     private readonly studiesService: StudiesService,
@@ -512,13 +518,24 @@ export class StudentService {
   async deleteStudent(student: any) {
     const studentProfile = await this.studentProfileRepository.findOne({
       where: { studentId: student.id },
+      relations: ['jobs', 'studies']
     });
+  
     if (studentProfile) {
+      await Promise.all(studentProfile.jobs.map(async (job) => {
+        await this.jobsRepository.delete(job.id);
+      }));
+  
+      await Promise.all(studentProfile.studies.map(async (study) => {
+        await this.studiesRepository.delete(study.id);
+      }));
+  
       await this.studentProfileRepository.remove(studentProfile);
     }
-
+  
     return this.studentRepository.remove(student);
   }
+  
 
   async createPref() {
     const students = await this.studentRepository.find();
