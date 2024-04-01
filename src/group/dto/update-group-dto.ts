@@ -17,4 +17,8 @@ export class UpdateGroupDto {
     @IsString()
     @IsOptional()
     picture?: string;
+
+    @ApiProperty()
+    @IsOptional()
+    isActive?: boolean;
 }
