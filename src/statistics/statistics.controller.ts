@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { StatisticsService } from './statistics.service';
 import { StudentStatsResponse } from './dtos/student-stats-response.dto';
 
@@ -15,6 +15,10 @@ export class StatisticsController {
     @ApiOperation({
         description: 'Get statistics as a student',
         summary: 'Get statistics as a student',
+    })
+    @ApiResponse({
+        status: 200,
+        type: StudentStatsResponse
     })
     async getStudentStats(@Req() req) : Promise<StudentStatsResponse>{
         return await this.statisticsService.getStudentStats(req);

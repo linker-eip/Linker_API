@@ -51,6 +51,23 @@ export class StatisticsService {
         response.reviews = reviewsDto
         response.note = profile.note
         response.noteNumber = profile.noteNumber
+        response.incomes = [
+            {
+                missionId: 1,
+                amount: 200,
+                paymentDate: new Date()
+            },
+            {
+                missionId: 2,
+                amount: 2000,
+                paymentDate: new Date('2024-04-09T12:00:00')
+            },
+            {
+                missionId: 2,
+                amount: 2000,
+                paymentDate: new Date('2024-02-09T12:00:00')
+            }
+        ]
 
         return response
     }

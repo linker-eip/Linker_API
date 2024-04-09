@@ -9,11 +9,22 @@ export class ReviewDto {
     review: string;
 }
 
-export class StudentStatsResponse {
+export class IncomeDto {
     @ApiProperty()
-    missions: GetMissionDto[]
+    missionId: number;
 
     @ApiProperty()
+    amount: number;
+
+    @ApiProperty()
+    paymentDate: Date;
+}
+
+export class StudentStatsResponse {
+    @ApiProperty({type: GetMissionDto, isArray: true})
+    missions: GetMissionDto[]
+
+    @ApiProperty({type: ReviewDto, isArray: true})
     reviews: ReviewDto[]
 
     @ApiProperty()
@@ -21,4 +32,7 @@ export class StudentStatsResponse {
 
     @ApiProperty()
     noteNumber: number;
+
+    @ApiProperty({type: IncomeDto, isArray: true})
+    incomes: IncomeDto[];
 }
