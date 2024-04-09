@@ -63,7 +63,7 @@ export class StatisticsService {
                 paymentDate: new Date('2024-04-09T12:00:00')
             },
             {
-                missionId: 2,
+                missionId: 3,
                 amount: 2000,
                 paymentDate: new Date('2024-02-09T12:00:00')
             }
