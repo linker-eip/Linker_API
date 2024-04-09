@@ -129,6 +129,7 @@ export class StudentService {
       jobs: jobs,
       website: profile.website,
       note: profile.note,
+      noteNumber: profile.nbNotes
     };
   }
 
