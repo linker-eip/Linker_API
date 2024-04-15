@@ -31,6 +31,7 @@ import { ContactModule } from './contact/contact.module';
 import { SkillsModule } from './student/skills/skills.module';
 import { LinkedinController } from './linkedin/linkedin.controller';
 import { LinkedinService } from './linkedin/linkedin.service';
+import { LinkedinModule } from './linkedin/linkedin.module';
 
 @Module({
   imports: [
@@ -71,9 +72,10 @@ import { LinkedinService } from './linkedin/linkedin.service';
     DocumentTransferModule,
     ContactModule,
     GatewayModule,
-    SkillsModule
+    SkillsModule,
+    LinkedinModule
   ],
-  controllers: [FileController, SiretController, DocumentTransferController, LinkedinController],
-  providers: [JwtStrategy, SiretService, LinkedinService ],
+  controllers: [FileController, SiretController, DocumentTransferController,],
+  providers: [JwtStrategy, SiretService,],
 })
-export class AppModule {}
+export class AppModule { }
