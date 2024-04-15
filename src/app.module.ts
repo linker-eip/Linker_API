@@ -32,6 +32,9 @@ import { SkillsModule } from './student/skills/skills.module';
 import { LinkedinController } from './linkedin/linkedin.controller';
 import { LinkedinService } from './linkedin/linkedin.service';
 import { LinkedinModule } from './linkedin/linkedin.module';
+import { StatisticsController } from './statistics/statistics.controller';
+import { StatisticsService } from './statistics/statistics.service';
+
 
 @Module({
   imports: [
@@ -75,7 +78,7 @@ import { LinkedinModule } from './linkedin/linkedin.module';
     SkillsModule,
     LinkedinModule
   ],
-  controllers: [FileController, SiretController, DocumentTransferController,],
-  providers: [JwtStrategy, SiretService,],
+  controllers: [FileController, SiretController, DocumentTransferController,StatisticsController],
+  providers: [JwtStrategy, SiretService,StatisticsService],
 })
 export class AppModule { }

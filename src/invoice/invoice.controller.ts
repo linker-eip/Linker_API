@@ -6,6 +6,7 @@ import { CompanyInvoiceDataDto } from '../company/dto/company-invoice-data.dto';
 import { CompanyCreateInvoiceDto } from '../company/dto/company-create-invoice.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { LinkerInvoiceCompanyDto } from './dto/linker-invoice-company.dto';
 
 @Controller('api/invoice')
 @UseGuards(AuthGuard('jwt'))
@@ -14,7 +15,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 export class InvoiceController {
   constructor(private readonly pdfService: InvoiceService) {}
 
-  @Post('generate')
+  @Post('generate/student')
   async generatePdf(
     @Res() res: Response,
     @Req() req,
@@ -51,5 +52,26 @@ export class InvoiceController {
   @Delete(':id')
   async deleteInvoice(@Param('id') id: number): Promise<any> {
     return this.pdfService.deleteInvoice(id);
+  }
+
+  @Post('generate/company')
+  async generateCompanyPdf(
+    @Res() res: Response,
+    @Req() req,
+    @Body() body: LinkerInvoiceCompanyDto,
+  ): Promise<void> {
+    const filePath = 'invoice.pdf';
+
+    try {
+      await this.pdfService.generateInvoiceForCompany(body);
+
+      res.setHeader('Content-Disposition', `attachment; filename=${filePath}`);
+      res.setHeader('Content-Type', 'application/pdf');
+
+      const fileStream = createReadStream(filePath);
+      fileStream.pipe(res);
+    } catch (error) {
+      res.status(500).send(`Error generating PDF: ${error.message}`);
+    }
   }
 }

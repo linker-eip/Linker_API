@@ -41,6 +41,7 @@ export class CompanyUser {
 
   @OneToOne(() => CompanyProfile, {
     cascade: true,
+    onDelete: 'CASCADE',
   })
   @JoinColumn([{ name: 'profileId', referencedColumnName: 'id' }])
   profile: CompanyProfile;

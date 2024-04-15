@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEmail, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CompanySearchGroupsFilterDto {
   @ApiPropertyOptional()
@@ -10,7 +10,6 @@ export class CompanySearchGroupsFilterDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsEmail()
-  @IsString()
   email?: string;
 
   @ApiPropertyOptional()
@@ -27,4 +26,8 @@ export class CompanySearchGroupsFilterDto {
   @IsOptional()
   @IsString()
   location?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  size?: number;
 }
