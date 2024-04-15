@@ -29,8 +29,12 @@ import { Gateway } from './chat/gateway';
 import { GatewayModule } from './chat/gateway.module';
 import { ContactModule } from './contact/contact.module';
 import { SkillsModule } from './student/skills/skills.module';
+import { LinkedinController } from './linkedin/linkedin.controller';
+import { LinkedinService } from './linkedin/linkedin.service';
+import { LinkedinModule } from './linkedin/linkedin.module';
 import { StatisticsController } from './statistics/statistics.controller';
 import { StatisticsService } from './statistics/statistics.service';
+
 
 @Module({
   imports: [
@@ -71,9 +75,10 @@ import { StatisticsService } from './statistics/statistics.service';
     DocumentTransferModule,
     ContactModule,
     GatewayModule,
-    SkillsModule
+    SkillsModule,
+    LinkedinModule
   ],
-  controllers: [FileController, SiretController, DocumentTransferController, StatisticsController],
-  providers: [JwtStrategy, SiretService, StatisticsService ],
+  controllers: [FileController, SiretController, DocumentTransferController,StatisticsController],
+  providers: [JwtStrategy, SiretService,StatisticsService],
 })
-export class AppModule {}
+export class AppModule { }
