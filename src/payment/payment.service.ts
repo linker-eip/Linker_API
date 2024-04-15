@@ -31,11 +31,17 @@ export class PaymentService {
         const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
         const session = await stripe.checkout.sessions.retrieve(sessionId);
-        const paymentIntent = await stripe.paymentIntents.retrieve(session.payment_intent);
+
+        console.log(session);
+
+        if (session.payment_status !== 'paid') {
+            throw new NotFoundException('Payment not successful');
+        }
 
         const payment = await this.paymentRepository.findOne({
             where: {
                 missionId: parseInt(missionId),
+                sessionId: sessionId,
             },
         });
         
@@ -45,6 +51,7 @@ export class PaymentService {
         }
         
         payment.status = PaymentStatus.PAID;
+        payment.email = session.customer_details.email;
 
         await this.paymentRepository.save(payment);
 
@@ -71,8 +78,14 @@ export class PaymentService {
 
         try {
 
-            if (await this.isPaymentAlreadyCreated(missionId)) {
-                throw new NotFoundException('Payment already created');
+            const actualPayment = await this.paymentRepository.findOne({
+                where: {
+                    missionId: missionId,
+                },
+            });
+            
+            if (actualPayment) {
+                return actualPayment;
             }
             
             const product = await stripe.products.create({
@@ -114,13 +127,6 @@ export class PaymentService {
         }
     }
 
-
-    async isPaymentAlreadyCreated(missionId: number) {
-        const payment = await this.paymentRepository.findOne({
-            where: { missionId: missionId },
-          });
-        return !!payment;
-    }
 
     async getPayment(missionId: string, req : any) {
         const mission = await this.missionService.findMissionById(parseInt(missionId));

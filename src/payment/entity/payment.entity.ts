@@ -28,9 +28,6 @@ export class Payment {
     @Column({ type: 'varchar', nullable: true })
     sessionUrl: string;
 
-    @Column({ type: 'varchar', nullable: true })
-    cancelUrl: string;
-
     @Column({ type: 'enum', enum: PaymentStatus, default: 'WAITING' })
     status: PaymentStatus;
 
