@@ -29,6 +29,8 @@ import { Gateway } from './chat/gateway';
 import { GatewayModule } from './chat/gateway.module';
 import { ContactModule } from './contact/contact.module';
 import { SkillsModule } from './student/skills/skills.module';
+import { LinkedinController } from './linkedin/linkedin.controller';
+import { LinkedinService } from './linkedin/linkedin.service';
 
 @Module({
   imports: [
@@ -71,7 +73,7 @@ import { SkillsModule } from './student/skills/skills.module';
     GatewayModule,
     SkillsModule
   ],
-  controllers: [FileController, SiretController, DocumentTransferController],
-  providers: [JwtStrategy, SiretService ],
+  controllers: [FileController, SiretController, DocumentTransferController, LinkedinController],
+  providers: [JwtStrategy, SiretService, LinkedinService ],
 })
 export class AppModule {}
