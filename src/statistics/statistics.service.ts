@@ -13,7 +13,25 @@ export class StatisticsService {
         private readonly studentService: StudentService
     ) {}
 
-    async getStudentStats(req: any): Promise<StudentStatsResponse> {
+    filterIncomes(response: any, startDate?: Date, endDate?: Date): void {
+        if (startDate && endDate && startDate > endDate) {
+            throw new Error('La date de début doit être antérieure à la date de fin');
+        }
+
+        if (response && response.incomes && response.incomes.length > 0) {
+            response.incomes = response.incomes.filter(income => {
+                if (
+                    (!startDate || income.paymentDate >= startDate) &&
+                    (!endDate || income.paymentDate <= endDate)
+                ) {
+                    return true;
+                }
+                return false;
+            });
+        }
+    }
+
+    async getStudentStats(req: any, startDate, endDate): Promise<StudentStatsResponse> {
         console.log(req.user)
         if (req.user.userType != "USER_STUDENT") {
             throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED)
@@ -68,6 +86,9 @@ export class StatisticsService {
                 paymentDate: new Date('2024-02-09T12:00:00')
             }
         ]
+        console.log(response)
+
+        this.filterIncomes(response, startDate, endDate)
 
         return response
     }

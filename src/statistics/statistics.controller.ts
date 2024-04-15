@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { StatisticsService } from './statistics.service';
@@ -20,8 +20,8 @@ export class StatisticsController {
         status: 200,
         type: StudentStatsResponse
     })
-    async getStudentStats(@Req() req) : Promise<StudentStatsResponse>{
-        return await this.statisticsService.getStudentStats(req);
+    async getStudentStats(@Req() req, @Query('startDate') startDate?: Date, @Query('endDate') endDate?: Date) : Promise<StudentStatsResponse>{
+        return await this.statisticsService.getStudentStats(req, startDate, endDate);
     }
 
 }
