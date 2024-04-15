@@ -29,6 +29,7 @@ import { Gateway } from './chat/gateway';
 import { GatewayModule } from './chat/gateway.module';
 import { ContactModule } from './contact/contact.module';
 import { SkillsModule } from './student/skills/skills.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -69,7 +70,8 @@ import { SkillsModule } from './student/skills/skills.module';
     DocumentTransferModule,
     ContactModule,
     GatewayModule,
-    SkillsModule
+    SkillsModule,
+    PaymentModule,
   ],
   controllers: [FileController, SiretController, DocumentTransferController],
   providers: [JwtStrategy, SiretService ],
