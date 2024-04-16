@@ -1,10 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { userInfo } from 'os';
-import { GetMissionDto } from 'src/mission/dto/get-mission.dto';
-import { MissionService } from 'src/mission/mission.service';
+import { GetMissionDto } from '../mission/dto/get-mission.dto';
+import { MissionService } from '../mission/mission.service';
 import { ReviewDto, StudentStatsResponse } from './dtos/student-stats-response.dto';
-import { StudentProfile } from 'src/student/entity/StudentProfile.entity';
-import { StudentService } from 'src/student/student.service';
+import { StudentProfile } from '../student/entity/StudentProfile.entity';
+import { StudentService } from '../student/student.service';
 
 @Injectable()
 export class StatisticsService {
