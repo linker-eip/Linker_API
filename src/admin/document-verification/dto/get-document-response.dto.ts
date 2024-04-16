@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { CompanyDocumentType, DocumentStatus } from '../../company/enum/CompanyDocument.enum';
-import { StudentDocumentType } from '../../student/enum/StudentDocument.enum';
+import { CompanyDocumentType, DocumentStatus } from '../../../company/enum/CompanyDocument.enum';
+import { StudentDocumentType } from '../../../student/enum/StudentDocument.enum';
 
 export class GetDocumentStatusStudentsResponseDto {
     @ApiProperty()
