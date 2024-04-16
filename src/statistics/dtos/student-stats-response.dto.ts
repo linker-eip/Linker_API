@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { GetMissionDto } from "src/mission/dto/get-mission.dto";
+import { GetMissionDto } from "../../mission/dto/get-mission.dto";
 
 export class ReviewDto {
     @ApiProperty()
