@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import { PaymentStatus } from './enum/payment.status.enum';
 import { CompanyService } from '../company/company.service';
+import { MissionStatus } from '../mission/enum/mission-status.enum';
 
 @Injectable()
 export class PaymentService {
@@ -32,8 +33,6 @@ export class PaymentService {
 
         const session = await stripe.checkout.sessions.retrieve(sessionId);
 
-        console.log(session);
-
         if (session.payment_status !== 'paid') {
             throw new NotFoundException('Payment not successful');
         }
@@ -50,10 +49,17 @@ export class PaymentService {
             throw new NotFoundException('Payment not found');
         }
         
+        const mission = await this.missionService.findMissionById(parseInt(missionId));
+        if (!mission) {
+            throw new NotFoundException('Mission not found');
+        }
+
+        mission.status = MissionStatus.PROVISIONED;
         payment.status = PaymentStatus.PAID;
         payment.email = session.customer_details.email;
 
         await this.paymentRepository.save(payment);
+        await this.missionService.saveMission(mission);
 
         return "Payment successful"
     }
