@@ -30,7 +30,6 @@ export class InvoiceService {
     @InjectRepository(Document)
     private readonly DocumentAdminRepository: Repository<Document>,
     private readonly fileService: FileService,
-    //private readonly companyService: CompanyService,
   ) {}
 
   async generateInvoice(email: string, body: CompanyCreateInvoiceDto) {
