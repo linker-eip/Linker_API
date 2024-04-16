@@ -29,6 +29,7 @@ import { Gateway } from './chat/gateway';
 import { GatewayModule } from './chat/gateway.module';
 import { ContactModule } from './contact/contact.module';
 import { SkillsModule } from './student/skills/skills.module';
+import { PaymentModule } from './payment/payment.module';
 import { LinkedinController } from './linkedin/linkedin.controller';
 import { LinkedinService } from './linkedin/linkedin.service';
 import { LinkedinModule } from './linkedin/linkedin.module';
@@ -76,6 +77,7 @@ import { StatisticsService } from './statistics/statistics.service';
     ContactModule,
     GatewayModule,
     SkillsModule,
+    PaymentModule,
     LinkedinModule
   ],
   controllers: [FileController, SiretController, DocumentTransferController,StatisticsController],

@@ -938,4 +938,8 @@ export class MissionService {
 
     await this.missionRepository.save(mission);
   }
+
+  async saveMission(mission: Mission) {
+    return await this.missionRepository.save(mission);
+  }
 }
