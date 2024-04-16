@@ -20,12 +20,11 @@ export class LinkedinService {
 
     async findProfile(@Req() req, url: string): Promise<any> {
 
-        if (req.user.userType != "USER_STUDENT") {
-            throw new HttpException("Compte étudiant invalide", HttpStatusCode.Forbidden)
-        }
-
         if (!this.validateLinkedInUrl(url)) {
             throw new HttpException("Invalid LinkedIn URL", HttpStatusCode.BadRequest)
+        }
+        if (req.user.userType != "USER_STUDENT") {
+            throw new HttpException("Compte étudiant invalide", HttpStatusCode.Forbidden)
         }
 
         const client = new LinkedinClient(process.env.LINKEDIN_KEY);
@@ -38,10 +37,9 @@ export class LinkedinService {
             profile.website = data.linkedinUrl
 
             this.studentService.updateStudentProfile(null, profile, req.user)
+            return profile
         } catch (err) {
             throw new HttpException("Impossible de récupérer le profil", HttpStatusCode.Conflict)
         }
-
-
     }
 }
