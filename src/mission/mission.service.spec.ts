@@ -38,6 +38,11 @@ import { UpdateMissionTaskDto } from './dto/update-mission-task.dto';
 import { MissionSearchOptionStudentDto } from './dto/mission-search-option-student.dto';
 import { CommentMissionDto } from './dto/comment-mission.dto';
 import { NoteMissionDto } from './dto/note-mission.dto';
+import { CompanyDocument } from '../company/entity/CompanyDocument.entity';
+import { CompanyPreferences } from '../company/entity/CompanyPreferences.entity';
+import { StudentPreferences } from '../student/entity/StudentPreferences.entity';
+import { StudentDocument } from '../student/entity/StudentDocuments.entity';
+import { MailService } from '../mail/mail.service';
 
 describe('MissionService', () => {
   let service: MissionService;
@@ -66,6 +71,7 @@ describe('MissionService', () => {
         StudiesService,
         DocumentTransferService,
         ConfigService,
+        MailService,
         {
           provide: getRepositoryToken(Mission),
           useClass: Repository,
@@ -95,6 +101,12 @@ describe('MissionService', () => {
           useClass: Repository,
         },
         {
+          provide: 'MAILER_PROVIDER',
+          useValue: {
+            sendMail: jest.fn(),
+          },
+        },
+        {
           provide: getRepositoryToken(StudentUser),
           useClass: Repository,
         },
@@ -112,6 +124,22 @@ describe('MissionService', () => {
         },
         {
           provide: getRepositoryToken(Jobs),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(CompanyDocument),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(CompanyPreferences),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(StudentPreferences),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(StudentDocument),
           useClass: Repository,
         },
         {
