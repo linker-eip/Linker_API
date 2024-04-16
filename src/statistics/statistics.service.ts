@@ -11,7 +11,7 @@ export class StatisticsService {
     constructor(
         private readonly missionService: MissionService,
         private readonly studentService: StudentService
-    ) {}
+    ) { }
 
     filterIncomes(response: any, startDate?: Date, endDate?: Date): void {
         if (startDate && endDate && startDate > endDate) {
@@ -20,19 +20,25 @@ export class StatisticsService {
 
         if (response && response.incomes && response.incomes.length > 0) {
             response.incomes = response.incomes.filter(income => {
-                if (
-                    (!startDate || income.paymentDate >= startDate) &&
-                    (!endDate || income.paymentDate <= endDate)
-                ) {
+                if (isNaN(startDate.getTime()) || income.paymentDate >= startDate) {
                     return true;
                 }
                 return false;
             });
+            console.log(response.incomes)
+            response.incomes = response.incomes.filter(income => {
+                if (isNaN(endDate.getTime()) || income.paymentDate <= endDate) {
+                    return true;
+                }
+                return false;
+            });
+            console.log(response.incomes)
+
         }
     }
 
-    async getStudentStats(req: any, startDate, endDate): Promise<StudentStatsResponse> {
-        console.log(req.user)
+    async getStudentStats(req: any, startDate?, endDate?): Promise<StudentStatsResponse> {
+        console.log(startDate, endDate)
         if (req.user.userType != "USER_STUDENT") {
             throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED)
         }
@@ -56,7 +62,7 @@ export class StatisticsService {
             missionsDto.push(dto);
 
             if (mission.comments != null && mission.comments.length > 0) {
-                reviewsDto.push({missionId: mission.id, review: mission.comments})
+                reviewsDto.push({ missionId: mission.id, review: mission.comments })
             }
         }
 
@@ -86,7 +92,6 @@ export class StatisticsService {
                 paymentDate: new Date('2024-02-09T12:00:00')
             }
         ]
-        console.log(response)
 
         this.filterIncomes(response, startDate, endDate)
 
