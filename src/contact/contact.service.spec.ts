@@ -7,6 +7,7 @@ import { Contact } from './entity/contact.entity';
 import { ContactService } from './contact.service';
 import { ContactController } from './contact.controller';
 import { CreateContactDto} from './dto/create-contact.dto';
+import { MailService } from '../mail/mail.service';
 
 describe('ContactService', () => {
   let service: ContactService;
@@ -27,7 +28,13 @@ describe('ContactService', () => {
         {
           provide: getRepositoryToken(Contact),
           useClass: Repository,
-        }
+        },
+        {
+          provide: MailService,
+          useValue: {
+            sendMail: jest.fn(),
+          },
+        },
       ],
       exports: [ContactService],
     }).compile();
