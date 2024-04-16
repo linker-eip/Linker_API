@@ -14,9 +14,11 @@ import { ConfigService } from '@nestjs/config';
 import { CompanyModule } from '../company/company.module';
 import { StudentPreferences } from './entity/StudentPreferences.entity';
 import { StudentDocument } from './entity/StudentDocuments.entity';
+import { Jobs } from './jobs/entity/jobs.entity';
+import { Studies } from './studies/entity/studies.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([StudentUser, StudentProfile, StudentPreferences, StudentDocument]), JobsModule, StudiesModule, SkillsModule, CompanyModule],
+  imports: [TypeOrmModule.forFeature([StudentUser, StudentProfile, StudentPreferences, StudentDocument, Jobs, Studies]), JobsModule, StudiesModule, SkillsModule, CompanyModule],
   controllers: [StudentController],
   providers: [StudentService, FileService, DocumentTransferService, ConfigService],
   exports: [StudentService],

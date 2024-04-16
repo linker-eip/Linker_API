@@ -30,6 +30,12 @@ import { GatewayModule } from './chat/gateway.module';
 import { ContactModule } from './contact/contact.module';
 import { SkillsModule } from './student/skills/skills.module';
 import { PaymentModule } from './payment/payment.module';
+import { LinkedinController } from './linkedin/linkedin.controller';
+import { LinkedinService } from './linkedin/linkedin.service';
+import { LinkedinModule } from './linkedin/linkedin.module';
+import { StatisticsController } from './statistics/statistics.controller';
+import { StatisticsService } from './statistics/statistics.service';
+
 
 @Module({
   imports: [
@@ -72,8 +78,9 @@ import { PaymentModule } from './payment/payment.module';
     GatewayModule,
     SkillsModule,
     PaymentModule,
+    LinkedinModule
   ],
-  controllers: [FileController, SiretController, DocumentTransferController],
-  providers: [JwtStrategy, SiretService ],
+  controllers: [FileController, SiretController, DocumentTransferController,StatisticsController],
+  providers: [JwtStrategy, SiretService,StatisticsService],
 })
-export class AppModule {}
+export class AppModule { }

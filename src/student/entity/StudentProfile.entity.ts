@@ -1,7 +1,6 @@
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { StudentUser } from './StudentUser.entity';
 import { Studies } from '../studies/entity/studies.entity';
-import { Skills } from '../skills/entity/skills.entity';
 import { Jobs } from '../jobs/entity/jobs.entity';
 
 @Entity()
@@ -33,13 +32,13 @@ export class StudentProfile {
   @Column({ nullable: true })
   picture: string;
 
-  @OneToMany(() => Studies, (studies) => studies.studentProfile)
+  @OneToMany(() => Studies, (studies) => studies.studentProfile, { cascade: true, onDelete: 'CASCADE' })
   studies: Studies[];
 
   @Column({ nullable: true })
   skills: string;
 
-  @OneToMany(() => Jobs, (jobs) => jobs.studentProfile)
+  @OneToMany(() => Jobs, (jobs) => jobs.studentProfile, { cascade: true, onDelete: 'CASCADE'})
   jobs: Jobs[];
 
   @Column({ nullable: true })

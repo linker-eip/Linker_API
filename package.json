@@ -45,6 +45,7 @@
     "fs-extra": "^11.1.1",
     "googleapis": "^118.0.0",
     "jest": "^29.7.0",
+    "linkedin-client": "^0.1.1",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.3",
     "passport": "^0.6.0",
