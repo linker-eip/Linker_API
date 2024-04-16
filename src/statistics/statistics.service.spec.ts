@@ -133,6 +133,39 @@ describe('StatisticsService', () => {
         service = module.get<StatisticsService>(StatisticsService)
     })
 
+    describe('getStatistics', () => {
+        it('should return all your statistics notifications', async () => {
+            const req = {
+                user: {
+                    email: "test@example.com",
+                }
+            }
+
+            const expectedResponse = {
+                missions: [],
+                reviews: [{
+                    missionId: 1,
+                    review: "Mock review",
+                }],
+                note: 4.3,
+                noteNumber: 4,
+                incomes: [{
+                    missionId: 1,
+                    amount: 1000,
+                    paymentDate: new Date()
+                }]
+            };
+
+
+            jest.spyOn(service, 'getStudentStats').mockResolvedValueOnce(expectedResponse);
+
+            const response = await controller.getStudentStats(req);
+
+            expect(service.getStudentStats).toHaveBeenCalledWith(req, undefined, undefined);
+            expect(response).toEqual(expectedResponse);
+        });
+    });
+
     it('should be defined', () => {
         expect(service).toBeDefined();
     });
