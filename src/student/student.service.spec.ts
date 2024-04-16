@@ -29,6 +29,7 @@ import { StudentPreferences } from './entity/StudentPreferences.entity';
 import { StudentDocument } from './entity/StudentDocuments.entity';
 import { CompanyDocument } from '../company/entity/CompanyDocument.entity';
 import { CompanyPreferences } from '../company/entity/CompanyPreferences.entity';
+import { DocumentStatus, StudentDocumentType } from './enum/StudentDocument.enum';
 
 describe('StudentService', () => {
   let service: StudentService;
@@ -229,7 +230,7 @@ describe('StudentService', () => {
 
       jest.spyOn(service, 'updateJob').mockResolvedValueOnce(expectedResponse);
 
-      const response = await controller.updateJob(1,dto, req);
+      const response = await controller.updateJob(1, dto, req);
 
     });
   });
@@ -250,7 +251,7 @@ describe('StudentService', () => {
         .spyOn(service, 'updateStudies')
         .mockResolvedValueOnce(expectedResponse);
 
-      const response = await controller.updateStudies(1,dto, req);
+      const response = await controller.updateStudies(1, dto, req);
 
     });
   });
@@ -356,4 +357,105 @@ describe('StudentService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+
+  describe('preferences', () => {
+    it('should update student prefs', async () => {
+      const req = {
+        user: {
+          email: 'test@exemple.com',
+        },
+      };
+
+      const dto = {
+        mailNotifMessage: true,
+        mailNotifGroup: true,
+        mailNotifMission: false,
+        mailNotifDocument: true,
+      }
+
+      const expectedResponse = null;
+
+      jest
+        .spyOn(service, 'updatePreferences')
+        .mockResolvedValueOnce(expectedResponse);
+
+      const response = await controller.updatePreferences(req, dto);
+
+      expect(service.updatePreferences).toHaveBeenCalledWith(req, dto);
+
+      expect(response).toEqual(expectedResponse);
+    });
+  });
+
+  describe('uploadFile', () => {
+    it('should upload a specific file', async () => {
+      const req = {
+        user: {
+          email: 'test@exemple.com',
+        },
+      };
+      const file: Express.Multer.File = {
+        fieldname: 'file',
+        originalname: 'test-file.txt',
+        encoding: '7bit',
+        mimetype: 'text/plain',
+        destination: './uploads',
+        filename: 'test-file.txt',
+        path: './uploads/test-file.txt',
+        size: 1234,
+        stream: null,
+        buffer: Buffer.from(''),
+      };
+
+      const dto = {
+        file: file,
+        documentType: StudentDocumentType.CNI,
+      }
+
+      const expectedResponse = null;
+
+      jest
+        .spyOn(service, 'uploadStudentDocument')
+        .mockResolvedValueOnce(expectedResponse);
+
+      const response = await controller.uploadStudentDocument(file, req, dto);
+
+      expect(service.uploadStudentDocument).toHaveBeenCalledWith(file, dto, req.user);
+
+      expect(response).toEqual(expectedResponse);
+    });
+  });
+
+  describe('documentStatus', () => {
+    it('should get student document status', async () => {
+      const req = {
+        user: {
+          email: 'test@exemple.com',
+        },
+      };
+
+      const expectedResponse = [
+        {
+          documentType: StudentDocumentType.CNI,
+          status: DocumentStatus.PENDING,
+          comment: null,
+        }
+      ]
+
+      jest
+        .spyOn(service, 'getDocumentStatus')
+        .mockResolvedValueOnce(expectedResponse);
+
+      const response = await controller.getDocumentStatus(req);
+
+      expect(service.getDocumentStatus).toHaveBeenCalledWith(req.user);
+
+      expect(response).toEqual(expectedResponse);
+    });
+  });
+
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
+
 });
