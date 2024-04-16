@@ -1,10 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsArray, IsNumber, IsOptional, IsString } from "class-validator";
 import { Studies } from "../studies/entity/studies.entity";
-import { Skills } from "../skills/entity/skills.entity";
 import { Jobs } from "../jobs/entity/jobs.entity";
 import { StudiesDto } from "../studies/dto/studies.dto";
-import { SkillsDto } from "../skills/dto/skills.dto";
 import { JobsDto } from "../jobs/dto/jobs.dto";
 
 export class UpdateSkillsDto {
