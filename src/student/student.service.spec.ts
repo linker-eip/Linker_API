@@ -25,6 +25,10 @@ import { StudentSearchOptionDto } from './dto/student-search-option.dto';
 import { UpdateSkillDto } from './skills/dto/update-skill.dto';
 import { UpdateJobsDto } from './jobs/dto/update-jobs.dto';
 import { UpdateStudiesDto } from './studies/dto/update-studies.dto';
+import { StudentPreferences } from './entity/StudentPreferences.entity';
+import { StudentDocument } from './entity/StudentDocuments.entity';
+import { CompanyDocument } from '../company/entity/CompanyDocument.entity';
+import { CompanyPreferences } from '../company/entity/CompanyPreferences.entity';
 
 describe('StudentService', () => {
   let service: StudentService;
@@ -54,6 +58,14 @@ describe('StudentService', () => {
           useClass: Repository,
         },
         {
+          provide: getRepositoryToken(StudentPreferences),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(StudentDocument),
+          useClass: Repository,
+        },
+        {
           provide: getRepositoryToken(Skills),
           useClass: Repository,
         },
@@ -75,6 +87,14 @@ describe('StudentService', () => {
         },
         {
           provide: getRepositoryToken(CompanyProfile),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(CompanyDocument),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(CompanyPreferences),
           useClass: Repository,
         },
       ],
@@ -105,7 +125,7 @@ describe('StudentService', () => {
         location: 'Marseille',
         picture: '',
         studies: [],
-        skills: [],
+        skills: null,
         jobs: [],
         website: 'http://example.com',
         note: 0,
@@ -152,12 +172,13 @@ describe('StudentService', () => {
         location: 'Paris',
         picture: '',
         studies: [],
-        skills: [],
+        skills: null,
         jobs: [],
         website: 'http://example.com',
         note: 0,
         studentId: 0,
         student: null,
+        noteNumber: 0,
       };
 
       jest
