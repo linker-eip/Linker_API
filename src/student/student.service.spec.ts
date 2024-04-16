@@ -109,6 +109,7 @@ describe('StudentService', () => {
         jobs: [],
         website: 'http://example.com',
         note: 0,
+        noteNumber: 0,
       };
 
       jest
