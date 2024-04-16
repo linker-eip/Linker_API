@@ -23,6 +23,11 @@ import { StudiesService } from "../student/studies/studies.service";
 import { Skills } from "../student/skills/entity/skills.entity";
 import { Jobs } from "../student/jobs/entity/jobs.entity";
 import { Studies } from "../student/studies/entity/studies.entity";
+import { StudentPreferences } from "../student/entity/StudentPreferences.entity";
+import { CompanyPreferences } from "../company/entity/CompanyPreferences.entity";
+import { MailService } from "../mail/mail.service";
+import { StudentDocument } from "../student/entity/StudentDocuments.entity";
+import { CompanyDocument } from "../company/entity/CompanyDocument.entity";
 
 describe('NotificationsService', () => {
   let service: NotificationsService;
@@ -38,7 +43,7 @@ describe('NotificationsService', () => {
         }),
       ],
       controllers: [NotificationsController],
-      providers: [NotificationsService, StudentService, CompanyService, SkillsService, JobsService,
+      providers: [NotificationsService, StudentService, CompanyService, SkillsService, JobsService, MailService,
         StudiesService, FileService, DocumentTransferService, CompanyProfile, ConfigService,
         {
           provide: getRepositoryToken(Notification),
@@ -69,6 +74,28 @@ describe('NotificationsService', () => {
         {
           provide: getRepositoryToken(Studies),
           useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(StudentPreferences),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(CompanyPreferences),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(StudentDocument),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(CompanyDocument),
+          useClass: Repository,
+        },
+        {
+          provide: 'MAILER_PROVIDER',
+          useValue: {
+            sendMail: jest.fn(),
+          },
         },
       ],
     })
@@ -140,10 +167,10 @@ describe('NotificationsService', () => {
       jest.spyOn(service, 'getNotifications').mockResolvedValueOnce(expectedResponse);
       jest.spyOn(service, 'updateNotificationsStatus').mockResolvedValueOnce(null);
 
-      await controller.updateNotificationsStatus(req, ids)
+      await controller.updateNotificationsStatus(req, {ids})
       const response = await controller.getNotifications(req);
 
-      expect(service.updateNotificationsStatus).toHaveBeenCalledWith(req, ids);
+      expect(service.updateNotificationsStatus).toHaveBeenCalledWith(req, {ids});
       expect(response).toEqual(expectedResponse);
     });
   });
