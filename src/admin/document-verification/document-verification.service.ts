@@ -1,14 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { GetDocumentStatusCompanyResponseDto, GetDocumentStatusStudentsResponseDto } from './dto/get-document-response.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { StudentDocument } from 'src/student/entity/StudentDocuments.entity';
+import { StudentDocument } from '../../student/entity/StudentDocuments.entity';
 import { Repository } from 'typeorm';
 import { ValidateDocumentCompanyDto, ValidateDocumentStudentDto } from './dto/validate-document.dto';
-import { DocumentStatus } from 'src/student/enum/StudentDocument.enum';
-import { NotificationsService } from 'src/notifications/notifications.service';
-import { NotificationType } from 'src/notifications/entity/Notification.entity';
+import { DocumentStatus } from '../../student/enum/StudentDocument.enum';
+import { NotificationsService } from '../../notifications/notifications.service';
+import { NotificationType } from '../../notifications/entity/Notification.entity';
 import { DenyDocumentCompanyDto, DenyDocumentStudentDto } from './dto/deny-document.dto';
-import { CompanyDocument } from 'src/company/entity/CompanyDocument.entity';
+import { CompanyDocument } from '../../company/entity/CompanyDocument.entity';
 
 @Injectable()
 export class DocumentVerificationService {

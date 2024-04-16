@@ -5,10 +5,10 @@ import { In, Repository } from 'typeorm';
 import { StudentService } from '../student/student.service';
 import { CompanyService } from '../company/company.service';
 import { UpdateNotificationsDto } from './dto/update-notifications.dto';
-import { StudentPreferences } from 'src/student/entity/StudentPreferences.entity';
-import { MailService } from 'src/mail/mail.service';
-import { SendMailDto } from 'src/mail/dto/send-mail.dto';
-import { CompanyPreferences } from 'src/company/entity/CompanyPreferences.entity';
+import { StudentPreferences } from '../student/entity/StudentPreferences.entity';
+import { MailService } from '../mail/mail.service';
+import { SendMailDto } from '../mail/dto/send-mail.dto';
+import { CompanyPreferences } from '../company/entity/CompanyPreferences.entity';
 
 @Injectable()
 export class NotificationsService {

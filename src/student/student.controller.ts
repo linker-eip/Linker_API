@@ -31,7 +31,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import {
   FileMimeTypeValidator,
   SupportedImageMimeTypes,
-} from 'src/document-transfer/src/helpers/fmt.validator';
+} from '../document-transfer/src/helpers/fmt.validator';
 import { UpdateSkillDto } from './skills/dto/update-skill.dto';
 import { UpdateJobsDto } from './jobs/dto/update-jobs.dto';
 import { UpdateStudiesDto } from './studies/dto/update-studies.dto';

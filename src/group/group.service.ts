@@ -29,8 +29,8 @@ import {
 import { CompanyService } from '../company/company.service';
 import { GetCompanySearchGroupsDto } from './dto/get-company-search-groups.dto';
 import { CompanySearchGroupsFilterDto } from './dto/company-search-groups-filter.dto';
-import { Mission } from 'src/mission/entity/mission.entity';
-import { MissionStatus } from 'src/mission/enum/mission-status.enum';
+import { Mission } from '../mission/entity/mission.entity';
+import { MissionStatus } from '../mission/enum/mission-status.enum';
 
 @Injectable()
 export class GroupService {
@@ -44,7 +44,7 @@ export class GroupService {
     private readonly studentService: StudentService,
     private readonly notificationService: NotificationsService,
     private readonly CompanyService: CompanyService,
-  ) {}
+  ) { }
 
   async getUserGroup(req: any): Promise<Group> {
     let group;
@@ -391,9 +391,9 @@ export class GroupService {
     this.notificationService.createNotification(
       'Invitation acceptée',
       student.firstName +
-        ' ' +
-        student.lastName +
-        ' a accepté de rejoindre votre groupe',
+      ' ' +
+      student.lastName +
+      ' a accepté de rejoindre votre groupe',
       NotificationType.GROUP,
       group.leaderId,
     );
@@ -419,9 +419,9 @@ export class GroupService {
     this.notificationService.createNotification(
       'Invitation refusée',
       student.firstName +
-        ' ' +
-        student.lastName +
-        ' a refusé de rejoindre votre groupe',
+      ' ' +
+      student.lastName +
+      ' a refusé de rejoindre votre groupe',
       NotificationType.GROUP,
       group.leaderId,
     );

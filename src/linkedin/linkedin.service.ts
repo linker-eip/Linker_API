@@ -1,7 +1,7 @@
 import { HttpCode, HttpException, Injectable, Req } from '@nestjs/common';
 import { HttpStatusCode } from 'axios';
-import { CreateStudentProfileDto } from 'src/student/dto/create-student-profile.dto';
-import { StudentService } from 'src/student/student.service';
+import { CreateStudentProfileDto } from '../student/dto/create-student-profile.dto';
+import { StudentService } from '../student/student.service';
 const LinkedinClient = require('linkedin-client');
 
 

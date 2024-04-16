@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNumber } from 'class-validator';
-import { CompanyDocumentType, DocumentStatus } from 'src/company/enum/CompanyDocument.enum';
-import { StudentDocumentType } from 'src/student/enum/StudentDocument.enum';
+import { CompanyDocumentType, DocumentStatus } from '../../company/enum/CompanyDocument.enum';
+import { StudentDocumentType } from '../../student/enum/StudentDocument.enum';
 
 export class ValidateDocumentStudentDto {
     @ApiProperty({required: true})

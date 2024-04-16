@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { LinkedinService } from './linkedin.service';
 import { LinkedinController } from './linkedin.controller';
-import { StudentModule } from 'src/student/student.module';
+import { StudentModule } from '../student/student.module';
 
 @Module({
     imports: [StudentModule],

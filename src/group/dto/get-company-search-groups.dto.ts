@@ -3,7 +3,7 @@ import { Studies } from '../../student/studies/entity/studies.entity';
 import { Skills } from '../../student/skills/entity/skills.entity';
 import { Jobs } from '../../student/jobs/entity/jobs.entity';
 import { IsNumber, IsString } from 'class-validator';
-import { UpdateSkillsDto } from 'src/student/dto/create-student-profile.dto';
+import { UpdateSkillsDto } from '../../student/dto/create-student-profile.dto';
 
 export class StudentProfileResponseDto {
   @ApiProperty()

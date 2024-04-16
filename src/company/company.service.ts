@@ -7,7 +7,7 @@ import { CreateCompanyProfileDto } from './dto/create-company-profile.dto';
 import { CompanyDocument } from './entity/CompanyDocument.entity';
 import { UploadCompanyDocumentDto } from './dto/upload-company-document.dto';
 import { DocumentStatus } from './enum/CompanyDocument.enum';
-import { DocumentTransferService } from 'src/document-transfer/src/services/document-transfer.service';
+import { DocumentTransferService } from '../document-transfer/src/services/document-transfer.service';
 import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
 import { CompanyPreferences } from './entity/CompanyPreferences.entity';
 

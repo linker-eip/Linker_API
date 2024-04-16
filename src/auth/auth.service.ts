@@ -30,10 +30,10 @@ import * as crypto from 'crypto';
 import { SiretService } from '../siret/siret.service';
 import { GroupService } from '../group/group.service';
 import { MissionService } from '../mission/mission.service';
-import { StudentPreferences } from 'src/student/entity/StudentPreferences.entity';
+import { StudentPreferences } from '../student/entity/StudentPreferences.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CompanyPreferences } from 'src/company/entity/CompanyPreferences.entity';
+import { CompanyPreferences } from '../company/entity/CompanyPreferences.entity';
 
 @Injectable()
 export class AuthService {
