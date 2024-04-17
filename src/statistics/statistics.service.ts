@@ -38,12 +38,16 @@ export class StatisticsService {
     }
 
     async getStudentStats(req: any, startDate?, endDate?): Promise<StudentStatsResponse> {
-        console.log(startDate, endDate)
         if (req.user.userType != "USER_STUDENT") {
             throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED)
         }
 
-        const missions = await this.missionService.getStudentMissions(req, {})
+        const student = await this.studentService.findOneByEmail(req.user.email)
+
+        let missions = []
+        if (student.groupId) {
+            const missions = await this.missionService.getStudentMissions(req, {})
+        }
         const missionsDto = []
         const reviewsDto = []
         for (let mission of missions) {
