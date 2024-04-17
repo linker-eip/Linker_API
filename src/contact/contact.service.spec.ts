@@ -63,7 +63,7 @@ describe('ContactService', () => {
 
       jest.spyOn(service, 'createContact').mockResolvedValue(contact);
 
-      const res = await controller.createContact(contact);
+      const res = await controller.createContact(contactDto);
 
       expect(service.createContact).toHaveBeenCalledWith(contactDto);
 

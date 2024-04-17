@@ -34,6 +34,11 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { ConfigService } from '@nestjs/config';
 import { Notification } from '../notifications/entity/Notification.entity';
 import { LinkerInvoiceCompanyDto } from './dto/linker-invoice-company.dto';
+import { StudentPreferences } from '../student/entity/StudentPreferences.entity';
+import { StudentDocument } from '../student/entity/StudentDocuments.entity';
+import { CompanyPreferences } from '../company/entity/CompanyPreferences.entity';
+import { CompanyDocument } from '../company/entity/CompanyDocument.entity';
+import { MailService } from '../mail/mail.service';
 
 describe('InvoiceService', () => {
   let service: InvoiceService;
@@ -60,6 +65,7 @@ describe('InvoiceService', () => {
         DocumentTransferService,
         NotificationsService,
         ConfigService,
+        MailService,
         {
           provide: getRepositoryToken(Mission),
           useClass: Repository,
@@ -81,6 +87,22 @@ describe('InvoiceService', () => {
           useClass: Repository,
         },
         {
+          provide: getRepositoryToken(StudentPreferences),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(StudentDocument),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(CompanyPreferences),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(CompanyDocument),
+          useClass: Repository,
+        },
+        {
           provide: getRepositoryToken(CompanyUser),
           useClass: Repository,
         },
@@ -95,7 +117,7 @@ describe('InvoiceService', () => {
         {
           provide: getRepositoryToken(Jobs),
           useClass: Repository,
-        },        {
+        }, {
           provide: getRepositoryToken(MissionTask),
           useClass: Repository,
         },
@@ -110,6 +132,12 @@ describe('InvoiceService', () => {
         {
           provide: getRepositoryToken(GroupInvite),
           useClass: Repository,
+        },
+        {
+          provide: 'MAILER_PROVIDER',
+          useValue: {
+            sendMail: jest.fn(),
+          },
         },
         {
           provide: getRepositoryToken(Notification),
@@ -148,8 +176,8 @@ describe('InvoiceService', () => {
           useClass: Repository
         },
         {
-          provide : InvoiceService,
-          useValue : {
+          provide: InvoiceService,
+          useValue: {
             getInvoices: jest.fn(),
             generateInvoice: jest.fn(),
             downloadInvoice: jest.fn(),

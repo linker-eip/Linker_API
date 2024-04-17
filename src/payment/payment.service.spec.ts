@@ -7,7 +7,7 @@ import { Payment } from './entity/payment.entity';
 import { PaymentService } from './payment.service';
 import { PaymentController } from './payment.controller';
 import { Mission } from '../mission/entity/mission.entity';
-import { CompanyUser } from '../company/entity/companyUser.entity';
+import { CompanyUser } from '../company/entity/CompanyUser.entity';
 import { PaymentStatus } from './enum/payment.status.enum';
 import { MissionStatus } from '../mission/enum/mission-status.enum';
 
