@@ -46,7 +46,7 @@ export class StatisticsService {
 
         let missions = []
         if (student.groupId) {
-            const missions = await this.missionService.getStudentMissions(req, {})
+            missions = await this.missionService.getStudentMissions(req, {})
         }
         const missionsDto = []
         const reviewsDto = []
