@@ -12,6 +12,7 @@ import { ContactAdminModule } from './contact/contact-admin.module';
 import { DocumentVerificationController } from './document-verification/document-verification.controller';
 import { DocumentVerificationService } from './document-verification/document-verification.service';
 import { DocumentVerificationModule } from './document-verification/document-verification.module';
+import { PaymentAdminModule } from './payment/payment-admin.module';
 
 @Module({
   imports: [
@@ -21,7 +22,8 @@ import { DocumentVerificationModule } from './document-verification/document-ver
     MissionModule,
     DocumentAdminModule,
     ContactAdminModule,
-    DocumentVerificationModule
+    DocumentVerificationModule,
+    PaymentAdminModule
   ],
   providers: [AdminService,],
   exports: [AdminService],

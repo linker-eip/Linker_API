@@ -58,3 +58,50 @@ export function formatToMissionAdminDto(
     }),
   };
 }
+
+
+export class missionAdminResponseBasicDto {
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
+  name: string;
+
+  @ApiProperty()
+  status: string;
+
+  @ApiProperty()
+  description: string;
+
+  @ApiProperty()
+  startOfMission: Date;
+
+  @ApiProperty()
+  endOfMission: Date;
+
+  @ApiProperty()
+  amount: number;
+
+  @ApiProperty()
+  numberOfStudents: number;
+
+  @ApiProperty()
+  company: CompanyUser;
+}
+
+export function formatToMissionAdminBasicDto(
+  mission: Mission,
+  company: CompanyUser,
+) : missionAdminResponseBasicDto {
+  return {
+    id: mission.id,
+    name: mission.name,
+    status: mission.status,
+    description: mission.description,
+    startOfMission: mission.startOfMission,
+    endOfMission: mission.endOfMission,
+    amount: mission.amount,
+    numberOfStudents: null,
+    company: company,
+  };
+}
