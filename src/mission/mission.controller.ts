@@ -2,13 +2,19 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
   Get,
+  HttpStatus,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   Post,
   Put,
   Query,
   Req,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -30,21 +36,38 @@ import { GetMissionDto } from './dto/get-mission.dto';
 import { MissionSearchOptionStudentDto } from './dto/mission-search-option-student.dto';
 import { CommentMissionDto } from './dto/comment-mission.dto';
 import { NoteMissionDto } from './dto/note-mission.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
 @ApiTags('Mission')
 @Controller('api/mission')
 export class MissionController {
-  constructor(private readonly missionService: MissionService) {}
+  constructor(private readonly missionService: MissionService) { }
 
   @Post()
   @ApiOperation({
     description: 'Create a mission as a company',
     summary: 'Create a mission as a company',
   })
-  async createMission(@Req() req, @Body() body: CreateMissionDto) {
-    return await this.missionService.createMission(body, req);
+  @UseInterceptors(FileInterceptor('specifications'))
+  async createMission(
+    @UploadedFile(
+      new ParseFilePipe({
+        fileIsRequired: false,
+        errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+        validators: [
+          new MaxFileSizeValidator({
+            maxSize: 3_500_000,
+          }),
+          new FileTypeValidator({
+            fileType: 'application/pdf',
+          }),
+        ],
+      }),
+    ) file,
+    @Req() req, @Body() body: CreateMissionDto) {
+    return await this.missionService.createMission(body, req, file);
   }
 
   @Delete(':id')
@@ -61,12 +84,27 @@ export class MissionController {
     description: 'Update a mission as a company',
     summary: 'Update a mission as a company',
   })
+  @UseInterceptors(FileInterceptor('specifications'))
   async updateMission(
+    @UploadedFile(
+      new ParseFilePipe({
+        fileIsRequired: false,
+        errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+        validators: [
+          new MaxFileSizeValidator({
+            maxSize: 3_500_000,
+          }),
+          new FileTypeValidator({
+            fileType: 'application/pdf',
+          }),
+        ],
+      }),
+    ) file,
     @Param('id') missionId: number,
     @Body() body: UpdateMissionDto,
     @Req() req,
   ) {
-    return await this.missionService.updateMission(missionId, body, req);
+    return await this.missionService.updateMission(missionId, body, req, file);
   }
 
   @Get()

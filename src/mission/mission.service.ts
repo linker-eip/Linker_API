@@ -25,6 +25,9 @@ import { MissionSearchOptionStudentDto } from './dto/mission-search-option-stude
 import { GetMissionDto } from './dto/get-mission.dto';
 import { CommentMissionDto } from './dto/comment-mission.dto';
 import { NoteMissionDto } from './dto/note-mission.dto';
+import { FileService } from 'src/filesystem/file.service';
+import { DocumentTransferModule } from 'src/document-transfer/src/document-transfer.module';
+import { DocumentTransferService } from 'src/document-transfer/src/services/document-transfer.service';
 
 @Injectable()
 export class MissionService {
@@ -38,6 +41,7 @@ export class MissionService {
     private readonly studentService: StudentService,
     @InjectRepository(MissionInvite)
     private readonly missionInviteRepository: Repository<MissionInvite>,
+    private readonly DocumentService: DocumentTransferService,
   ) {}
 
   async findMissionById(missionId: number): Promise<Mission> {
@@ -56,7 +60,7 @@ export class MissionService {
     return missions;
   }
 
-  async createMission(createMissionDto: CreateMissionDto, req: any) {
+  async createMission(createMissionDto: CreateMissionDto, req: any, file: any) {
     let company = null;
     try {
       company = await this.companyService.findOne(req.user.email);
@@ -72,6 +76,11 @@ export class MissionService {
     mission.amount = createMissionDto.amount;
     mission.companyId = company.id;
     mission.skills = createMissionDto.skills;
+
+    if (file) {
+      const filePath = await this.DocumentService.uploadFileNotImage(file)
+      mission.specificationsFile = filePath
+    }
 
     return await this.missionRepository.save(mission);
   }
@@ -97,6 +106,7 @@ export class MissionService {
     missionId: number,
     updateMissionDto: UpdateMissionDto,
     req: any,
+    file: any
   ) {
     let company = null;
     try {
@@ -134,6 +144,11 @@ export class MissionService {
 
     if (updateMissionDto.skills !== null) {
       update.skills = updateMissionDto.skills;
+    }
+
+    if (file) {
+      const filePath = await this.DocumentService.uploadFileNotImage(file);
+      update.specificationsFile = filePath;
     }
 
     await this.missionRepository.update(mission.id, update);
