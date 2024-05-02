@@ -1,6 +1,7 @@
 import {
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
   forwardRef,
 } from '@nestjs/common';
@@ -25,6 +26,7 @@ import { MissionSearchOptionStudentDto } from './dto/mission-search-option-stude
 import { GetMissionDto } from './dto/get-mission.dto';
 import { CommentMissionDto } from './dto/comment-mission.dto';
 import { NoteMissionDto } from './dto/note-mission.dto';
+import { PaymentService } from '../payment/payment.service';
 
 @Injectable()
 export class MissionService {
@@ -38,6 +40,8 @@ export class MissionService {
     private readonly studentService: StudentService,
     @InjectRepository(MissionInvite)
     private readonly missionInviteRepository: Repository<MissionInvite>,
+    @Inject(forwardRef(() => PaymentService))
+    private readonly paymentService: PaymentService
   ) {}
 
   async findMissionById(missionId: number): Promise<Mission> {
@@ -440,6 +444,9 @@ export class MissionService {
 
     mission.status = MissionStatus.FINISHED;
 
+    for (let missionTask of missionTasks) {
+      await this.paymentService.createStudentPayment(mission.id,missionTask.studentId, missionTask.amount);
+    }
     await this.missionRepository.save(mission);
   }
 

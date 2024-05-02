@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { MissionService } from '../mission/mission.service';
 import { Payment } from './entity/payment.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,15 +6,21 @@ import { Not, Repository } from 'typeorm';
 import { PaymentStatus } from './enum/payment.status.enum';
 import { CompanyService } from '../company/company.service';
 import { MissionStatus } from '../mission/enum/mission-status.enum';
+import { StudentPayment } from './entity/student-payment.entity';
+import { StudentService } from '../student/student.service';
+import { StudentPaymentResponseDto } from '../payment/dto/student-payment-response.dto';
 
 @Injectable()
 export class PaymentService {
-
     constructor(
+        @Inject(forwardRef(() => MissionService))
         private readonly missionService: MissionService,
         @InjectRepository(Payment)
         private readonly paymentRepository: Repository<Payment>,
         private readonly companyService: CompanyService,
+        @InjectRepository(StudentPayment)
+        private readonly studentPaymentRepository: Repository<StudentPayment>,
+        private readonly studentService: StudentService,
     ) { }
     
     async createProductAndCheckoutSession(missionId: string, req: any) {
@@ -160,6 +166,40 @@ export class PaymentService {
         }
 
         return payment;
+    }
+
+
+    async createStudentPayment(missionId: number, studentId: number, amount: number) {
+        const studentPayment = new StudentPayment();
+        studentPayment.missionId = missionId;
+        studentPayment.studentId = studentId;
+        studentPayment.amount = amount;
+
+        await this.studentPaymentRepository.save(studentPayment);
+    }
+
+    async getStudentPayment(req: any) : Promise<StudentPaymentResponseDto[]> {
+        const student = await this.studentService.findOneByEmail(req.user.email);
+        const studentPayments = await this.studentPaymentRepository.find({
+            where: {
+                studentId: student.id,
+            },
+        });
+
+        const studentPaymentResponseDtos = studentPayments.map(async (studentPayment) => {
+            const mission = await this.missionService.findMissionById(studentPayment.missionId);
+            if (!mission) {
+                throw new NotFoundException('Mission not found');
+            }
+            return {
+                id: studentPayment.id,
+                missionName: mission.name,
+                status: studentPayment.status,
+                amount: studentPayment.amount,
+            }
+        });
+
+        return Promise.all(studentPaymentResponseDtos);
     }
 }
 

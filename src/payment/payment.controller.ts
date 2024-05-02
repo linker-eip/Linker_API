@@ -3,6 +3,7 @@ import { PaymentService } from './payment.service';
 import { MissionService } from '../mission/mission.service';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { StudentPaymentResponseDto } from './dto/student-payment-response.dto';
 
 @Controller('api/payment')
 @ApiBearerAuth()
@@ -32,6 +33,14 @@ export class PaymentController {
         @Req() req
     ) {
         return this.stripeService.getPayment(missionId, req);
+    }
+
+    @Get('student')
+    @UseGuards(AuthGuard('jwt'))
+    async getStudentPayments(
+        @Req() req
+    ) : Promise<StudentPaymentResponseDto[]> {
+        return this.stripeService.getStudentPayment(req);
     }
     
 }
