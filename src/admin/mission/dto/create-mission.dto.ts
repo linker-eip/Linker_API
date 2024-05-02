@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsDate, IsDateString, IsNumber, IsString } from 'class-validator';
 
-export class CreateMissionDto {
+export class CreateMissionAdminDto {
   @ApiProperty()
   @IsString()
   name: string;

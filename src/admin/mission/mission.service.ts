@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Mission } from '../../mission/entity/mission.entity';
 import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
-import { CreateMissionDto } from './dto/create-mission.dto';
+import { CreateMissionAdminDto } from './dto/create-mission.dto';
 import { UserAdminService } from '../user-admin/user-admin.service';
 import { MissionSearchOptionAdmin } from './dto/missions-search-option-admin.dto';
 import { UpdateMission } from './dto/update-mission.dto';
@@ -15,7 +15,7 @@ export class MissionService {
     private readonly userAdminService: UserAdminService,
   ) {}
 
-  async createMission(createMissionDto: CreateMissionDto) {
+  async createMission(createMissionDto: CreateMissionAdminDto) {
     const company = await this.userAdminService.findOneCompanyById(
       createMissionDto.companyId,
     );

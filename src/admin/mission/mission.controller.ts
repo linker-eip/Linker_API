@@ -16,7 +16,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { MissionService } from './mission.service';
-import { CreateMissionDto } from './dto/create-mission.dto';
+import { CreateMissionAdminDto } from './dto/create-mission.dto';
 import {
   formatToMissionAdminDto,
   missionAdminResponseDto,
@@ -43,9 +43,9 @@ export class MissionController {
   })
   @ApiOkResponse({
     description: 'Create a mission',
-    type: CreateMissionDto,
+    type: CreateMissionAdminDto,
   })
-  async createMission(@Body() body: CreateMissionDto) {
+  async createMission(@Body() body: CreateMissionAdminDto) {
     return await this.missionService.createMission(body);
   }
 
