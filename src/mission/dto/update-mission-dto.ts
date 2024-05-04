@@ -43,4 +43,8 @@ export class UpdateMissionDto {
   @IsNumber()
   @IsOptional()
   groupId: number;
+
+  @ApiProperty()
+  @IsOptional()
+  specifications: Express.Multer.File
 }
