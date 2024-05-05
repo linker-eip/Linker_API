@@ -42,7 +42,7 @@ export class MissionService {
     @InjectRepository(MissionInvite)
     private readonly missionInviteRepository: Repository<MissionInvite>,
     private readonly DocumentService: DocumentTransferService,
-  ) {}
+  ) { }
 
   async findMissionById(missionId: number): Promise<Mission> {
     const mission = await this.missionRepository.findOne({
@@ -165,7 +165,7 @@ export class MissionService {
     if (company == null) {
       throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
     }
-    const missions =  await this.findAllByCompanyId(company.id);
+    const missions = await this.findAllByCompanyId(company.id);
     return missions;
   }
 
@@ -191,6 +191,40 @@ export class MissionService {
     missionTask.name = createMissionTaskDto.name;
     missionTask.description = createMissionTaskDto.description;
     missionTask.studentId = createMissionTaskDto.studentId;
+    missionTask.missionId = missionId;
+    missionTask.amount = createMissionTaskDto.amount;
+    missionTask.skills = createMissionTaskDto.skills;
+
+    return await this.missionTaskRepository.save(missionTask);
+  }
+
+  async createMissionTaskStudent(
+    missionId: number,
+    createMissionTaskDto: CreateMissionTaskDto,
+    req: any,
+  ) {
+    let groupId = null
+    try {
+      const student = await this.studentService.findOneByEmail(req.user.email);
+      groupId = student.groupId
+      if (groupId == null) {
+        throw new HttpException('Invalid group', HttpStatus.UNAUTHORIZED);
+      }
+    } catch (err) {
+      throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED);
+    }
+
+    const missionInvite = await this.missionInviteRepository.findOneBy({ groupId: groupId, missionId: missionId })
+
+    if (missionInvite == null) {
+      throw new HttpException('Invalid mission', HttpStatus.NOT_FOUND);
+    }
+
+    const missionTask = new MissionTask();
+    missionTask.name = createMissionTaskDto.name;
+    missionTask.description = createMissionTaskDto.description;
+    missionTask.studentId = createMissionTaskDto.studentId;
+    missionTask.groupId = groupId
     missionTask.missionId = missionId;
     missionTask.amount = createMissionTaskDto.amount;
     missionTask.skills = createMissionTaskDto.skills;
@@ -259,6 +293,76 @@ export class MissionService {
     });
   }
 
+  async updateMissionTaskStudent(
+    taskId: number,
+    createMissionTaskDto: UpdateMissionTaskDto,
+    req: any,
+  ) {
+    let groupId = null
+    try {
+      const student = await this.studentService.findOneByEmail(req.user.email);
+      groupId = student.groupId
+      if (groupId == null) {
+        throw new HttpException('Invalid group', HttpStatus.UNAUTHORIZED);
+      }
+    } catch (err) {
+      throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED);
+    }
+
+    const missionTask = await this.missionTaskRepository.findOne({
+      where: { id: taskId },
+    });
+
+    if (missionTask == null) {
+      throw new HttpException('Invalid mission task', HttpStatus.NOT_FOUND);
+    }
+
+    const missionInvite = await this.missionInviteRepository.findOneBy({ groupId: groupId, missionId: missionTask.missionId })
+
+    if (missionInvite == null) {
+      throw new HttpException('Invalid mission', HttpStatus.NOT_FOUND);
+    }
+
+    if (missionTask.groupId != groupId) {
+      throw new HttpException('Vous ne pouvez pas modifier cette tâche', HttpStatus.FORBIDDEN);
+    }
+
+
+    if (missionTask == null) {
+      throw new HttpException('Invalid mission task', HttpStatus.NOT_FOUND);
+    }
+
+    const update: Partial<MissionTask> = {};
+    if (createMissionTaskDto.name !== null) {
+      update.name = createMissionTaskDto.name;
+    }
+
+    if (createMissionTaskDto.description !== null) {
+      update.description = createMissionTaskDto.description;
+    }
+
+    if (createMissionTaskDto.studentId !== null) {
+      update.studentId = createMissionTaskDto.studentId;
+    }
+
+    if (createMissionTaskDto.status !== null) {
+      update.status = createMissionTaskDto.status;
+    }
+
+    if (createMissionTaskDto.amount !== null) {
+      update.amount = createMissionTaskDto.amount;
+    }
+
+    if (createMissionTaskDto.skills !== null) {
+      update.skills = createMissionTaskDto.skills;
+    }
+
+    await this.missionTaskRepository.update(missionTask.id, update);
+    return await this.missionTaskRepository.findOne({
+      where: { id: taskId },
+    });
+  }
+
   async deleteMissionTask(taskId: number, req: any) {
     let company = null;
     try {
@@ -279,6 +383,29 @@ export class MissionService {
 
     if (mission == null || mission.companyId != company.id) {
       throw new HttpException('Invalid mission', HttpStatus.NOT_FOUND);
+    }
+
+    return await this.missionTaskRepository.delete(missionTask.id);
+  }
+
+  async deleteMissionTaskStudent(taskId: number, req: any) {
+    let groupId = null
+    try {
+      const student = await this.studentService.findOneByEmail(req.user.email);
+      groupId = student.groupId
+      if (groupId == null) {
+        throw new HttpException('Invalid group', HttpStatus.UNAUTHORIZED);
+      }
+    } catch (err) {
+      throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED);
+    }
+
+    const missionTask = await this.missionTaskRepository.findOne({
+      where: { id: taskId, groupId: groupId },
+    });
+
+    if (missionTask == null) {
+      throw new HttpException('Invalid mission task', HttpStatus.NOT_FOUND);
     }
 
     return await this.missionTaskRepository.delete(missionTask.id);
