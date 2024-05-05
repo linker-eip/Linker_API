@@ -32,7 +32,7 @@ import { MissionTaskDto } from './dto/mission-task.dto';
 import { GetMissionDetailsStudentDto } from './dto/get-mission-details-student.dto';
 import { GetMissionDetailsCompanyDto } from './dto/get-mission-details-company.dto';
 import { UpdateTaskStatusDto } from './dto/update-task-status-dto';
-import { GetMissionDto } from './dto/get-mission.dto';
+import { GetMissionDto, getInvitedGroups } from './dto/get-mission.dto';
 import { MissionSearchOptionStudentDto } from './dto/mission-search-option-student.dto';
 import { CommentMissionDto } from './dto/comment-mission.dto';
 import { NoteMissionDto } from './dto/note-mission.dto';
@@ -395,6 +395,8 @@ export class MissionController {
   })
   @ApiOkResponse({
     description: 'Get all invited groups for a mission',
+    type: getInvitedGroups,
+    isArray: true
   })
   async getInvitedStudents(@Req() req, missionId: number) {
     return await this.missionService.getInvitedGroups(req, missionId);
