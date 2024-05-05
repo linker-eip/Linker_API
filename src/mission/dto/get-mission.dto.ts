@@ -1,4 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { MissionInviteStatus } from "../enum/mission-invite-status.enum";
+import { IsEnum } from "class-validator";
 
 export class GetMissionDto {
 
@@ -34,4 +36,13 @@ export class GetMissionDto {
 
     @ApiProperty()
     skills: string;
+}
+
+export class getInvitedGroups {
+
+    @ApiProperty()
+    groupId: number;
+
+    @ApiProperty({enum: MissionInviteStatus})
+    invitedStatus: MissionInviteStatus
 }
