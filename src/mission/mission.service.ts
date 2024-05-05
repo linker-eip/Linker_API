@@ -648,6 +648,37 @@ export class MissionService {
     return groupIds
   }
 
+  async getInvitedGroups(req: any, missionId: number) {
+    let company = null;
+    try {
+      company = await this.companyService.findOne(req.user.email);
+    } catch (err) {
+      throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
+    }
+    if (company == null) {
+      throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
+    }
+    let mission = await this.findMissionById(missionId);
+    if (mission == null) {
+      throw new HttpException('Invalid mission', HttpStatus.NOT_FOUND);
+    }
+
+    if (mission.companyId != company.id) {
+      throw new HttpException(
+        'Invalid mission',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    let missionsInvites = await this.missionInviteRepository.findBy({missionId: missionId})
+
+    let dto = missionsInvites.map((mission) => {
+      return {groupId: mission.groupId, status: mission.status}
+    })
+
+    return dto;
+  }
+
   async finishMission(missionId: number, req: any) {
     let mission = await this.findMissionById(missionId);
     if (mission == null) {
