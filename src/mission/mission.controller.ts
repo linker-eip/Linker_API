@@ -137,6 +137,23 @@ export class MissionController {
     return await this.missionService.createMissionTask(missionId, body, req);
   }
 
+  @Post('studentTask/:missionId')
+  @ApiOperation({
+    description: 'Create a task for a mission - AS AN INVITED GROUP',
+    summary: 'Create a task for a mission - AS AN INVITED GROUP',
+  })
+  @ApiOkResponse({
+    description: 'Create a task for a mission',
+    type: MissionTaskDto,
+  })
+  async createMissionTaskStudent(
+    @Param('missionId') missionId: number,
+    @Body() body: CreateMissionTaskDto,
+    @Req() req,
+  ) {
+    return await this.missionService.createMissionTaskStudent(missionId, body, req);
+  }
+
   @Put('task/:taskId')
   @ApiOperation({
     description: 'Update a task for a mission',
@@ -154,13 +171,39 @@ export class MissionController {
     return await this.missionService.updateMissionTask(taskId, body, req);
   }
 
+  @Put('studentTask/:taskId')
+  @ApiOperation({
+    description: 'Update a task for a mission - AS AN INVITED GROUP',
+    summary: 'Update a task for a mission - AS AN INVITED GROUP',
+  })
+  @ApiOkResponse({
+    description: 'Update a task for a mission',
+    type: MissionTaskDto,
+  })
+  async updateMissionTaskStudent(
+    @Param('taskId') taskId: number,
+    @Body() body: UpdateMissionTaskDto,
+    @Req() req,
+  ) {
+    return await this.missionService.updateMissionTaskStudent(taskId, body, req);
+  }
+
   @Delete('task/:taskId')
   @ApiOperation({
     description: 'Delete a task for a mission',
     summary: 'Delete a task for a mission',
   })
-  async deleteMissionTask(@Param('taskId') taskId: number, @Req() req) {
+  async deleteMissionTaskStudent(@Param('taskId') taskId: number, @Req() req) {
     return await this.missionService.deleteMissionTask(taskId, req);
+  }
+
+  @Delete('studentTask/:taskId')
+  @ApiOperation({
+    description: 'Delete a task for a mission  - AS AN INVITED GROUP',
+    summary: 'Delete a task for a mission  - AS AN INVITED GROUP',
+  })
+  async deleteMissionTask(@Param('taskId') taskId: number, @Req() req) {
+    return await this.missionService.deleteMissionTaskStudent(taskId, req);
   }
 
   @Get('task/:missionId')
