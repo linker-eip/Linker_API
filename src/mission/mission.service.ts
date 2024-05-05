@@ -663,6 +663,8 @@ export class MissionService {
       throw new HttpException('Invalid mission', HttpStatus.NOT_FOUND);
     }
 
+    console.log(mission)
+    console.log(company)
     if (mission.companyId != company.id) {
       throw new HttpException(
         'Invalid mission',
