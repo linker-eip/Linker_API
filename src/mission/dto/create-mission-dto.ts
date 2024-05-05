@@ -20,8 +20,7 @@ export class CreateMissionDto {
   endOfMission: Date;
 
   @ApiProperty({ description: "Montant de la mission" })
-  @IsDefined()
-  @IsNumber(null, { message: "Le montant doit être un nombre" })
+  @IsNumber(undefined, { message: "Le montant doit être un nombre" })
   amount: number;
 
   @ApiProperty({ description: "Compétences" })
