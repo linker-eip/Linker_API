@@ -398,7 +398,7 @@ export class MissionController {
     type: getInvitedGroups,
     isArray: true
   })
-  async getInvitedStudents(@Req() req, missionId: number) {
+  async getInvitedStudents(@Req() req, @Param('missionId') missionId: number) {
     return await this.missionService.getInvitedGroups(req, missionId);
   }
 

@@ -46,7 +46,7 @@ export class MissionService {
   ) { }
 
   async findMissionById(missionId: number): Promise<Mission> {
-    const mission = await this.missionRepository.findOneBy({id: missionId});
+    const mission = await this.missionRepository.findOneBy({ id: missionId });
 
     return mission;
   }
@@ -640,7 +640,7 @@ export class MissionService {
       );
     }
 
-    let missionsInvites = await this.missionInviteRepository.findBy({missionId: missionId, status: MissionInviteStatus.GROUP_ACCEPTED})
+    let missionsInvites = await this.missionInviteRepository.findBy({ missionId: missionId, status: MissionInviteStatus.GROUP_ACCEPTED })
 
     let groupIds = missionsInvites.map((it) => it.groupId)
     return groupIds
@@ -656,13 +656,11 @@ export class MissionService {
     if (company == null) {
       throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
     }
-    let mission = await this.findMissionById(missionId);
+    let mission = await this.missionRepository.findOne({ where: { id: missionId } })
     if (mission == null) {
       throw new HttpException('Invalid mission', HttpStatus.NOT_FOUND);
     }
 
-    console.log(mission)
-    console.log(company)
     if (mission.companyId != company.id) {
       throw new HttpException(
         'Invalid mission',
@@ -670,11 +668,11 @@ export class MissionService {
       );
     }
 
-    let missionsInvites = await this.missionInviteRepository.findBy({missionId: missionId})
+    let missionsInvites = await this.missionInviteRepository.findBy({ missionId: missionId })
 
-    let dto = missionsInvites.map(async (mission) => {
-      let group = await this.groupService.findGroupById(mission.groupId)
-      return {groupId: mission.groupId, status: mission.status, groupName: group.name}
+    let dto = missionsInvites.map(async (it) => {
+      let group = await this.groupService.findGroupById(it.groupId)
+      return { groupId: it.groupId, status: it.status, groupName: group.name }
     })
 
     return dto;
