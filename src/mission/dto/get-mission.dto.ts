@@ -43,6 +43,9 @@ export class getInvitedGroups {
     @ApiProperty()
     groupId: number;
 
+    @ApiProperty()
+    groupName: string;
+
     @ApiProperty({enum: MissionInviteStatus})
     invitedStatus: MissionInviteStatus
 }

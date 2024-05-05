@@ -672,8 +672,9 @@ export class MissionService {
 
     let missionsInvites = await this.missionInviteRepository.findBy({missionId: missionId})
 
-    let dto = missionsInvites.map((mission) => {
-      return {groupId: mission.groupId, status: mission.status}
+    let dto = missionsInvites.map(async (mission) => {
+      let group = await this.groupService.findGroupById(mission.groupId)
+      return {groupId: mission.groupId, status: mission.status, groupName: group.name}
     })
 
     return dto;
