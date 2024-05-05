@@ -260,6 +260,20 @@ export class MissionController {
     return await this.missionService.acceptMission(missionId, groupId, req);
   }
 
+  @Post('acceptGroup/:missionId/:groupId')
+  @ApiOperation({
+    description: 'Accept a group for a mission AS A COMPANY',
+    summary: 'Accept a group for a mission AS A COMPANY',
+  })
+  async acceptGroup(
+    @Param('missionId') missionId: number,
+    @Param('groupId') groupId: number,
+    @Req() req,
+  ) {
+    return await this.missionService.acceptGroup(missionId, groupId, req);
+  }
+
+
   @Post('refuse/:missionId/:groupId')
   @ApiOperation({
     description: 'Refuse a mission for a group',
@@ -271,6 +285,28 @@ export class MissionController {
     @Req() req,
   ) {
     return await this.missionService.refuseMission(missionId, groupId, req);
+  }
+
+  @Post('refuseGroup/:missionId/:groupId')
+  @ApiOperation({
+    description: 'Refuse a group for a mission AS A COMPANY',
+    summary: 'Refuse a group for a mission AS A COMPANY',
+  })
+  async refuseGroup(
+    @Param('missionId') missionId: number,
+    @Param('groupId') groupId: number,
+    @Req() req,
+  ) {
+    return await this.missionService.refuseGroup(missionId, groupId, req);
+  }
+
+  @Get('groupToAccept/:missionId')
+  @ApiOperation({
+    description: 'Get the list of group that accepted missions AS A COMPANY',
+    summary: 'Get the list of group that accepted missions AS A COMPANY',
+  })
+  async getGroupToAccept(@Param('missionId') missionId: number, @Req() req) {
+    return await this.missionService.getGroupToAccept(req, missionId)
   }
 
   @Post('finish/:missionId')
