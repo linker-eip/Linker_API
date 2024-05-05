@@ -388,6 +388,18 @@ export class MissionController {
     return await this.missionService.getMissionInvites(req);
   }
 
+  @Get('invitedGroups/:missionId')
+  @ApiOperation({
+    description: 'Get all invited groups for a mission',
+    summary: 'Get all invited groups for a mission',
+  })
+  @ApiOkResponse({
+    description: 'Get all invited groups for a mission',
+  })
+  async getInvitedStudents(@Req() req, missionId: number) {
+    return await this.missionService.getInvitedGroups(req, missionId);
+  }
+
   @Put('company/comment/:missionId')
   @ApiOperation({
     description: 'Comment a mission',
