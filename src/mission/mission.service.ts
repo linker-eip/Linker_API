@@ -670,11 +670,10 @@ export class MissionService {
 
     let missionsInvites = await this.missionInviteRepository.findBy({ missionId: missionId })
 
-    let dto = missionsInvites.map(async (it) => {
+    let dto = await Promise.all(missionsInvites.map(async (it) => {
       let group = await this.groupService.findGroupById(it.groupId)
       return { groupId: it.groupId, status: it.status, groupName: group.name }
-    })
-
+    }))
     return dto;
   }
 
