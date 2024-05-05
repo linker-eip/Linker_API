@@ -31,6 +31,7 @@ import { DocumentTransferService } from 'src/document-transfer/src/services/docu
 
 @Injectable()
 export class MissionService {
+
   constructor(
     @InjectRepository(Mission)
     private readonly missionRepository: Repository<Mission>,
@@ -481,6 +482,45 @@ export class MissionService {
       );
     }
 
+    // mission.groupId = groupId;
+    // mission.status = MissionStatus.IN_PROGRESS;
+    missionInvite.status = MissionInviteStatus.GROUP_ACCEPTED;
+
+
+    await this.missionRepository.save(mission);
+    await this.missionInviteRepository.save(missionInvite);
+    return;
+  }
+
+  async acceptGroup(missionId: number, groupId: number, req: any) {
+    let missionInvite = await this.missionInviteRepository.findOne({
+      where: { missionId: missionId, groupId: groupId },
+    });
+
+    if (missionInvite == null) {
+      throw new HttpException('Invalid mission invite', HttpStatus.NOT_FOUND);
+    }
+    let company = null;
+    try {
+      company = await this.companyService.findOne(req.user.email);
+    } catch (err) {
+      throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
+    }
+    if (company == null) {
+      throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
+    }
+    let mission = await this.findMissionById(missionId);
+    if (mission == null) {
+      throw new HttpException('Invalid mission', HttpStatus.NOT_FOUND);
+    }
+
+    if (mission.companyId != company.id) {
+      throw new HttpException(
+        'Invalid mission',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     mission.groupId = groupId;
     mission.status = MissionStatus.IN_PROGRESS;
     missionInvite.status = MissionInviteStatus.ACCEPTED;
@@ -535,6 +575,77 @@ export class MissionService {
 
     await this.missionInviteRepository.save(missionInvite);
     return;
+  }
+
+  async refuseGroup(missionId: number, groupId: number, req: any) {
+    let missionInvite = await this.missionInviteRepository.findOne({
+      where: { missionId, groupId },
+    });
+
+    if (missionInvite == null) {
+      throw new HttpException('Invalid mission invite', HttpStatus.NOT_FOUND);
+    }
+
+    if (missionInvite.status != MissionInviteStatus.PENDING) {
+      throw new HttpException(
+        'This mission invite is already accepted or refused',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    let company = null;
+    try {
+      company = await this.companyService.findOne(req.user.email);
+    } catch (err) {
+      throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
+    }
+    if (company == null) {
+      throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
+    }
+    let mission = await this.findMissionById(missionId);
+    if (mission == null) {
+      throw new HttpException('Invalid mission', HttpStatus.NOT_FOUND);
+    }
+
+    if (mission.companyId != company.id) {
+      throw new HttpException(
+        'Invalid mission',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    missionInvite.status = MissionInviteStatus.REFUSED;
+
+    await this.missionInviteRepository.save(missionInvite);
+    return;
+  }
+
+  async getGroupToAccept(req: any, missionId: number) {
+    let company = null;
+    try {
+      company = await this.companyService.findOne(req.user.email);
+    } catch (err) {
+      throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
+    }
+    if (company == null) {
+      throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
+    }
+    let mission = await this.findMissionById(missionId);
+    if (mission == null) {
+      throw new HttpException('Invalid mission', HttpStatus.NOT_FOUND);
+    }
+
+    if (mission.companyId != company.id) {
+      throw new HttpException(
+        'Invalid mission',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    let missionsInvites = await this.missionInviteRepository.findBy({missionId: missionId, status: MissionInviteStatus.GROUP_ACCEPTED})
+
+    let groupIds = missionsInvites.map((it) => it.groupId)
+    return groupIds
   }
 
   async finishMission(missionId: number, req: any) {
