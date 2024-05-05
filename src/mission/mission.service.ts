@@ -46,9 +46,7 @@ export class MissionService {
   ) { }
 
   async findMissionById(missionId: number): Promise<Mission> {
-    const mission = await this.missionRepository.findOne({
-      where: { id: missionId },
-    });
+    const mission = await this.missionRepository.findOneBy({id: missionId});
 
     return mission;
   }
