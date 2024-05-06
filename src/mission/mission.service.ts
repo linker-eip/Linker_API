@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Mission } from './entity/mission.entity';
-import { Repository } from 'typeorm';
+import { And, Equal, IsNull, Not, Repository } from 'typeorm';
 import { CreateMissionDto } from './dto/create-mission-dto';
 import { CompanyService } from '../company/company.service';
 import { UpdateMissionDto } from './dto/update-mission-dto';
@@ -528,6 +528,10 @@ export class MissionService {
     missionInvite.status = MissionInviteStatus.ACCEPTED;
 
     await this.missionRepository.save(mission);
+    await this.missionTaskRepository.delete({
+      groupId: And(Not(Equal(groupId)), Not(IsNull())),
+      missionId: mission.id
+    });
     await this.missionInviteRepository.save(missionInvite);
     return;
   }
@@ -854,6 +858,8 @@ export class MissionService {
       where: { missionId },
     });
     for (let missionTask of missionTasks) {
+      if (missionTask.groupId != null && missionTask.groupId != studentUser.groupId)
+        continue;
       let student = await this.studentService.findOneById(
         missionTask.studentId,
       );
@@ -957,11 +963,13 @@ export class MissionService {
       throw new HttpException('Tâche invalide', HttpStatus.NOT_FOUND);
     }
 
-    if (affectedStudent == null || student.groupId != affectedStudent.groupId) {
+    if (studentId != -1 && (affectedStudent == null || student.groupId != affectedStudent.groupId)) {
       throw new HttpException('Invalid student', HttpStatus.BAD_REQUEST);
     }
 
-    if (student.id == group.leaderId || student.id == affectedStudent.id) {
+    if (studentId == -1) {
+      task.studentId = null
+    } else if (student.id == group.leaderId || student.id == affectedStudent.id) {
       task.studentId = affectedStudent.id;
     } else {
       throw new HttpException(
