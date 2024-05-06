@@ -847,6 +847,8 @@ export class MissionService {
       where: { missionId },
     });
     for (let missionTask of missionTasks) {
+      if (missionTask.groupId != null && missionTask.groupId != studentUser.groupId)
+        continue;
       let student = await this.studentService.findOneById(
         missionTask.studentId,
       );
