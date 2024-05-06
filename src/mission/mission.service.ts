@@ -45,7 +45,7 @@ export class MissionService {
     @InjectRepository(MissionInvite)
     private readonly missionInviteRepository: Repository<MissionInvite>,
     @Inject(forwardRef(() => PaymentService))
-    private readonly paymentService: PaymentService
+    private readonly paymentService: PaymentService,
     private readonly DocumentService: DocumentTransferService,
   ) { }
 
