@@ -193,7 +193,13 @@ export class MissionService {
     const missionTask = new MissionTask();
     missionTask.name = createMissionTaskDto.name;
     missionTask.description = createMissionTaskDto.description;
-    missionTask.studentId = createMissionTaskDto.studentId;
+    if (createMissionTaskDto.studentId !== null) {
+      if (createMissionTaskDto.studentId == -1) {
+        missionTask.studentId = null
+      } else {
+        missionTask.studentId = createMissionTaskDto.studentId;
+      }
+    }
     missionTask.missionId = missionId;
     missionTask.amount = createMissionTaskDto.amount;
     missionTask.skills = createMissionTaskDto.skills;
@@ -226,7 +232,13 @@ export class MissionService {
     const missionTask = new MissionTask();
     missionTask.name = createMissionTaskDto.name;
     missionTask.description = createMissionTaskDto.description;
-    missionTask.studentId = createMissionTaskDto.studentId;
+    if (createMissionTaskDto.studentId !== null) {
+      if (createMissionTaskDto.studentId == -1) {
+        missionTask.studentId = null
+      } else {
+        missionTask.studentId = createMissionTaskDto.studentId;
+      }
+    }
     missionTask.groupId = groupId
     missionTask.missionId = missionId;
     missionTask.amount = createMissionTaskDto.amount;
@@ -345,7 +357,11 @@ export class MissionService {
     }
 
     if (createMissionTaskDto.studentId !== null) {
-      update.studentId = createMissionTaskDto.studentId;
+      if (createMissionTaskDto.studentId == -1) {
+        update.studentId = null
+      } else {
+        update.studentId = createMissionTaskDto.studentId;
+      }
     }
 
     if (createMissionTaskDto.status !== null) {
