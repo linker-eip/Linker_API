@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Mission } from './entity/mission.entity';
-import { Repository } from 'typeorm';
+import { And, Equal, IsNull, Not, Repository } from 'typeorm';
 import { CreateMissionDto } from './dto/create-mission-dto';
 import { CompanyService } from '../company/company.service';
 import { UpdateMissionDto } from './dto/update-mission-dto';
@@ -524,6 +524,10 @@ export class MissionService {
     missionInvite.status = MissionInviteStatus.ACCEPTED;
 
     await this.missionRepository.save(mission);
+    await this.missionTaskRepository.delete({
+      groupId: And(Not(Equal(groupId)), Not(IsNull())),
+      missionId: mission.id
+    });
     await this.missionInviteRepository.save(missionInvite);
     return;
   }
