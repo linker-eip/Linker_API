@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Req, UseGuards, Param, Put } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { MissionService } from '../mission/mission.service';
 import { ApiBearerAuth } from '@nestjs/swagger';
@@ -42,6 +42,23 @@ export class PaymentController {
     ) : Promise<StudentPaymentResponseDto[]> {
         return this.stripeService.getStudentPayment(req);
     }
+
+    @Get('student/:studentPaymentId')
+    @UseGuards(AuthGuard('jwt'))
+    async getStudentPayment(
+        @Req() req,
+        @Param('studentPaymentId') studentPaymentId: number
+    ) {
+        return this.stripeService.getStudentPaymentById(studentPaymentId, req);
+    }
+
+    @Put('student/receive/:studentPaymentId')
+    @UseGuards(AuthGuard('jwt'))
+    async receiveStudentPayment(
+        @Req() req,
+        @Param('studentPaymentId') studentPaymentId: number
+    ) {
+        return this.stripeService.receiveStudentPayment(studentPaymentId, req);
+    }
     
 }
-    

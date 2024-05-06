@@ -1,10 +1,11 @@
 import { Body, Controller, Get, Put } from '@nestjs/common';
 import { PaymentAdminService } from './payment-admin.service';
-import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { StudentPaymentResponseDto } from './dto/student-payment-response.dto';
 import { UpdateStudentPaymentDto } from './dto/update-student-payment.dto';
 
 @Controller('api/admin/payment')
+@ApiTags('Admin/Payment')
 export class PaymentAdminController {
 
     constructor(

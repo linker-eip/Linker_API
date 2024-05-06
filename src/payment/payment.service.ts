@@ -9,6 +9,7 @@ import { MissionStatus } from '../mission/enum/mission-status.enum';
 import { StudentPayment } from './entity/student-payment.entity';
 import { StudentService } from '../student/student.service';
 import { StudentPaymentResponseDto } from '../payment/dto/student-payment-response.dto';
+import { StudentPaymentStatus } from './enum/student-payment.status.enum copy';
 
 @Injectable()
 export class PaymentService {
@@ -201,5 +202,53 @@ export class PaymentService {
 
         return Promise.all(studentPaymentResponseDtos);
     }
-}
 
+    async getStudentPaymentById(studentPaymentId: number, req: any) {
+        const studentPayment = await this.studentPaymentRepository.findOne({
+            where: {
+                id: studentPaymentId,
+            },
+        });
+
+        if (!studentPayment) {
+            throw new NotFoundException('Student payment not found');
+        }
+
+        const student = await this.studentService.findOneByEmail(req.user.email);
+        if (student.id !== studentPayment.studentId) {
+            throw new NotFoundException('Student does not own this payment');
+        }
+
+        const mission = await this.missionService.findMissionById(studentPayment.missionId);
+        if (!mission) {
+            throw new NotFoundException('Mission not found');
+        }
+
+        return {
+            id: studentPayment.id,
+            missionName: mission.name,
+            status: studentPayment.status,
+            amount: studentPayment.amount,
+        }
+    }
+
+    async receiveStudentPayment(studentPaymentId: number, req: any) {
+        const studentPayment = await this.studentPaymentRepository.findOne({
+            where: {
+                id: studentPaymentId,
+            },
+        });
+
+        if (!studentPayment) {
+            throw new NotFoundException('Student payment not found');
+        }
+
+        const student = await this.studentService.findOneByEmail(req.user.email);
+        if (student.id !== studentPayment.studentId) {
+            throw new NotFoundException('Student does not own this payment');
+        }
+
+        studentPayment.status = StudentPaymentStatus.WAITING;
+        await this.studentPaymentRepository.save(studentPayment);
+    }
+}
