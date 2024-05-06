@@ -8,6 +8,7 @@ import { MissionTask } from './entity/mission-task.entity';
 import { GroupModule } from '../group/group.module';
 import { StudentModule } from '../student/student.module';
 import { MissionInvite } from './entity/mission-invite.entity';
+import { PaymentModule } from '../payment/payment.module';
 import { FileModule } from 'src/filesystem/file.module';
 import { DocumentTransferModule } from 'src/document-transfer/src/document-transfer.module';
 
@@ -17,6 +18,7 @@ import { DocumentTransferModule } from 'src/document-transfer/src/document-trans
     CompanyModule,
     GroupModule,
     StudentModule,
+    forwardRef(() => PaymentModule),
     DocumentTransferModule
   ],
   providers: [MissionService],
