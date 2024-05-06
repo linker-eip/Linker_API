@@ -956,11 +956,13 @@ export class MissionService {
       throw new HttpException('Tâche invalide', HttpStatus.NOT_FOUND);
     }
 
-    if (affectedStudent == null || student.groupId != affectedStudent.groupId) {
+    if (studentId != -1 && (affectedStudent == null || student.groupId != affectedStudent.groupId)) {
       throw new HttpException('Invalid student', HttpStatus.BAD_REQUEST);
     }
 
-    if (student.id == group.leaderId || student.id == affectedStudent.id) {
+    if (studentId == -1) {
+      task.studentId = null
+    } else if (student.id == group.leaderId || student.id == affectedStudent.id) {
       task.studentId = affectedStudent.id;
     } else {
       throw new HttpException(
