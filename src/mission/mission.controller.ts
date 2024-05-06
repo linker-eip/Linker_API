@@ -37,6 +37,7 @@ import { MissionSearchOptionStudentDto } from './dto/mission-search-option-stude
 import { CommentMissionDto } from './dto/comment-mission.dto';
 import { NoteMissionDto } from './dto/note-mission.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { MissionInviteStatus } from './enum/mission-invite-status.enum';
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
@@ -384,8 +385,8 @@ export class MissionController {
     description: 'Get all invitations for a student',
     type: GetMissionDto,
   })
-  async getStudentInvitations(@Req() req) {
-    return await this.missionService.getMissionInvites(req);
+  async getStudentInvitations(@Req() req, @Query('status') status: MissionInviteStatus) {
+    return await this.missionService.getMissionInvites(req, status);
   }
 
   @Get('invitedGroups/:missionId')

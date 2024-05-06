@@ -1079,7 +1079,7 @@ export class MissionService {
     await this.missionInviteRepository.save(missionInvite);
   }
 
-  async getMissionInvites(req: any): Promise<GetMissionDto[]> {
+  async getMissionInvites(req: any, status : MissionInviteStatus): Promise<GetMissionDto[]> {
     const student = await this.studentService.findOneByEmail(req.user.email);
     if (student == null) {
       throw new HttpException(
@@ -1088,7 +1088,7 @@ export class MissionService {
       );
     }
     const missionInvites = await this.missionInviteRepository.find({
-      where: { groupId: student.groupId, status: MissionInviteStatus.PENDING },
+      where: { groupId: student.groupId, status: status ? status : MissionInviteStatus.PENDING },
     });
     const missions = [];
     for (let missionInvite of missionInvites) {
