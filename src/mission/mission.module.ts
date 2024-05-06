@@ -9,6 +9,8 @@ import { GroupModule } from '../group/group.module';
 import { StudentModule } from '../student/student.module';
 import { MissionInvite } from './entity/mission-invite.entity';
 import { PaymentModule } from '../payment/payment.module';
+import { FileModule } from 'src/filesystem/file.module';
+import { DocumentTransferModule } from 'src/document-transfer/src/document-transfer.module';
 
 @Module({
   imports: [
@@ -17,6 +19,7 @@ import { PaymentModule } from '../payment/payment.module';
     GroupModule,
     StudentModule,
     forwardRef(() => PaymentModule),
+    DocumentTransferModule
   ],
   providers: [MissionService],
   controllers: [MissionController],

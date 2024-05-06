@@ -49,4 +49,7 @@ export class Mission {
 
   @Column({ type: 'boolean', nullable: true, default: false })
   isNoted: boolean;
+
+  @Column({ type: 'varchar', nullable: true, default:null})
+  specificationsFile: string;
 }

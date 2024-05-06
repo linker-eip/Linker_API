@@ -18,6 +18,9 @@ export class MissionTask {
   @Column({ type: 'int', nullable: false })
   missionId: number;
 
+  @Column({ type: 'int', nullable: true, default: null})
+  groupId: number;
+
   @Column({ type: 'int', nullable: true })
   studentId: number;
 
