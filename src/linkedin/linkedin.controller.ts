@@ -3,9 +3,10 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { LinkedinService } from './linkedin.service';
 import { LinkedinDto } from './dto/Linkedin.dto';
+import { VerifiedUserGuard } from 'src/admin/auth/guard/user.guard';
 
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(VerifiedUserGuard)
 @ApiTags('LinkedIn')
 @Controller('api/linkedin')
 export class LinkedinController {

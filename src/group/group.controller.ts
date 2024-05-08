@@ -24,9 +24,10 @@ import { GetGroupeResponse } from './dto/get-group-response-dto';
 import { GetInvitesResponse, GetPersonnalInvitesResponse } from './dto/get-invites-response-dto';
 import { GetCompanySearchGroupsDto } from './dto/get-company-search-groups.dto';
 import { CompanySearchGroupsFilterDto } from './dto/company-search-groups-filter.dto';
+import { VerifiedUserGuard } from 'src/admin/auth/guard/user.guard';
 
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(VerifiedUserGuard)
 @ApiTags('Group')
 @Controller('api/group')
 export class GroupController {

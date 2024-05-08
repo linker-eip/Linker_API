@@ -45,9 +45,10 @@ import { UpdatePreferencesDto } from './dto/update-preferences.dto';
 import { UploadStudentDocumentDto } from './dto/upload-student-document.dto';
 import { DocumentStatus } from './enum/StudentDocument.enum';
 import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
+import { VerifiedUserGuard } from 'src/admin/auth/guard/user.guard';
 
 @Controller('api/student')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(VerifiedUserGuard)
 @ApiTags('Student')
 @ApiBearerAuth()
 export class StudentController {

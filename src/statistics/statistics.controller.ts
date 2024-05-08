@@ -3,9 +3,10 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { StatisticsService } from './statistics.service';
 import { StudentStatsResponse } from './dtos/student-stats-response.dto';
+import { VerifiedUserGuard } from 'src/admin/auth/guard/user.guard';
 
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(VerifiedUserGuard)
 @ApiTags('Statistics')
 @Controller('api/statistics')
 export class StatisticsController {
