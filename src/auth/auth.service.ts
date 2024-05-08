@@ -787,4 +787,12 @@ export class AuthService {
 
     return;
   }
+
+  async isStudentVerified(req: any): Promise<Boolean> {
+    const student = await this.studentService.findOneByEmail(req.user.email);
+    if (!student) {
+      throw new HttpException("Invalid student", HttpStatus.UNAUTHORIZED)
+    }
+    return student.isVerified
+  }
 }
