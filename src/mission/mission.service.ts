@@ -747,7 +747,7 @@ export class MissionService {
     mission.status = MissionStatus.FINISHED;
 
     for (let missionTask of missionTasks) {
-      await this.paymentService.createStudentPayment(mission.id,missionTask.studentId, missionTask.amount);
+      await this.paymentService.createStudentPayment(mission.id, missionTask.studentId, missionTask.amount);
     }
     await this.missionRepository.save(mission);
   }
@@ -835,6 +835,10 @@ export class MissionService {
     );
     if (studentUser == null) {
       throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED);
+    }
+
+    if (studentUser.groupId == null) {
+      throw new HttpException("Vous ne pouvez pas accéder aux détail d'une mission sans groupe", HttpStatus.UNAUTHORIZED);
     }
 
     if (mission == null) {
@@ -1103,7 +1107,7 @@ export class MissionService {
     await this.missionInviteRepository.save(missionInvite);
   }
 
-  async getMissionInvites(req: any, status : MissionInviteStatus): Promise<GetMissionDto[]> {
+  async getMissionInvites(req: any, status: MissionInviteStatus): Promise<GetMissionDto[]> {
     const student = await this.studentService.findOneByEmail(req.user.email);
     if (student == null) {
       throw new HttpException(
@@ -1111,6 +1115,11 @@ export class MissionService {
         HttpStatus.UNAUTHORIZED,
       );
     }
+
+    if (student.groupId == null) {
+      throw new HttpException("Vous ne pouvez pas accéder aux invitations sans groupe", HttpStatus.UNAUTHORIZED);
+    }
+
     const missionInvites = await this.missionInviteRepository.find({
       where: { groupId: student.groupId, status: status ? status : MissionInviteStatus.PENDING },
     });
