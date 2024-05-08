@@ -1,10 +1,8 @@
 import { Body, Controller, Get, Post, Query, Req, UseGuards, Param, Put } from '@nestjs/common';
 import { PaymentService } from './payment.service';
-import { MissionService } from '../mission/mission.service';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
 import { StudentPaymentResponseDto } from './dto/student-payment-response.dto';
-import { VerifiedUserGuard } from 'src/admin/auth/guard/user.guard';
+import { VerifiedUserGuard } from '../admin/auth/guard/user.guard';
 
 @Controller('api/payment')
 @ApiBearerAuth()

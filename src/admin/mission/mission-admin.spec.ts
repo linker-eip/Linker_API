@@ -1,12 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MissionController } from './mission.controller';
 import { MissionService } from './mission.service';
-import { AuthGuard, PassportModule } from '@nestjs/passport';
+import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
 import { UserAdminService } from '../user-admin/user-admin.service';
-import { CreateMissionDto } from './dto/create-mission.dto';
 import { Mission } from '../../mission/entity/mission.entity';
 import { CompanyUser } from '../../company/entity/CompanyUser.entity';
 import { CompanyProfile } from '../../company/entity/CompanyProfile.entity';
@@ -14,8 +13,8 @@ import { StudentUser } from '../../student/entity/StudentUser.entity';
 import { StudentProfile } from '../../student/entity/StudentProfile.entity';
 import { MissionStatus } from '../../mission/enum/mission-status.enum';
 import { UpdateMission } from './dto/update-mission.dto';
-import { MissionSearchOptionAdmin } from './dto/missions-search-option-admin.dto';
 import { missionAdminResponseDto } from './dto/mission-admin-response.dto';
+import { CreateMissionAdminDto } from './dto/create-mission.dto';
 
 describe('MissionService', () => {
   let service: MissionService;
@@ -65,7 +64,7 @@ describe('MissionService', () => {
 
   describe('createMission', () => {
     it('should create a mission', async () => {
-      const createMissionDto: CreateMissionDto = {
+      const createMissionDto: CreateMissionAdminDto = {
         name: 'Name',
         description: 'Desc',
         startOfMission: null,
@@ -89,6 +88,7 @@ describe('MissionService', () => {
         skills: '',
         comments: null,
         isNoted: false,
+        specificationsFile: null,
       };
 
       jest
@@ -149,6 +149,7 @@ describe('MissionService', () => {
         skills: '',
         comments: null,
         isNoted: false,
+        specificationsFile: null,
       };
 
       jest
@@ -182,6 +183,7 @@ describe('MissionService', () => {
         skills: '',
         comments: null,
         isNoted: false,
+        specificationsFile: null,
       };
 
       const expectedResponse: missionAdminResponseDto = {

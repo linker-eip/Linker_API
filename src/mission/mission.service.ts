@@ -27,12 +27,10 @@ import { GetMissionDto } from './dto/get-mission.dto';
 import { CommentMissionDto } from './dto/comment-mission.dto';
 import { NoteMissionDto } from './dto/note-mission.dto';
 import { PaymentService } from '../payment/payment.service';
-import { FileService } from 'src/filesystem/file.service';
-import { DocumentTransferModule } from 'src/document-transfer/src/document-transfer.module';
-import { DocumentTransferService } from 'src/document-transfer/src/services/document-transfer.service';
-import { CompanyUser } from 'src/company/entity/CompanyUser.entity';
-import { CompanyDocument } from 'src/company/entity/CompanyDocument.entity';
-import { DocumentStatus } from 'src/company/enum/CompanyDocument.enum';
+import { DocumentTransferService } from '../document-transfer/src/services/document-transfer.service';
+import { CompanyUser } from '../company/entity/CompanyUser.entity';
+import { CompanyDocument } from '../company/entity/CompanyDocument.entity';
+import { DocumentStatus } from '../company/enum/CompanyDocument.enum';
 import { HttpStatusCode } from 'axios';
 
 @Injectable()

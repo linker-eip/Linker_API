@@ -26,12 +26,7 @@ import {
 } from '@nestjs/swagger';
 import { CreateStudentProfileDto } from './dto/create-student-profile.dto';
 import { StudentProfileResponseDto } from './dto/student-profile-response.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
-import {
-  FileMimeTypeValidator,
-  SupportedImageMimeTypes,
-} from '../document-transfer/src/helpers/fmt.validator';
 import { UpdateSkillDto } from './skills/dto/update-skill.dto';
 import { UpdateJobsDto } from './jobs/dto/update-jobs.dto';
 import { UpdateStudiesDto } from './studies/dto/update-studies.dto';
@@ -43,9 +38,8 @@ import { StudentSearchOptionDto } from './dto/student-search-option.dto';
 import { CompanyProfileResponseDto } from '../company/dto/company-profile-response.dto';
 import { UpdatePreferencesDto } from './dto/update-preferences.dto';
 import { UploadStudentDocumentDto } from './dto/upload-student-document.dto';
-import { DocumentStatus } from './enum/StudentDocument.enum';
 import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
-import { VerifiedUserGuard } from 'src/admin/auth/guard/user.guard';
+import { VerifiedUserGuard } from '../admin/auth/guard/user.guard';
 
 @Controller('api/student')
 @UseGuards(VerifiedUserGuard)

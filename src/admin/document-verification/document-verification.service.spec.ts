@@ -36,6 +36,9 @@ import { DocumentVerificationService } from "./document-verification.service"
 import { DocumentVerificationController } from "./document-verification.controller"
 import { DocumentStatus, StudentDocumentType } from "../../student/enum/StudentDocument.enum"
 import { CompanyDocumentType } from "../../company/enum/CompanyDocument.enum"
+import { Payment } from "../../payment/entity/payment.entity"
+import { StudentPayment } from "../../payment/entity/student-payment.entity"
+import { PaymentService } from "../../payment/payment.service"
 
 describe('DocumentVerificationService', () => {
     let service: DocumentVerificationService
@@ -51,7 +54,7 @@ describe('DocumentVerificationService', () => {
                 }),
             ],
             controllers: [DocumentVerificationController],
-            providers: [DocumentVerificationService, DocumentTransferService, ConfigService, NotificationsService, CompanyService, MissionService, StudentService, GroupService, MailService, JobsService, StudiesService, FileService, SkillsService, {
+            providers: [DocumentVerificationService, DocumentTransferService, ConfigService, NotificationsService, PaymentService, CompanyService, MissionService, StudentService, GroupService, MailService, JobsService, StudiesService, FileService, SkillsService, {
                 provide: getRepositoryToken(Mission),
                 useClass: Repository,
             },
@@ -69,6 +72,14 @@ describe('DocumentVerificationService', () => {
                 },
                 {
                     provide: getRepositoryToken(MissionInvite),
+                    useClass: Repository,
+                },
+                {
+                    provide: getRepositoryToken(Payment),
+                    useClass: Repository,
+                },
+                {
+                    provide: getRepositoryToken(StudentPayment),
                     useClass: Repository,
                 },
                 {
@@ -316,5 +327,5 @@ describe('DocumentVerificationService', () => {
     it('should be defined', () => {
         expect(service).toBeDefined();
     });
-    
+
 })

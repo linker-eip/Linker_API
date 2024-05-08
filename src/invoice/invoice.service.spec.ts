@@ -39,6 +39,9 @@ import { StudentDocument } from '../student/entity/StudentDocuments.entity';
 import { CompanyPreferences } from '../company/entity/CompanyPreferences.entity';
 import { CompanyDocument } from '../company/entity/CompanyDocument.entity';
 import { MailService } from '../mail/mail.service';
+import { PaymentService } from '../payment/payment.service';
+import { Payment } from '../payment/entity/payment.entity';
+import { StudentPayment } from '../payment/entity/student-payment.entity';
 
 describe('InvoiceService', () => {
   let service: InvoiceService;
@@ -65,6 +68,7 @@ describe('InvoiceService', () => {
         DocumentTransferService,
         NotificationsService,
         ConfigService,
+        PaymentService,
         MailService,
         {
           provide: getRepositoryToken(Mission),
@@ -72,6 +76,14 @@ describe('InvoiceService', () => {
         },
         {
           provide: getRepositoryToken(CompanyProfile),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(Payment),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(StudentPayment),
           useClass: Repository,
         },
         {

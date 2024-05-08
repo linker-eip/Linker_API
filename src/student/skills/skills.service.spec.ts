@@ -34,6 +34,9 @@ import { NotificationsService } from "../../notifications/notifications.service"
 import { MailService } from "../../mail/mail.service"
 import { SkillsController } from "./skills.controller"
 import { SkillList } from "./consts/skills-list"
+import { PaymentService } from "../../payment/payment.service"
+import { Payment } from "../../payment/entity/payment.entity"
+import { StudentPayment } from "../../payment/entity/student-payment.entity"
 
 describe('SkillsService', () => {
     let service: SkillsService
@@ -49,7 +52,7 @@ describe('SkillsService', () => {
                 }),
             ],
             controllers: [SkillsController],
-            providers: [SkillsService, DocumentTransferService, ConfigService, NotificationsService, CompanyService, MissionService, StudentService, GroupService, MailService, JobsService, StudiesService, FileService, SkillsService, {
+            providers: [SkillsService, DocumentTransferService, ConfigService, NotificationsService, CompanyService, MissionService, StudentService, GroupService, MailService, JobsService, StudiesService, FileService, SkillsService,PaymentService, {
                 provide: getRepositoryToken(Mission),
                 useClass: Repository,
             },
@@ -71,6 +74,14 @@ describe('SkillsService', () => {
                 },
                 {
                     provide: getRepositoryToken(CompanyDocument),
+                    useClass: Repository,
+                },
+                {
+                    provide: getRepositoryToken(Payment),
+                    useClass: Repository,
+                },
+                {
+                    provide: getRepositoryToken(StudentPayment),
                     useClass: Repository,
                 },
                 {

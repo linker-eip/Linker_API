@@ -45,6 +45,9 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { MissionTask } from '../mission/entity/mission-task.entity';
 import { MissionInvite } from '../mission/entity/mission-invite.entity';
 import { Notification } from '../notifications/entity/Notification.entity';
+import { PaymentService } from '../payment/payment.service';
+import { Payment } from '../payment/entity/payment.entity';
+import { StudentPayment } from '../payment/entity/student-payment.entity';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -61,7 +64,7 @@ describe('AuthService', () => {
       ],
       controllers: [AuthController],
       providers: [AuthService, StudentService, JwtService, CompanyService, MailService, GoogleApiService, SkillsService, JobsService, GroupService, MissionService,
-        StudiesService, FileService, SiretService, NotificationsService,DocumentTransferService, ConfigService,
+        StudiesService, FileService, SiretService, NotificationsService, DocumentTransferService, PaymentService, ConfigService,
         {
           provide: getRepositoryToken(StudentUser),
           useClass: Repository,
@@ -80,7 +83,7 @@ describe('AuthService', () => {
         }, {
           provide: getRepositoryToken(Jobs),
           useClass: Repository
-        },{
+        }, {
           provide: getRepositoryToken(Group),
           useClass: Repository
         },
@@ -90,6 +93,14 @@ describe('AuthService', () => {
         },
         {
           provide: getRepositoryToken(MissionInvite),
+          useClass: Repository
+        },
+        {
+          provide: getRepositoryToken(Payment),
+          useClass: Repository
+        },
+        {
+          provide: getRepositoryToken(StudentPayment),
           useClass: Repository
         },
         {

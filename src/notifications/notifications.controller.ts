@@ -3,7 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { NotificationsService } from './notifications.service';
 import { UpdateNotificationsDto } from './dto/update-notifications.dto';
-import { VerifiedUserGuard } from 'src/admin/auth/guard/user.guard';
+import { VerifiedUserGuard } from '../admin/auth/guard/user.guard';
 
 @ApiBearerAuth()
 @UseGuards(VerifiedUserGuard)

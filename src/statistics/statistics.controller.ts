@@ -1,9 +1,8 @@
 import { Body, Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { StatisticsService } from './statistics.service';
 import { StudentStatsResponse } from './dtos/student-stats-response.dto';
-import { VerifiedUserGuard } from 'src/admin/auth/guard/user.guard';
+import { VerifiedUserGuard } from '../admin/auth/guard/user.guard';
 
 @ApiBearerAuth()
 @UseGuards(VerifiedUserGuard)

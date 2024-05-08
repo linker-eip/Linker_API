@@ -9,9 +9,8 @@ import { GroupModule } from '../group/group.module';
 import { StudentModule } from '../student/student.module';
 import { MissionInvite } from './entity/mission-invite.entity';
 import { PaymentModule } from '../payment/payment.module';
-import { FileModule } from 'src/filesystem/file.module';
-import { DocumentTransferModule } from 'src/document-transfer/src/document-transfer.module';
-import { CompanyDocument } from 'src/company/entity/CompanyDocument.entity';
+import { DocumentTransferModule } from '../document-transfer/src/document-transfer.module';
+import { CompanyDocument } from '../company/entity/CompanyDocument.entity';
 
 @Module({
   imports: [
@@ -19,6 +18,7 @@ import { CompanyDocument } from 'src/company/entity/CompanyDocument.entity';
     CompanyModule,
     GroupModule,
     StudentModule,
+    PaymentModule,
     forwardRef(() => PaymentModule),
     DocumentTransferModule
   ],

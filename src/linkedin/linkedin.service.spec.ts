@@ -34,8 +34,9 @@ import { NotificationsService } from "../notifications/notifications.service"
 import { MailService } from "../mail/mail.service"
 import { LinkedinService } from "./linkedin.service"
 import { LinkedinController } from "./linkedin.controller"
-import { HttpException } from "@nestjs/common"
-import { HttpStatusCode } from "axios"
+import { PaymentService } from "../payment/payment.service"
+import { Payment } from "../payment/entity/payment.entity"
+import { StudentPayment } from "../payment/entity/student-payment.entity"
 
 describe('LinkedinService', () => {
     let service: LinkedinService
@@ -51,7 +52,7 @@ describe('LinkedinService', () => {
                 }),
             ],
             controllers: [LinkedinController],
-            providers: [LinkedinService, DocumentTransferService, ConfigService, NotificationsService, CompanyService, MissionService, StudentService, GroupService, MailService, JobsService, StudiesService, FileService, SkillsService, {
+            providers: [LinkedinService, DocumentTransferService, ConfigService, NotificationsService, CompanyService, MissionService, StudentService, GroupService, MailService, PaymentService, JobsService, StudiesService, FileService, SkillsService, {
                 provide: getRepositoryToken(Mission),
                 useClass: Repository,
             },
@@ -69,6 +70,14 @@ describe('LinkedinService', () => {
                 },
                 {
                     provide: getRepositoryToken(MissionInvite),
+                    useClass: Repository,
+                },
+                {
+                    provide: getRepositoryToken(Payment),
+                    useClass: Repository,
+                },
+                {
+                    provide: getRepositoryToken(StudentPayment),
                     useClass: Repository,
                 },
                 {

@@ -7,7 +7,7 @@ import { CompanyCreateInvoiceDto } from '../company/dto/company-create-invoice.d
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { LinkerInvoiceCompanyDto } from './dto/linker-invoice-company.dto';
-import { VerifiedUserGuard } from 'src/admin/auth/guard/user.guard';
+import { VerifiedUserGuard } from '../admin/auth/guard/user.guard';
 
 @Controller('api/invoice')
 @UseGuards(VerifiedUserGuard)

@@ -27,7 +27,7 @@ import { CompanyProfileResponseDto } from './dto/company-profile-response.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadCompanyDocumentDto } from './dto/upload-company-document.dto';
 import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
-import { VerifiedUserGuard } from 'src/admin/auth/guard/user.guard';
+import { VerifiedUserGuard } from '../admin/auth/guard/user.guard';
 
 @Controller('api/company')
 @UseGuards(VerifiedUserGuard)

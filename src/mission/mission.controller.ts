@@ -38,7 +38,7 @@ import { CommentMissionDto } from './dto/comment-mission.dto';
 import { NoteMissionDto } from './dto/note-mission.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MissionInviteStatus } from './enum/mission-invite-status.enum';
-import { VerifiedUserGuard } from 'src/admin/auth/guard/user.guard';
+import { VerifiedUserGuard } from '../admin/auth/guard/user.guard';
 
 @ApiBearerAuth()
 @UseGuards(VerifiedUserGuard)
@@ -195,7 +195,7 @@ export class MissionController {
     description: 'Delete a task for a mission',
     summary: 'Delete a task for a mission',
   })
-  async deleteMissionTaskStudent(@Param('taskId') taskId: number, @Req() req) {
+  async deleteMissionTask(@Param('taskId') taskId: number, @Req() req) {
     return await this.missionService.deleteMissionTask(taskId, req);
   }
 
@@ -204,7 +204,7 @@ export class MissionController {
     description: 'Delete a task for a mission  - AS AN INVITED GROUP',
     summary: 'Delete a task for a mission  - AS AN INVITED GROUP',
   })
-  async deleteMissionTask(@Param('taskId') taskId: number, @Req() req) {
+  async deleteMissionTaskStudent(@Param('taskId') taskId: number, @Req() req) {
     return await this.missionService.deleteMissionTaskStudent(taskId, req);
   }
 

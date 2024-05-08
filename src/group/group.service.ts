@@ -31,9 +31,9 @@ import { GetCompanySearchGroupsDto } from './dto/get-company-search-groups.dto';
 import { CompanySearchGroupsFilterDto } from './dto/company-search-groups-filter.dto';
 import { Mission } from '../mission/entity/mission.entity';
 import { MissionStatus } from '../mission/enum/mission-status.enum';
-import { StudentUser } from 'src/student/entity/StudentUser.entity';
-import { StudentDocument } from 'src/student/entity/StudentDocuments.entity';
-import { DocumentStatus } from 'src/student/enum/StudentDocument.enum';
+import { StudentUser } from '../student/entity/StudentUser.entity';
+import { StudentDocument } from '../student/entity/StudentDocuments.entity';
+import { DocumentStatus } from '../student/enum/StudentDocument.enum';
 import { HttpStatusCode } from 'axios';
 
 @Injectable()

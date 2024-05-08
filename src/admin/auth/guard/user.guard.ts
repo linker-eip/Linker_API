@@ -1,7 +1,7 @@
 import { Injectable, ExecutionContext, Inject, HttpException, HttpCode } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { StudentService } from 'src/student/student.service';
-import { CompanyService } from 'src/company/company.service';
+import { StudentService } from '../../../student/student.service';
+import { CompanyService } from '../../../company/company.service';
 import { HttpStatusCode } from 'axios';
 
 @Injectable()

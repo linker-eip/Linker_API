@@ -1,14 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserAdminController } from './user-admin.controller';
 import { UserAdminService } from './user-admin.service';
-import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { StudentUser } from '../../student/entity/StudentUser.entity';
 import { StudentProfile } from '../../student/entity/StudentProfile.entity';
 import { CompanyUser } from '../../company/entity/CompanyUser.entity';
 import { CompanyProfile } from '../../company/entity/CompanyProfile.entity';
 import { RegisterStudentAdminDto } from './dto/register-student-admin.dto';
 import { Repository } from 'typeorm';
-import { StudentService } from '../../student/student.service';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { StudentAdminResponseDto } from './dto/students-admin-response.dto';
