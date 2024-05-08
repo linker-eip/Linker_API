@@ -4,6 +4,7 @@ import { MissionService } from '../mission/mission.service';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { StudentPaymentResponseDto } from './dto/student-payment-response.dto';
+import { VerifiedUserGuard } from 'src/admin/auth/guard/user.guard';
 
 @Controller('api/payment')
 @ApiBearerAuth()
@@ -12,7 +13,7 @@ export class PaymentController {
 ) {}
 
     @Get('checkout')
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(VerifiedUserGuard)
     async createProductAndCheckoutSession(
         @Query('mission_id') missionId: string,
         @Req() req
@@ -27,7 +28,7 @@ export class PaymentController {
     }
 
     @Get('')
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(VerifiedUserGuard)
     async getPayments(
         @Query('mission_id') missionId: string,
         @Req() req
@@ -36,7 +37,7 @@ export class PaymentController {
     }
 
     @Get('student')
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(VerifiedUserGuard)
     async getStudentPayments(
         @Req() req
     ) : Promise<StudentPaymentResponseDto[]> {
@@ -44,7 +45,7 @@ export class PaymentController {
     }
 
     @Get('student/:studentPaymentId')
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(VerifiedUserGuard)
     async getStudentPayment(
         @Req() req,
         @Param('studentPaymentId') studentPaymentId: number
@@ -53,7 +54,7 @@ export class PaymentController {
     }
 
     @Put('student/receive/:studentPaymentId')
-    @UseGuards(AuthGuard('jwt'))
+    @UseGuards(VerifiedUserGuard)
     async receiveStudentPayment(
         @Req() req,
         @Param('studentPaymentId') studentPaymentId: number

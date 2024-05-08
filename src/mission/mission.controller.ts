@@ -38,9 +38,10 @@ import { CommentMissionDto } from './dto/comment-mission.dto';
 import { NoteMissionDto } from './dto/note-mission.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MissionInviteStatus } from './enum/mission-invite-status.enum';
+import { VerifiedUserGuard } from 'src/admin/auth/guard/user.guard';
 
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(VerifiedUserGuard)
 @ApiTags('Mission')
 @Controller('api/mission')
 export class MissionController {
