@@ -31,6 +31,10 @@ import { GetCompanySearchGroupsDto } from './dto/get-company-search-groups.dto';
 import { CompanySearchGroupsFilterDto } from './dto/company-search-groups-filter.dto';
 import { Mission } from '../mission/entity/mission.entity';
 import { MissionStatus } from '../mission/enum/mission-status.enum';
+import { StudentUser } from 'src/student/entity/StudentUser.entity';
+import { StudentDocument } from 'src/student/entity/StudentDocuments.entity';
+import { DocumentStatus } from 'src/student/enum/StudentDocument.enum';
+import { HttpStatusCode } from 'axios';
 
 @Injectable()
 export class GroupService {
@@ -41,10 +45,17 @@ export class GroupService {
     private readonly groupInviteRepository: Repository<GroupInvite>,
     @InjectRepository(Mission)
     private readonly missionRepository: Repository<Mission>,
+    @InjectRepository(StudentDocument)
+    private readonly studentDocumentRepository: Repository<StudentDocument>,
     private readonly studentService: StudentService,
     private readonly notificationService: NotificationsService,
     private readonly CompanyService: CompanyService,
   ) { }
+
+  async groupVerification(student: StudentUser) {
+    let studentDocuments = await this.studentDocumentRepository.findBy({ studentId: student.id, status: DocumentStatus.VERIFIED })
+    if (studentDocuments.length < 4) throw new HttpException("Vous ne pouvez pas avoir de groupe avant d'avoir fait vérifier tous vos documents", HttpStatusCode.Forbidden)
+  }
 
   async getUserGroup(req: any): Promise<Group> {
     let group;
@@ -88,6 +99,8 @@ export class GroupService {
     } catch (err) {
       throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED);
     }
+
+    await this.groupVerification(student);
 
     if (student.groupId != null) {
       throw new HttpException(
@@ -367,6 +380,8 @@ export class GroupService {
 
   async acceptInvite(req: any, groupId: number) {
     let student = await this.studentService.findOneByEmail(req.user.email);
+    
+    await this.groupVerification(student);
 
     let groupInvite = await this.groupInviteRepository.findOne({
       where: { userId: student.id, groupId: groupId },
