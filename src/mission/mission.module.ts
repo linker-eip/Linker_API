@@ -11,10 +11,11 @@ import { MissionInvite } from './entity/mission-invite.entity';
 import { PaymentModule } from '../payment/payment.module';
 import { FileModule } from 'src/filesystem/file.module';
 import { DocumentTransferModule } from 'src/document-transfer/src/document-transfer.module';
+import { CompanyDocument } from 'src/company/entity/CompanyDocument.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Mission, MissionTask, MissionInvite]),
+    TypeOrmModule.forFeature([Mission, MissionTask, MissionInvite, CompanyDocument]),
     CompanyModule,
     GroupModule,
     StudentModule,

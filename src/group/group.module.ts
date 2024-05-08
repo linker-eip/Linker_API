@@ -8,10 +8,11 @@ import { NotificationsModule } from '../notifications/notifications.module';
 import { GroupInvite } from './entity/GroupInvite.entity';
 import { CompanyModule } from '../company/company.module';
 import { Mission } from '../mission/entity/mission.entity';
+import { StudentDocument } from 'src/student/entity/StudentDocuments.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Group, GroupInvite, Mission]),
+        TypeOrmModule.forFeature([Group, GroupInvite, Mission, StudentDocument]),
         StudentModule,
         NotificationsModule,
         CompanyModule,
