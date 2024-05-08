@@ -4,13 +4,17 @@ import { CompanyController } from './company.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CompanyUser } from '../company/entity/CompanyUser.entity';
 import { CompanyProfile } from '../company/entity/CompanyProfile.entity';
+import { CompanyDocument } from './entity/CompanyDocument.entity';
+import { DocumentTransferService } from '../document-transfer/src/services/document-transfer.service';
+import { ConfigService } from '@nestjs/config';
+import { CompanyPreferences } from './entity/CompanyPreferences.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([CompanyUser, CompanyProfile]),
+    TypeOrmModule.forFeature([CompanyUser, CompanyProfile, CompanyDocument, CompanyPreferences]),
   ],
-  providers: [CompanyService],
+  providers: [CompanyService, DocumentTransferService, ConfigService],
   controllers: [CompanyController],
-  exports: [CompanyService],
+  exports: [CompanyService,],
 })
-export class CompanyModule {}
+export class CompanyModule { }

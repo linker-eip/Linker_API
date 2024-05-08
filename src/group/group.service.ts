@@ -3,7 +3,16 @@ import { CreateGroupDto } from './dto/create-group-dto';
 import { StudentService } from '../student/student.service';
 import { Group } from './entity/Group.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
+import {
+  MoreThan,
+  ILike,
+  Brackets,
+  Not,
+  Repository,
+  SelectQueryBuilder,
+  And,
+  Equal,
+} from 'typeorm';
 import { UpdateGroupDto } from './dto/update-group-dto';
 import {
   GetGroupeResponse,
@@ -13,10 +22,19 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { NotificationType } from '../notifications/entity/Notification.entity';
 import { Request } from 'express';
 import { GroupInvite } from './entity/GroupInvite.entity';
-import { GetInvitesResponse } from './dto/get-invites-response-dto';
+import {
+  GetInvitesResponse,
+  GetPersonnalInvitesResponse,
+} from './dto/get-invites-response-dto';
 import { CompanyService } from '../company/company.service';
 import { GetCompanySearchGroupsDto } from './dto/get-company-search-groups.dto';
 import { CompanySearchGroupsFilterDto } from './dto/company-search-groups-filter.dto';
+import { Mission } from '../mission/entity/mission.entity';
+import { MissionStatus } from '../mission/enum/mission-status.enum';
+import { StudentUser } from '../student/entity/StudentUser.entity';
+import { StudentDocument } from '../student/entity/StudentDocuments.entity';
+import { DocumentStatus } from '../student/enum/StudentDocument.enum';
+import { HttpStatusCode } from 'axios';
 
 @Injectable()
 export class GroupService {
@@ -25,10 +43,19 @@ export class GroupService {
     private readonly groupRepository: Repository<Group>,
     @InjectRepository(GroupInvite)
     private readonly groupInviteRepository: Repository<GroupInvite>,
+    @InjectRepository(Mission)
+    private readonly missionRepository: Repository<Mission>,
+    @InjectRepository(StudentDocument)
+    private readonly studentDocumentRepository: Repository<StudentDocument>,
     private readonly studentService: StudentService,
     private readonly notificationService: NotificationsService,
     private readonly CompanyService: CompanyService,
-  ) {}
+  ) { }
+
+  async groupVerification(student: StudentUser) {
+    let studentDocuments = await this.studentDocumentRepository.findBy({ studentId: student.id, status: DocumentStatus.VERIFIED })
+    if (studentDocuments.length < 4) throw new HttpException("Vous ne pouvez pas avoir de groupe avant d'avoir fait vérifier tous vos documents", HttpStatusCode.Forbidden)
+  }
 
   async getUserGroup(req: any): Promise<Group> {
     let group;
@@ -72,6 +99,8 @@ export class GroupService {
     } catch (err) {
       throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED);
     }
+
+    await this.groupVerification(student);
 
     if (student.groupId != null) {
       throw new HttpException(
@@ -133,6 +162,9 @@ export class GroupService {
     }
     if (updateGroupDto.picture != null) {
       group.picture = updateGroupDto.picture;
+    }
+    if (updateGroupDto.isActive != null) {
+      group.isActive = updateGroupDto.isActive;
     }
     await this.groupRepository.save(group);
     return await this.findGroupById(group.id);
@@ -213,6 +245,7 @@ export class GroupService {
       leaderId: group.leaderId,
       isLeader: group.leaderId == student.id,
       groupId: group.id,
+      isActive: group.isActive,
     };
     return response;
   }
@@ -230,6 +263,13 @@ export class GroupService {
       throw new HttpException(
         "Cet étudiant n'existe pas",
         HttpStatus.NOT_FOUND,
+      );
+    }
+
+    if (invitedStudent.isActive == false) {
+      throw new HttpException(
+        "Cet étudiant n'est pas actif",
+        HttpStatus.BAD_REQUEST,
       );
     }
 
@@ -281,7 +321,7 @@ export class GroupService {
     }
   }
 
-  async getGroupInvites(req: any): Promise<GetInvitesResponse[]> {
+  async getGroupInvites(req: any): Promise<GetPersonnalInvitesResponse[]> {
     let group = await this.getUserGroup(req);
     let student = await this.studentService.findOneByEmail(req.user.email);
 
@@ -299,11 +339,10 @@ export class GroupService {
         let userProfile = await this.studentService.findStudentProfile(
           user.email,
         );
-        let groupInviteResponse: GetInvitesResponse = {
+        let groupInviteResponse: GetPersonnalInvitesResponse = {
           id: user.id,
           name: user.firstName + ' ' + user.lastName,
           picture: userProfile.picture,
-          leaderName: null,
         };
         return groupInviteResponse;
       }),
@@ -327,6 +366,7 @@ export class GroupService {
         let response: GetInvitesResponse = {
           id: group.id,
           name: group.name,
+          description: group.description,
           picture: group.picture,
           leaderName: leader.firstName + ' ' + leader.lastName,
         };
@@ -340,6 +380,8 @@ export class GroupService {
 
   async acceptInvite(req: any, groupId: number) {
     let student = await this.studentService.findOneByEmail(req.user.email);
+    
+    await this.groupVerification(student);
 
     let groupInvite = await this.groupInviteRepository.findOne({
       where: { userId: student.id, groupId: groupId },
@@ -364,9 +406,9 @@ export class GroupService {
     this.notificationService.createNotification(
       'Invitation acceptée',
       student.firstName +
-        ' ' +
-        student.lastName +
-        ' a accepté de rejoindre votre groupe',
+      ' ' +
+      student.lastName +
+      ' a accepté de rejoindre votre groupe',
       NotificationType.GROUP,
       group.leaderId,
     );
@@ -392,9 +434,9 @@ export class GroupService {
     this.notificationService.createNotification(
       'Invitation refusée',
       student.firstName +
-        ' ' +
-        student.lastName +
-        ' a refusé de rejoindre votre groupe',
+      ' ' +
+      student.lastName +
+      ' a refusé de rejoindre votre groupe',
       NotificationType.GROUP,
       group.leaderId,
     );
@@ -424,6 +466,68 @@ export class GroupService {
 
     this.groupRepository.save(group);
     this.studentService.save(student);
+  }
+
+  async ejectMember(req: any, userId: any) {
+    let student = await this.studentService.findOneByEmail(req.user.email);
+
+    if (student.groupId == null) {
+      throw new HttpException(
+        "Vous n'avez pas de groupe",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (student.id == userId) {
+      throw new HttpException(
+        'Vous ne pouvez pas vous éjecter vous même',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    let group = await this.getUserGroup(req);
+
+    if (student.id != group.leaderId) {
+      throw new HttpException(
+        'Vous devez être chef de groupe pour éjecter un membre',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    let member = await this.studentService.findOneById(userId);
+
+    if (member == null || member.groupId != student.groupId) {
+      throw new HttpException(
+        "Cet étudiant n'a pas été trouvé",
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    let missions = await this.missionRepository
+      .createQueryBuilder('mission')
+      .where('mission.groupId = :groupId', { groupId: group.id })
+      .andWhere('mission.status IN (:...statuses)', {
+        statuses: [
+          MissionStatus.IN_PROGRESS,
+          MissionStatus.ACCEPTED,
+          MissionStatus.PROVISIONED,
+        ],
+      })
+      .getMany();
+    if (missions.length > 0) {
+      throw new HttpException(
+        'Vous ne pouvez pas éjecter un membre si une mission est en cours',
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    group.studentIds = group.studentIds.filter((it) => it != member.id);
+    member.groupId = null;
+
+    this.groupRepository.save(group);
+    this.studentService.save(member);
+
+    return HttpStatus.OK;
   }
 
   async getAllGroups(
@@ -464,12 +568,15 @@ export class GroupService {
             groupName: searchOption.groupName,
           });
         }
+        qb.andWhere('group.isActive = true', {
+          isActive: true,
+        });
       }),
     );
 
     const groups = await groupsQuery.getMany();
 
-    return Promise.all(
+    const dtos = Promise.all(
       groups.map(async (it) => {
         let students = await this.studentService.findAllByIdIn(it.studentIds);
         let studentProfiles = await Promise.all(
@@ -489,5 +596,64 @@ export class GroupService {
         return dto;
       }),
     );
+
+    let filteredGroups = await dtos;
+
+    if (searchOption.skills) {
+      filteredGroups = filterGroupsBySkills(filteredGroups, searchOption.skills);
+    }
+
+    if (searchOption.size) {
+      filteredGroups = filterGroupBySize(filteredGroups, searchOption.size);
+    }
+
+    return filteredGroups;
   }
+
+  async checkIfStudentIsInGroup(student: any) {
+    if (student.groupId) {
+      return true;
+    }
+    const group = await this.groupRepository.findOne({
+      where: { leaderId: student.id },
+    });
+    if (group) {
+      return true;
+    }
+
+    const groups = await this.groupRepository.find();
+    let groupMember = false;
+    const studentIdAsString = student.id.toString();
+    groups.forEach((group) => {
+      if (group.studentIds.includes(studentIdAsString)) {
+        groupMember = true;
+      }
+    });
+    (groupMember);
+
+    if (groupMember) {
+      return true;
+    }
+
+    return false;
+  }
+}
+
+
+function filterGroupsBySkills(dto: GetCompanySearchGroupsDto[], skillsString: string): GetCompanySearchGroupsDto[] {
+
+  const skillsArray = skillsString.split(',').map(skill => skill.trim().toLowerCase());
+
+  const filteredGroups = dto.filter(group => {
+    return group.studentsProfiles.some(studentProfile => {
+      const studentSkills = Object.values(studentProfile.skills).flat().map(skill => skill.toLowerCase());
+      return skillsArray.some(skill => studentSkills.includes(skill));
+    });
+  });
+
+  return filteredGroups;
+}
+
+function filterGroupBySize(dto: GetCompanySearchGroupsDto[], size: number): GetCompanySearchGroupsDto[] {
+  return dto.filter(group => group.studentsProfiles.length >= size);
 }

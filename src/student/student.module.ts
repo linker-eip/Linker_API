@@ -9,12 +9,16 @@ import { StudiesService } from './studies/studies.service';
 import { StudiesModule } from './studies/studies.module';
 import { SkillsModule } from './skills/skills.module';
 import { FileService } from '../filesystem/file.service';
-import { DocumentTransferService } from 'src/document-transfer/src/services/document-transfer.service';
+import { DocumentTransferService } from '../document-transfer/src/services/document-transfer.service';
 import { ConfigService } from '@nestjs/config';
 import { CompanyModule } from '../company/company.module';
+import { StudentPreferences } from './entity/StudentPreferences.entity';
+import { StudentDocument } from './entity/StudentDocuments.entity';
+import { Jobs } from './jobs/entity/jobs.entity';
+import { Studies } from './studies/entity/studies.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([StudentUser, StudentProfile]), JobsModule, StudiesModule, SkillsModule, CompanyModule],
+  imports: [TypeOrmModule.forFeature([StudentUser, StudentProfile, StudentPreferences, StudentDocument, Jobs, Studies]), JobsModule, StudiesModule, SkillsModule, CompanyModule],
   controllers: [StudentController],
   providers: [StudentService, FileService, DocumentTransferService, ConfigService],
   exports: [StudentService],

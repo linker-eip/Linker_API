@@ -1,10 +1,12 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
   Post,
+  Put,
   Query,
   Req,
   UseGuards,
@@ -213,5 +215,65 @@ export class AuthController {
   @ApiOperation({ summary: 'Gives the type of the user' })
   async getUserType(@Req() req) {
     return req.user.userType
+  }
+
+  @Put('student/disable')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Disable student account' })
+  @ApiResponse({
+    status: 200,
+    description: 'Student account disabled',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Account already disabled',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Vous ne pouvez pas désactiver votre compte si vous êtes dans un groupe',
+  })
+  async disableStudentAccount(@Req() req) {
+    return this.authService.disableStudentAccount(req)
+  }
+
+  @Put('company/disable')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Disable company account' })
+  @ApiResponse({
+    status: 200,
+    description: 'Company account disabled',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Account already disabled',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Vous ne pouvez pas désactiver votre compte si vous avez des missions en cours',
+  })
+  async disableCompanyAccount(@Req() req) {
+    return this.authService.disableCompanyAccount(req)
+  }
+
+  @Delete('student/delete')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Delete student account' })
+  @ApiResponse({
+    status: 401,
+    description: 'Vous ne pouvez pas supprimer votre compte si vous êtes dans un groupe',
+  })
+  async deleteStudentAccount(@Req() req) {
+    return this.authService.deleteStudentAccount(req)
+  }
+
+  @Delete('company/delete')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Delete company account' })
+  @ApiResponse({
+    status: 401,
+    description: 'Vous ne pouvez pas supprimer votre compte si vous avez des missions en cours',
+  })
+  async deleteCompanyAccount(@Req() req) {
+    return this.authService.deleteCompanyAccount(req)
   }
 }

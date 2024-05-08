@@ -8,6 +8,7 @@ import { Repository } from "typeorm";
 import { Request } from "express";
 import { DocumentTransferService } from "../document-transfer/src/services/document-transfer.service";
 import { ConfigService } from "@nestjs/config";
+import { Mission } from '../mission/entity/mission.entity';
 import { CompanyUser } from "../company/entity/CompanyUser.entity";
 import { CompanyProfile } from "../company/entity/CompanyProfile.entity";
 import { Notification, NotificationType } from "../notifications/entity/Notification.entity"
@@ -28,6 +29,11 @@ import { NotificationsService } from "../notifications/notifications.service";
 import { GroupInvite } from "./entity/GroupInvite.entity";
 import { GetGroupeResponse } from "./dto/get-group-response-dto";
 import { GetInvitesResponse } from "./dto/get-invites-response-dto";
+import { StudentPreferences } from "../student/entity/StudentPreferences.entity";
+import { StudentDocument } from "../student/entity/StudentDocuments.entity";
+import { CompanyDocument } from "../company/entity/CompanyDocument.entity";
+import { CompanyPreferences } from "../company/entity/CompanyPreferences.entity";
+import { MailService } from "../mail/mail.service";
 
 describe('NotificationsService', () => {
   let service: GroupService;
@@ -44,7 +50,7 @@ describe('NotificationsService', () => {
       ],
       controllers: [GroupController],
       providers: [GroupService, StudentService, CompanyService, SkillsService, JobsService,
-        StudiesService, FileService, DocumentTransferService, CompanyProfile, ConfigService, NotificationsService,
+        StudiesService, FileService, DocumentTransferService, CompanyProfile, ConfigService, NotificationsService, MailService,
         {
           provide: getRepositoryToken(Notification),
           useClass: Repository,
@@ -76,13 +82,39 @@ describe('NotificationsService', () => {
           useClass: Repository,
         },
         {
-            provide: getRepositoryToken(Group),
-            useClass: Repository,
+          provide: getRepositoryToken(Group),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(GroupInvite),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(Mission),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(StudentPreferences),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(StudentDocument),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(CompanyDocument),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(CompanyPreferences),
+          useClass: Repository,
+        },
+        {
+          provide: 'MAILER_PROVIDER',
+          useValue: {
+            sendMail: jest.fn(),
           },
-          {
-            provide: getRepositoryToken(GroupInvite),
-            useClass: Repository,
-          },
+        }
       ],
     })
       .overrideGuard(AuthGuard('jwt'))
@@ -108,14 +140,15 @@ describe('NotificationsService', () => {
       }
 
       const expectedResponse: Group =
-        {
-          id: 1,
-          name: "Test group",
-          description: "Test group description",
-          picture: "image://test-picture.jpg",
-         studentIds: [1],
-         leaderId: 1,
-        };
+      {
+        id: 1,
+        name: "Test group",
+        description: "Test group description",
+        picture: "image://test-picture.jpg",
+        studentIds: [1],
+        leaderId: 1,
+        isActive: true,
+      };
 
 
       jest.spyOn(service, 'createGroup').mockResolvedValueOnce(expectedResponse);
@@ -141,14 +174,15 @@ describe('NotificationsService', () => {
       }
 
       const expectedResponse: Group =
-        {
-          id: 1,
-          name: "New Test group",
-          description: "New Test group description",
-          picture: "image://test-picture.jpg",
-         studentIds: [1],
-         leaderId: 1,
-        };
+      {
+        id: 1,
+        name: "New Test group",
+        description: "New Test group description",
+        picture: "image://test-picture.jpg",
+        studentIds: [1],
+        leaderId: 1,
+        isActive: true,
+      };
 
 
       jest.spyOn(service, 'updateGroup').mockResolvedValueOnce(expectedResponse);
@@ -169,21 +203,22 @@ describe('NotificationsService', () => {
       }
 
       const expectedResponse: GetGroupeResponse =
-        {
-          name: "New Test group",
-          description: "New Test group description",
+      {
+        name: "New Test group",
+        description: "New Test group description",
+        picture: "image://test-picture.jpg",
+        members: [{
+          firstName: "Test",
+          lastName: "TestName",
           picture: "image://test-picture.jpg",
-         members: [{
-            firstName: "Test",
-            lastName: "TestName",
-            picture: "image://test-picture.jpg",
-            isLeader: true,
-            id: 1
-         }],
-         leaderId: 1,
-         isLeader: true,
-         groupId: 1,
-        };
+          isLeader: true,
+          id: 1
+        }],
+        leaderId: 1,
+        isLeader: true,
+        groupId: 1,
+        isActive: true
+      };
 
 
       jest.spyOn(service, 'getGroup').mockResolvedValueOnce(expectedResponse);
@@ -265,10 +300,11 @@ describe('NotificationsService', () => {
 
       const expectedResponse: GetInvitesResponse[] = [
         {
-            id: 2,
-            name: "Test User2",
-            picture: "image://test-image.jpg",
-            leaderName: null,
+          id: 2,
+          name: "Test User2",
+          description: "New test group description",
+          picture: "image://test-image.jpg",
+          leaderName: null,
         }
       ]
 
@@ -291,10 +327,11 @@ describe('NotificationsService', () => {
 
       const expectedResponse: GetInvitesResponse[] = [
         {
-            id: 1,
-            name: "New Test group",
-            picture: "image://test-image.jpg",
-            leaderName: "Test User",
+          id: 1,
+          description: "New test group description",
+          name: "New Test group",
+          picture: "image://test-image.jpg",
+          leaderName: "Test User",
         }
       ]
 

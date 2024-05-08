@@ -1,4 +1,9 @@
-import { HttpCode, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpCode,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { LoginStudentDto } from './dto/login-student.dto';
 import { RegisterStudentDto } from './dto/register-student.dto';
 import { StudentService } from '../student/student.service';
@@ -7,7 +12,10 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginCompanyDto } from './dto/login-company.dto';
 import { CompanyService } from '../company/company.service';
-import { RegisterCompanyDto, RegisterCompanyV2Dto } from './dto/register-company.dto';
+import {
+  RegisterCompanyDto,
+  RegisterCompanyV2Dto,
+} from './dto/register-company.dto';
 import { CompanyUser } from '../company/entity/CompanyUser.entity';
 import { ForgetPasswordDto } from '../auth/dto/forget-password.dto';
 import { SendMailDto } from '../mail/dto/send-mail.dto';
@@ -20,16 +28,28 @@ import { StudentUser } from '../student/entity/StudentUser.entity';
 import { GoogleApiService } from './services/google-api-services';
 import * as crypto from 'crypto';
 import { SiretService } from '../siret/siret.service';
+import { GroupService } from '../group/group.service';
+import { MissionService } from '../mission/mission.service';
+import { StudentPreferences } from '../student/entity/StudentPreferences.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CompanyPreferences } from '../company/entity/CompanyPreferences.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @InjectRepository(StudentPreferences)
+    private studentPreferencesRepository: Repository<StudentPreferences>,
+    @InjectRepository(CompanyPreferences)
+    private companyPreferencesRepository: Repository<CompanyPreferences>,
     private readonly studentService: StudentService,
     private readonly jwtService: JwtService,
     private readonly companyService: CompanyService,
     private readonly mailService: MailService,
     private readonly googleApiService: GoogleApiService,
     private readonly siretService: SiretService,
+    private readonly groupService: GroupService,
+    private readonly missionService: MissionService,
   ) {}
 
   async hashPassword(password: string): Promise<string> {
@@ -51,7 +71,10 @@ export class AuthService {
     const existingUser = await this.studentService.findOneByEmail(email);
 
     if (existingUser) {
-      throw new HttpException("Un compte utilisant cette adresse e-mail existe déjà.", HttpStatus.UNAUTHORIZED)
+      throw new HttpException(
+        'Un compte utilisant cette adresse e-mail existe déjà.',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
 
     const newUser = new StudentUser();
@@ -65,7 +88,14 @@ export class AuthService {
 
     const savedUser = await this.studentService.save(newUser);
 
-    const token = jwt.sign({ email: savedUser.email, userType: "USER_STUDENT" }, process.env.JWT_SECRET);
+    const userPref = new StudentPreferences()
+    userPref.studentId = savedUser.id
+    await this.studentPreferencesRepository.save(userPref)
+
+    const token = jwt.sign(
+      { email: savedUser.email, userType: 'USER_STUDENT' },
+      process.env.JWT_SECRET,
+    );
 
     await this.studentService.updateStudentProfile(
       null,
@@ -78,18 +108,22 @@ export class AuthService {
         location: '',
         picture: null,
         studies: [],
-        skills: [],
+        skills: {"Development":[],"No-code":[],"Design & Produit":[],"Data":[],"Marketing & Sales":[]},
         jobs: [],
         website: '',
       },
-      savedUser
+      savedUser,
     );
 
     const sendMailDto = new SendMailDto();
-    sendMailDto.to = savedUser.email
-    sendMailDto.subject = 'Verification de compte Linker'
-    sendMailDto.text = 'Veuillez vérifier votre compte Linker : ' + process.env.FRONT_URL + '/auth/verify/' + savedUser.verificationKey
-    this.mailService.sendMail(sendMailDto)
+    sendMailDto.to = savedUser.email;
+    sendMailDto.subject = 'Verification de compte Linker';
+    sendMailDto.text =
+      'Veuillez vérifier votre compte Linker : ' +
+      process.env.FRONT_URL +
+      '/auth/verify/' +
+      savedUser.verificationKey;
+    this.mailService.sendMail(sendMailDto);
 
     return { token };
   }
@@ -97,23 +131,32 @@ export class AuthService {
   async verifyStudent(code: string) {
     const student = await this.studentService.findOneByVerificationKey(code);
     if (!student) {
-      throw new HttpException('Code de vérification invalide', HttpStatus.NOT_FOUND)
+      throw new HttpException(
+        'Code de vérification invalide',
+        HttpStatus.NOT_FOUND,
+      );
     }
 
-    student.verificationKey = null
-    student.isVerified = true
-    this.studentService.save(student)
+    student.verificationKey = null;
+    student.isVerified = true;
+    this.studentService.save(student);
   }
 
   async registerCompany(registerCompanyDto: RegisterCompanyDto) {
     const { email, password, name, phoneNumber } = registerCompanyDto;
 
     if (await this.companyService.findOne(email)) {
-      throw new HttpException('Un compte utilisant cette adresse e-mail existe déjà.', HttpStatus.UNAUTHORIZED)
+      throw new HttpException(
+        'Un compte utilisant cette adresse e-mail existe déjà.',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
 
     if (await this.companyService.findOneByPhoneNumber(phoneNumber)) {
-      throw new HttpException('Un compte utilisant ce numéro de téléphone existe déjà.', HttpStatus.UNAUTHORIZED)
+      throw new HttpException(
+        'Un compte utilisant ce numéro de téléphone existe déjà.',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
 
     const newUser = new CompanyUser();
@@ -124,7 +167,14 @@ export class AuthService {
 
     const savedUser = await this.companyService.save(newUser);
 
-    const token = jwt.sign({ email: savedUser.email, userType: "USER_COMPANY" }, process.env.JWT_SECRET);
+    const companyPrefs = new CompanyPreferences()
+    companyPrefs.companyId = savedUser.id;
+    await this.companyPreferencesRepository.save(companyPrefs)
+
+    const token = jwt.sign(
+      { email: savedUser.email, userType: 'USER_COMPANY' },
+      process.env.JWT_SECRET,
+    );
 
     await this.companyService.updateCompanyProfile(
       {
@@ -142,7 +192,6 @@ export class AuthService {
       },
       savedUser,
     );
-
 
     return { token };
   }
@@ -151,35 +200,52 @@ export class AuthService {
     const { email, password, siret, phoneNumber } = registerCompanyDto;
 
     if (await this.companyService.findOne(email)) {
-      throw new HttpException('Un compte utilisant cette adresse e-mail existe déjà.', HttpStatus.UNAUTHORIZED)
+      throw new HttpException(
+        'Un compte utilisant cette adresse e-mail existe déjà.',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
 
     if (await this.companyService.findOne(email)) {
-      throw new HttpException('Un compte utilisant cette adresse e-mail existe déjà.', HttpStatus.UNAUTHORIZED)
+      throw new HttpException(
+        'Un compte utilisant cette adresse e-mail existe déjà.',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
 
     if (await this.companyService.findOneByPhoneNumber(phoneNumber)) {
-      throw new HttpException('Un compte utilisant ce numéro de téléphone existe déjà.', HttpStatus.UNAUTHORIZED)
+      throw new HttpException(
+        'Un compte utilisant ce numéro de téléphone existe déjà.',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
 
     let companyInfos;
 
     try {
-      companyInfos = await this.siretService.searchCompanyFromSiret(registerCompanyDto.siret);
+      companyInfos = await this.siretService.searchCompanyFromSiret(
+        registerCompanyDto.siret,
+      );
     } catch (err) {
       throw new HttpException('SIRET invalide', HttpStatus.BAD_REQUEST);
     }
 
-
     const newUser = new CompanyUser();
     newUser.email = email;
     newUser.password = await this.hashPassword(password);
-    newUser.companyName = companyInfos.uniteLegale.nomUniteLegale
+    newUser.companyName = companyInfos.uniteLegale.nomUniteLegale;
     newUser.phoneNumber = phoneNumber;
 
     const savedUser = await this.companyService.save(newUser);
 
-    const token = jwt.sign({ email: savedUser.email, userType: "USER_COMPANY" }, process.env.JWT_SECRET);
+    const companyPrefs = new CompanyPreferences()
+    companyPrefs.companyId = savedUser.id;
+    await this.companyPreferencesRepository.save(companyPrefs)
+
+    const token = jwt.sign(
+      { email: savedUser.email, userType: 'USER_COMPANY' },
+      process.env.JWT_SECRET,
+    );
 
     await this.companyService.updateCompanyProfile(
       {
@@ -198,23 +264,33 @@ export class AuthService {
       savedUser,
     );
 
-
     return { token };
   }
 
   async loginStudent(loginStudentDto: LoginStudentDto) {
-    const student = await this.studentService.findOneByEmail(loginStudentDto.email);
+    const student = await this.studentService.findOneByEmail(
+      loginStudentDto.email,
+    );
 
     if (!student) {
       return {
-        error: "Il n'existe pas de compte associé à l'e-mail " + loginStudentDto.email
+        error:
+          "Il n'existe pas de compte associé à l'e-mail " +
+          loginStudentDto.email,
       };
     }
 
     if (
       await this.comparePassword(loginStudentDto.password, student.password)
     ) {
-      const token = jwt.sign({ email: student.email, userType: "USER_STUDENT" }, process.env.JWT_SECRET);
+      if (!student.isActive) {
+        student.isActive = true;
+        this.studentService.save(student);
+      }
+      const token = jwt.sign(
+        { email: student.email, userType: 'USER_STUDENT' },
+        process.env.JWT_SECRET,
+      );
       return { token };
     }
 
@@ -226,13 +302,22 @@ export class AuthService {
 
     if (!company) {
       return {
-        error: "Il n'existe pas de compte associé à l'e-mail " + loginCompanyDto.email
+        error:
+          "Il n'existe pas de compte associé à l'e-mail " +
+          loginCompanyDto.email,
       };
     }
     if (
       await this.comparePassword(loginCompanyDto.password, company.password)
     ) {
-      const token = jwt.sign({ email: company.email, userType: "USER_COMPANY" }, process.env.JWT_SECRET);
+      if (!company.isActive) {
+        company.isActive = true;
+        this.companyService.save(company);
+      }
+      const token = jwt.sign(
+        { email: company.email, userType: 'USER_COMPANY' },
+        process.env.JWT_SECRET,
+      );
       return { token };
     }
     return null;
@@ -241,11 +326,13 @@ export class AuthService {
   async generateCompanyResetPassword(body: ForgetPasswordDto) {
     const company = await this.companyService.findOne(body.email);
     if (!company) {
-      return { error: "Il n'existe pas de compte associé à l'adresse e-mail " + body.email};
+      return {
+        error:
+          "Il n'existe pas de compte associé à l'adresse e-mail " + body.email,
+      };
     }
 
     const randomString = Math.random().toString(36).substring(2, 8);
-
 
     company.resetPasswordToken = randomString;
     const emailBody =
@@ -260,7 +347,7 @@ export class AuthService {
     sendMailDto.text = emailBody;
     this.mailService.sendMail(sendMailDto);
     await this.companyService.save(company);
-    return ;
+    return;
   }
 
   async resetCompanyPassword(body: ResetPasswordDto) {
@@ -271,7 +358,7 @@ export class AuthService {
       body.token,
     );
     if (!company) {
-      return { error: 'Jeton de réinitialisation invalide'};
+      return { error: 'Jeton de réinitialisation invalide' };
     }
     company.password = await this.hashPassword(body.password);
     company.resetPasswordToken = null;
@@ -282,7 +369,10 @@ export class AuthService {
   async generateStudentResetPassword(body: ForgetPasswordDto) {
     const student = await this.studentService.findOneByEmail(body.email);
     if (!student) {
-      return { error: "Il n'existe pas de compte associé à l'adresse e-mail " + body.email};
+      return {
+        error:
+          "Il n'existe pas de compte associé à l'adresse e-mail " + body.email,
+      };
     }
     const randomString = Math.random().toString(36).substring(2, 8);
 
@@ -307,7 +397,7 @@ export class AuthService {
       body.token,
     );
     if (!student) {
-      return { error: 'Jeton de réinitialisation invalide'};
+      return { error: 'Jeton de réinitialisation invalide' };
     }
     student.password = await this.hashPassword(body.password);
     student.resetPasswordToken = null;
@@ -349,8 +439,12 @@ export class AuthService {
     );
 
     if (existingUser) {
+      if (!existingUser.isActive) {
+        existingUser.isActive = true;
+        this.studentService.save(existingUser);
+      }
       const token = jwt.sign(
-        { email: existingUser.email, userType: "USER_STUDENT" },
+        { email: existingUser.email, userType: 'USER_STUDENT' },
         process.env.JWT_SECRET,
       );
       return { token };
@@ -364,7 +458,7 @@ export class AuthService {
       const savedUser = await this.studentService.save(newUser);
 
       const token = jwt.sign(
-        { email: savedUser.email, userType: "USER_STUDENT" },
+        { email: savedUser.email, userType: 'USER_STUDENT' },
         process.env.JWT_SECRET,
       );
 
@@ -379,11 +473,11 @@ export class AuthService {
           location: '',
           picture: null,
           studies: [],
-          skills: [],
+          skills: {"Development":[],"No-code":[],"Design & Produit":[],"Data":[],"Marketing & Sales":[]},
           jobs: [],
           website: '',
         },
-        savedUser
+        savedUser,
       );
 
       return { token };
@@ -395,13 +489,20 @@ export class AuthService {
       googleLoginTokenDto.token,
     );
 
-    const existingUser = await this.studentService.findOneByEmail(userinfos.email);
+    const existingUser = await this.studentService.findOneByEmail(
+      userinfos.email,
+    );
 
     if (existingUser) {
+      if (!existingUser.isActive) {
+        existingUser.isActive = true;
+        this.studentService.save(existingUser);
+      }
       const token = jwt.sign(
-        { email: existingUser.email, userType: "USER_STUDENT" },
+        { email: existingUser.email, userType: 'USER_STUDENT' },
         process.env.JWT_SECRET,
       );
+
       return { token };
     } else {
       const newUser = new StudentUser();
@@ -413,7 +514,7 @@ export class AuthService {
       const savedUser = await this.studentService.save(newUser);
 
       const token = jwt.sign(
-        { email: savedUser.email, userType: "USER_STUDENT" },
+        { email: savedUser.email, userType: 'USER_STUDENT' },
         process.env.JWT_SECRET,
       );
 
@@ -428,11 +529,11 @@ export class AuthService {
           location: '',
           picture: null,
           studies: [],
-          skills: [],
+          skills: {"Development":[],"No-code":[],"Design & Produit":[],"Data":[],"Marketing & Sales":[]},
           jobs: [],
           website: '',
         },
-        savedUser
+        savedUser,
       );
 
       return { token };
@@ -473,8 +574,12 @@ export class AuthService {
     );
 
     if (existingUser) {
+      if (!existingUser.isActive) {
+        existingUser.isActive = true;
+        this.companyService.save(existingUser);
+      }
       const token = jwt.sign(
-        { email: existingUser.email, userType: "USER_COMPANY" },
+        { email: existingUser.email, userType: 'USER_COMPANY' },
         process.env.JWT_SECRET,
       );
       return { token };
@@ -482,13 +587,14 @@ export class AuthService {
       const newUser = new CompanyUser();
       newUser.email = userinfos.data.email;
       newUser.password = await this.hashPassword(tokens.id_token);
-      newUser.companyName = userinfos.data.given_name + ' ' + userinfos.data.family_name;
+      newUser.companyName =
+        userinfos.data.given_name + ' ' + userinfos.data.family_name;
       newUser.phoneNumber = '+33';
 
       const savedUser = await this.companyService.save(newUser);
 
       const token = jwt.sign(
-        { email: savedUser.email, userType: "USER_COMPANY" },
+        { email: savedUser.email, userType: 'USER_COMPANY' },
         process.env.JWT_SECRET,
       );
 
@@ -521,8 +627,12 @@ export class AuthService {
     const existingUser = await this.companyService.findOne(userinfos.email);
 
     if (existingUser) {
+      if (!existingUser.isActive) {
+        existingUser.isActive = true;
+        this.companyService.save(existingUser);
+      }
       const token = jwt.sign(
-        { email: existingUser.email, userType: "USER_COMPANY" },
+        { email: existingUser.email, userType: 'USER_COMPANY' },
         process.env.JWT_SECRET,
       );
       return { token };
@@ -536,7 +646,7 @@ export class AuthService {
       const savedUser = await this.companyService.save(newUser);
 
       const token = jwt.sign(
-        { email: savedUser.email, userType: "USER_COMPANY" },
+        { email: savedUser.email, userType: 'USER_COMPANY' },
         process.env.JWT_SECRET,
       );
 
@@ -559,5 +669,122 @@ export class AuthService {
 
       return { token };
     }
+  }
+
+  async disableStudentAccount(req) {
+    const student = await this.studentService.findOneByEmail(req.user.email);
+    if (!student) {
+      throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED);
+    }
+
+    if (!student.isActive) {
+      throw new HttpException(
+        'Account already disabled',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const isInGroup = await this.groupService.checkIfStudentIsInGroup(student);
+    if (isInGroup) {
+      throw new HttpException(
+        'Vous ne pouvez pas désactiver votre compte si vous êtes dans un groupe',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    student.isActive = false;
+    await this.studentService.save(student);
+
+    const sendMailDto = new SendMailDto();
+    sendMailDto.to = student.email;
+    sendMailDto.subject = 'Compte désactivé';
+    sendMailDto.text =
+      "Votre compte Linker a été désactivé, pour l'activer de nouveau vous pouvez simplement vous connecter à votre compte. Si vous pensez qu'il s'agit d'une erreur, veuillez contacter le support.";
+    this.mailService.sendMail(sendMailDto);
+
+    return;
+  }
+
+  async disableCompanyAccount(req) {
+    const company = await this.companyService.findOne(req.user.email);
+    if (!company) {
+      throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
+    }
+
+    if (!company.isActive) {
+      throw new HttpException(
+        'Account already disabled',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const hasMissions = await this.missionService.getCompanyMissions(req);
+    if (hasMissions.length > 0) {
+      throw new HttpException(
+        'Vous ne pouvez pas désactiver votre compte si vous avez des missions en cours',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    company.isActive = false;
+    await this.companyService.save(company);
+
+    const sendMailDto = new SendMailDto();
+    sendMailDto.to = company.email;
+    sendMailDto.subject = 'Compte désactivé';
+    sendMailDto.text =
+      "Votre compte Linker a été désactivé, pour l'activer de nouveau vous pouvez simplement vous connecter à votre compte. Si vous pensez qu'il s'agit d'une erreur, veuillez contacter le support.";
+    this.mailService.sendMail(sendMailDto);
+
+    return;
+  }
+
+  async deleteStudentAccount(req) {
+    const student = await this.studentService.findOneByEmail(req.user.email);
+    if (!student) {
+      throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED);
+    }
+
+    const isInGroup = await this.groupService.checkIfStudentIsInGroup(student);
+    if (isInGroup) {
+      throw new HttpException(
+        'Vous ne pouvez pas supprimer votre compte si vous êtes dans un groupe',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const sendMailDto = new SendMailDto();
+    sendMailDto.to = student.email;
+    sendMailDto.subject = 'Compte supprimé';
+    sendMailDto.text =
+      'Votre compte Linker a été supprimé définitivement suite à votre demande.';
+    this.mailService.sendMail(sendMailDto);
+    await this.studentService.deleteStudent(student);
+    return;
+  }
+
+  async deleteCompanyAccount(req) {
+    const company = await this.companyService.findOne(req.user.email);
+    if (!company) {
+      throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
+    }
+
+    const hasMissions = await this.missionService.getCompanyMissions(req);
+    if (hasMissions.length > 0) {
+      throw new HttpException(
+        'Vous ne pouvez pas supprimer votre compte si vous avez des missions en cours',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+ 
+    const sendMailDto = new SendMailDto();
+    sendMailDto.to = company.email;
+    sendMailDto.subject = 'Compte supprimé';
+    sendMailDto.text =
+      'Votre compte Linker a été supprimé définitivement suite à votre demande.';
+    this.mailService.sendMail(sendMailDto);
+    await this.companyService.deleteCompany(company);
+
+    return;
   }
 }

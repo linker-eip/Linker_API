@@ -31,6 +31,23 @@ import { GoogleLoginDto, GoogleLoginTokenDto } from './dto/google-login.dto';
 import { SiretService } from '../siret/siret.service';
 import { DocumentTransferService } from '../document-transfer/src/services/document-transfer.service';
 import { ConfigService } from '@nestjs/config';
+import { StudentPreferences } from '../student/entity/StudentPreferences.entity';
+import { CompanyPreferences } from '../company/entity/CompanyPreferences.entity';
+import { GroupService } from '../group/group.service';
+import { MissionService } from '../mission/mission.service';
+import { StudentDocument } from '../student/entity/StudentDocuments.entity';
+import { CompanyDocument } from '../company/entity/CompanyDocument.entity';
+import { Group } from '../group/entity/Group.entity';
+import { GroupModule } from '../group/group.module';
+import { GroupInvite } from '../group/entity/GroupInvite.entity';
+import { Mission } from '../mission/entity/mission.entity';
+import { NotificationsService } from '../notifications/notifications.service';
+import { MissionTask } from '../mission/entity/mission-task.entity';
+import { MissionInvite } from '../mission/entity/mission-invite.entity';
+import { Notification } from '../notifications/entity/Notification.entity';
+import { PaymentService } from '../payment/payment.service';
+import { Payment } from '../payment/entity/payment.entity';
+import { StudentPayment } from '../payment/entity/student-payment.entity';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -46,8 +63,8 @@ describe('AuthService', () => {
         }),
       ],
       controllers: [AuthController],
-      providers: [AuthService, StudentService, JwtService, CompanyService, MailService, GoogleApiService, SkillsService, JobsService, 
-        StudiesService, FileService, SiretService, DocumentTransferService, ConfigService,
+      providers: [AuthService, StudentService, JwtService, CompanyService, MailService, GoogleApiService, SkillsService, JobsService, GroupService, MissionService,
+        StudiesService, FileService, SiretService, NotificationsService, DocumentTransferService, PaymentService, ConfigService,
         {
           provide: getRepositoryToken(StudentUser),
           useClass: Repository,
@@ -67,16 +84,60 @@ describe('AuthService', () => {
           provide: getRepositoryToken(Jobs),
           useClass: Repository
         }, {
+          provide: getRepositoryToken(Group),
+          useClass: Repository
+        },
+        {
+          provide: getRepositoryToken(Notification),
+          useClass: Repository
+        },
+        {
+          provide: getRepositoryToken(MissionInvite),
+          useClass: Repository
+        },
+        {
+          provide: getRepositoryToken(Payment),
+          useClass: Repository
+        },
+        {
+          provide: getRepositoryToken(StudentPayment),
+          useClass: Repository
+        },
+        {
+          provide: getRepositoryToken(MissionTask),
+          useClass: Repository
+        },
+        {
+          provide: getRepositoryToken(GroupInvite),
+          useClass: Repository
+        },
+        {
+          provide: getRepositoryToken(Mission),
+          useClass: Repository
+        }, {
           provide: getRepositoryToken(Studies),
           useClass: Repository
         }, {
           provide: "MAILER_PROVIDER",
           useValue: "GMAIL"
-        }],
+        },
+        {
+          provide: getRepositoryToken(StudentPreferences),
+          useClass: Repository
+        }, {
+          provide: getRepositoryToken(CompanyPreferences),
+          useClass: Repository
+        }, {
+          provide: getRepositoryToken(StudentDocument),
+          useClass: Repository
+        }, {
+          provide: getRepositoryToken(CompanyDocument),
+          useClass: Repository
+        },],
     })
-    .overrideGuard(AuthGuard('jwt'))
-    .useValue({ canActivate: jest.fn(() => true) })
-    .compile();
+      .overrideGuard(AuthGuard('jwt'))
+      .useValue({ canActivate: jest.fn(() => true) })
+      .compile();
 
     controller = module.get<AuthController>(AuthController);
     service = module.get<AuthService>(AuthService);
@@ -243,7 +304,7 @@ describe('AuthService', () => {
         email: 'test@example.com',
       };
 
-      const expectedToken = {token: "token"}
+      const expectedToken = { token: "token" }
 
       jest.spyOn(service, 'generateStudentResetPassword').mockResolvedValueOnce(null);
 
@@ -259,14 +320,14 @@ describe('AuthService', () => {
         email: 'test@example.com',
       };
 
-      const expectedToken = {token: "token"}
+      const expectedToken = { token: "token" }
 
       jest.spyOn(service, 'generateCompanyResetPassword').mockResolvedValueOnce(null);
 
       const response = await controller.forgotPassword(forgetPasswordDto)
 
       expect(service.generateCompanyResetPassword).toHaveBeenCalledWith(forgetPasswordDto);
-    //  expect(response).toEqual(expectedToken)
+      //  expect(response).toEqual(expectedToken)
     });
   });
 
@@ -277,7 +338,7 @@ describe('AuthService', () => {
         password: 'newPassword123!'
       };
 
-      const expectedMessage = {message: "Mot de passe rénitialisé avec succès"}
+      const expectedMessage = { message: "Mot de passe rénitialisé avec succès" }
 
       jest.spyOn(service, 'resetStudentPassword').mockResolvedValueOnce(expectedMessage);
 
@@ -295,7 +356,7 @@ describe('AuthService', () => {
         password: 'newPassword123!'
       };
 
-      const expectedMessage = {message: "Mot de passe rénitialisé avec succès"}
+      const expectedMessage = { message: "Mot de passe rénitialisé avec succès" }
 
       jest.spyOn(service, 'resetCompanyPassword').mockResolvedValueOnce(expectedMessage);
 
@@ -312,7 +373,7 @@ describe('AuthService', () => {
         code: 'code',
       };
 
-      const expectedToken = {token: "token"}
+      const expectedToken = { token: "token" }
 
       jest.spyOn(service, 'googleStudentLoginWithCode').mockResolvedValueOnce(expectedToken);
 
@@ -348,13 +409,13 @@ describe('AuthService', () => {
       const googleLoginDto: GoogleLoginDto = {
         code: 'code',
       };
-  
-      const expectedToken = {token: "token"}
-  
+
+      const expectedToken = { token: "token" }
+
       jest.spyOn(service, 'googleCompanyLoginWithCode').mockResolvedValueOnce(expectedToken);
-  
+
       const response = await controller.googleCompanyLoginWithCode(googleLoginDto)
-  
+
       expect(service.googleCompanyLoginWithCode).toHaveBeenCalledWith(googleLoginDto);
       expect(response).toEqual(expectedToken)
     });
@@ -366,7 +427,7 @@ describe('AuthService', () => {
         token: 'token',
       };
 
-      const expectedToken = {token: "token"}
+      const expectedToken = { token: "token" }
 
       jest.spyOn(service, 'googleStudentLoginWithToken').mockResolvedValueOnce(expectedToken);
 
@@ -382,13 +443,13 @@ describe('AuthService', () => {
       const googleLoginDto: GoogleLoginTokenDto = {
         token: 'token',
       };
-  
-      const expectedToken = {token: "token"}
-  
+
+      const expectedToken = { token: "token" }
+
       jest.spyOn(service, 'googleCompanyLoginWithToken').mockResolvedValueOnce(expectedToken);
-  
+
       const response = await controller.googleCompanyLoginWithToken(googleLoginDto)
-  
+
       expect(service.googleCompanyLoginWithToken).toHaveBeenCalledWith(googleLoginDto);
       expect(response).toEqual(expectedToken)
     });

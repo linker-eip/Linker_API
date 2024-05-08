@@ -1,22 +1,31 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CompanyProfile } from './entity/CompanyProfile.entity';
 import { CompanyUser } from './entity/CompanyUser.entity';
 import { Repository } from 'typeorm';
 import { CreateCompanyProfileDto } from './dto/create-company-profile.dto';
-import { CompanyCreateInvoiceDto } from './dto/company-create-invoice.dto';
-import { CompanyInvoiceDataDto } from './dto/company-invoice-data.dto';
-import { MissionService } from '../mission/mission.service';
-import { StudentService } from '../student/student.service';
+import { CompanyDocument } from './entity/CompanyDocument.entity';
+import { UploadCompanyDocumentDto } from './dto/upload-company-document.dto';
+import { DocumentStatus } from './enum/CompanyDocument.enum';
+import { DocumentTransferService } from '../document-transfer/src/services/document-transfer.service';
+import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
+import { CompanyPreferences } from './entity/CompanyPreferences.entity';
 
 @Injectable()
 export class CompanyService {
+
   constructor(
     @InjectRepository(CompanyUser)
     private companyRepository: Repository<CompanyUser>,
     @InjectRepository(CompanyProfile)
     private companyProfileRepository: Repository<CompanyProfile>,
-  ) {}
+    @InjectRepository(CompanyDocument)
+    private companyDocumentRepository: Repository<CompanyDocument>,
+    @InjectRepository(CompanyPreferences)
+    private companyPreferencesRepository: Repository<CompanyPreferences>,
+    private readonly documentTransferService: DocumentTransferService,
+
+  ) { }
 
   async findAll(): Promise<CompanyUser[]> {
     return this.companyRepository.find();
@@ -63,12 +72,16 @@ export class CompanyService {
     return this.companyProfileRepository.save(CompanyProfileObj);
   }
 
+  async findCompanyById(companyId: number): Promise<CompanyUser> {
+    return this.companyRepository.findOne({ where: { id: companyId } })
+  }
+
   async findCompanyProfile(email: string): Promise<CompanyProfile> {
     return this.companyProfileRepository.findOne({ where: { email } });
   }
 
   async findCompanyProfileById(id: number): Promise<CompanyProfile> {
-    return this.companyProfileRepository.findOne({ where: { companyId : id } });
+    return this.companyProfileRepository.findOne({ where: { companyId: id } });
   }
 
   async updateCompanyProfile(
@@ -125,5 +138,72 @@ export class CompanyService {
 
   async findCompanyProfileByCompanyId(companyId: number) {
     return this.companyProfileRepository.findOne({ where: { companyId } });
+  }
+
+  async deleteCompany(company: any) {
+    const companyProfile = await this.companyProfileRepository.findOne({
+      where: { companyId: company.id },
+    });
+    if (companyProfile) {
+      await this.companyProfileRepository.remove(companyProfile);
+    }
+    return this.companyRepository.remove(company);
+  }
+
+  async uploadCompanyDocument(file: any, uploadCompanyDocument: UploadCompanyDocumentDto, user: any) {
+    let company;
+    company = await this.companyRepository.findOne({ where: { email: user.email } })
+    if (!company) {
+      throw new HttpException("Invalid company", HttpStatus.UNAUTHORIZED)
+    }
+
+    let companyDocument = await this.companyDocumentRepository.findOne({ where: { companyId: company.id, documentType: uploadCompanyDocument.documentType } })
+
+    if (companyDocument != null) {
+      if (companyDocument.status == DocumentStatus.VERIFIED) {
+        throw new HttpException("Ce fichier a déjà été validé", HttpStatus.CONFLICT)
+      }
+    } else {
+      companyDocument = new CompanyDocument()
+    }
+
+    const url = await this.documentTransferService.uploadFileNotImage(file);
+
+    companyDocument.file = url
+    companyDocument.companyId = company.id;
+    companyDocument.comment = "";
+    companyDocument.documentType = uploadCompanyDocument.documentType;
+    companyDocument.status = DocumentStatus.PENDING;
+
+    this.companyDocumentRepository.save(companyDocument);
+  }
+
+  async getDocumentStatus(user: any): Promise<DocumentStatusResponseDto[]> {
+    const company = await this.companyRepository.findOne({ where: { email: user.email } });
+    if (!company) {
+      throw new HttpException("Invalid company", HttpStatus.UNAUTHORIZED)
+    }
+
+    const documentStatuses = await this.companyDocumentRepository.findBy({ companyId: company.id })
+
+    const documentStatusesResponse = documentStatuses.map(doc => {
+      const it = new DocumentStatusResponseDto()
+      it.documentType = doc.documentType
+      it.status = doc.status
+      it.comment = doc.comment
+      return it
+    })
+
+    return documentStatusesResponse
+  }
+
+  async createPref() {
+    const companies = await this.companyRepository.find();
+
+    for (const company of companies) {
+      const prefs = new CompanyPreferences()
+      prefs.companyId = company.id;
+      this.companyPreferencesRepository.save(prefs)
+    }
   }
 }

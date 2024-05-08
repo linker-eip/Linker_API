@@ -2,13 +2,19 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
   Get,
+  HttpStatus,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   Post,
   Put,
   Query,
   Req,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -26,25 +32,44 @@ import { MissionTaskDto } from './dto/mission-task.dto';
 import { GetMissionDetailsStudentDto } from './dto/get-mission-details-student.dto';
 import { GetMissionDetailsCompanyDto } from './dto/get-mission-details-company.dto';
 import { UpdateTaskStatusDto } from './dto/update-task-status-dto';
-import { GetMissionDto } from './dto/get-mission.dto';
+import { GetMissionDto, getInvitedGroups } from './dto/get-mission.dto';
 import { MissionSearchOptionStudentDto } from './dto/mission-search-option-student.dto';
 import { CommentMissionDto } from './dto/comment-mission.dto';
 import { NoteMissionDto } from './dto/note-mission.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { MissionInviteStatus } from './enum/mission-invite-status.enum';
+import { VerifiedUserGuard } from '../admin/auth/guard/user.guard';
 
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(VerifiedUserGuard)
 @ApiTags('Mission')
 @Controller('api/mission')
 export class MissionController {
-  constructor(private readonly missionService: MissionService) {}
+  constructor(private readonly missionService: MissionService) { }
 
   @Post()
   @ApiOperation({
     description: 'Create a mission as a company',
     summary: 'Create a mission as a company',
   })
-  async createMission(@Req() req, @Body() body: CreateMissionDto) {
-    return await this.missionService.createMission(body, req);
+  @UseInterceptors(FileInterceptor('specifications'))
+  async createMission(
+    @UploadedFile(
+      new ParseFilePipe({
+        fileIsRequired: false,
+        errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+        validators: [
+          new MaxFileSizeValidator({
+            maxSize: 3_500_000,
+          }),
+          new FileTypeValidator({
+            fileType: 'application/pdf',
+          }),
+        ],
+      }),
+    ) file,
+    @Req() req, @Body() body: CreateMissionDto) {
+    return await this.missionService.createMission(body, req, file);
   }
 
   @Delete(':id')
@@ -61,12 +86,27 @@ export class MissionController {
     description: 'Update a mission as a company',
     summary: 'Update a mission as a company',
   })
+  @UseInterceptors(FileInterceptor('specifications'))
   async updateMission(
+    @UploadedFile(
+      new ParseFilePipe({
+        fileIsRequired: false,
+        errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+        validators: [
+          new MaxFileSizeValidator({
+            maxSize: 3_500_000,
+          }),
+          new FileTypeValidator({
+            fileType: 'application/pdf',
+          }),
+        ],
+      }),
+    ) file,
     @Param('id') missionId: number,
     @Body() body: UpdateMissionDto,
     @Req() req,
   ) {
-    return await this.missionService.updateMission(missionId, body, req);
+    return await this.missionService.updateMission(missionId, body, req, file);
   }
 
   @Get()
@@ -99,6 +139,23 @@ export class MissionController {
     return await this.missionService.createMissionTask(missionId, body, req);
   }
 
+  @Post('studentTask/:missionId')
+  @ApiOperation({
+    description: 'Create a task for a mission - AS AN INVITED GROUP',
+    summary: 'Create a task for a mission - AS AN INVITED GROUP',
+  })
+  @ApiOkResponse({
+    description: 'Create a task for a mission',
+    type: MissionTaskDto,
+  })
+  async createMissionTaskStudent(
+    @Param('missionId') missionId: number,
+    @Body() body: CreateMissionTaskDto,
+    @Req() req,
+  ) {
+    return await this.missionService.createMissionTaskStudent(missionId, body, req);
+  }
+
   @Put('task/:taskId')
   @ApiOperation({
     description: 'Update a task for a mission',
@@ -116,6 +173,23 @@ export class MissionController {
     return await this.missionService.updateMissionTask(taskId, body, req);
   }
 
+  @Put('studentTask/:taskId')
+  @ApiOperation({
+    description: 'Update a task for a mission - AS AN INVITED GROUP',
+    summary: 'Update a task for a mission - AS AN INVITED GROUP',
+  })
+  @ApiOkResponse({
+    description: 'Update a task for a mission',
+    type: MissionTaskDto,
+  })
+  async updateMissionTaskStudent(
+    @Param('taskId') taskId: number,
+    @Body() body: UpdateMissionTaskDto,
+    @Req() req,
+  ) {
+    return await this.missionService.updateMissionTaskStudent(taskId, body, req);
+  }
+
   @Delete('task/:taskId')
   @ApiOperation({
     description: 'Delete a task for a mission',
@@ -123,6 +197,15 @@ export class MissionController {
   })
   async deleteMissionTask(@Param('taskId') taskId: number, @Req() req) {
     return await this.missionService.deleteMissionTask(taskId, req);
+  }
+
+  @Delete('studentTask/:taskId')
+  @ApiOperation({
+    description: 'Delete a task for a mission  - AS AN INVITED GROUP',
+    summary: 'Delete a task for a mission  - AS AN INVITED GROUP',
+  })
+  async deleteMissionTaskStudent(@Param('taskId') taskId: number, @Req() req) {
+    return await this.missionService.deleteMissionTaskStudent(taskId, req);
   }
 
   @Get('task/:missionId')
@@ -179,6 +262,20 @@ export class MissionController {
     return await this.missionService.acceptMission(missionId, groupId, req);
   }
 
+  @Post('acceptGroup/:missionId/:groupId')
+  @ApiOperation({
+    description: 'Accept a group for a mission AS A COMPANY',
+    summary: 'Accept a group for a mission AS A COMPANY',
+  })
+  async acceptGroup(
+    @Param('missionId') missionId: number,
+    @Param('groupId') groupId: number,
+    @Req() req,
+  ) {
+    return await this.missionService.acceptGroup(missionId, groupId, req);
+  }
+
+
   @Post('refuse/:missionId/:groupId')
   @ApiOperation({
     description: 'Refuse a mission for a group',
@@ -190,6 +287,28 @@ export class MissionController {
     @Req() req,
   ) {
     return await this.missionService.refuseMission(missionId, groupId, req);
+  }
+
+  @Post('refuseGroup/:missionId/:groupId')
+  @ApiOperation({
+    description: 'Refuse a group for a mission AS A COMPANY',
+    summary: 'Refuse a group for a mission AS A COMPANY',
+  })
+  async refuseGroup(
+    @Param('missionId') missionId: number,
+    @Param('groupId') groupId: number,
+    @Req() req,
+  ) {
+    return await this.missionService.refuseGroup(missionId, groupId, req);
+  }
+
+  @Get('groupToAccept/:missionId')
+  @ApiOperation({
+    description: 'Get the list of group that accepted missions AS A COMPANY',
+    summary: 'Get the list of group that accepted missions AS A COMPANY',
+  })
+  async getGroupToAccept(@Param('missionId') missionId: number, @Req() req) {
+    return await this.missionService.getGroupToAccept(req, missionId)
   }
 
   @Post('finish/:missionId')
@@ -267,8 +386,22 @@ export class MissionController {
     description: 'Get all invitations for a student',
     type: GetMissionDto,
   })
-  async getStudentInvitations(@Req() req) {
-    return await this.missionService.getMissionInvites(req);
+  async getStudentInvitations(@Req() req, @Query('status') status: MissionInviteStatus) {
+    return await this.missionService.getMissionInvites(req, status);
+  }
+
+  @Get('invitedGroups/:missionId')
+  @ApiOperation({
+    description: 'Get all invited groups for a mission',
+    summary: 'Get all invited groups for a mission',
+  })
+  @ApiOkResponse({
+    description: 'Get all invited groups for a mission',
+    type: getInvitedGroups,
+    isArray: true
+  })
+  async getInvitedStudents(@Req() req, @Param('missionId') missionId: number) {
+    return await this.missionService.getInvitedGroups(req, missionId);
   }
 
   @Put('company/comment/:missionId')

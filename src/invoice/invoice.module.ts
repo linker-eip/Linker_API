@@ -7,9 +7,10 @@ import { StudentModule } from '../student/student.module';
 import { Document } from '../documents/entity/document.entity';
 import { FileModule } from '../filesystem/file.module';
 import { InvoiceController } from './invoice.controller';
+import { CompanyModule } from '../company/company.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([CompanyProfile, Document]),MissionModule, StudentModule, FileModule
+  imports: [TypeOrmModule.forFeature([CompanyProfile, Document]),MissionModule, StudentModule, FileModule, CompanyModule
   ],
   providers: [InvoiceService],
   exports: [InvoiceService],

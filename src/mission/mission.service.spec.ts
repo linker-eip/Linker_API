@@ -38,6 +38,14 @@ import { UpdateMissionTaskDto } from './dto/update-mission-task.dto';
 import { MissionSearchOptionStudentDto } from './dto/mission-search-option-student.dto';
 import { CommentMissionDto } from './dto/comment-mission.dto';
 import { NoteMissionDto } from './dto/note-mission.dto';
+import { CompanyDocument } from '../company/entity/CompanyDocument.entity';
+import { CompanyPreferences } from '../company/entity/CompanyPreferences.entity';
+import { StudentPreferences } from '../student/entity/StudentPreferences.entity';
+import { StudentDocument } from '../student/entity/StudentDocuments.entity';
+import { MailService } from '../mail/mail.service';
+import { PaymentService } from '../payment/payment.service';
+import { Payment } from '../payment/entity/payment.entity';
+import { StudentPayment } from '../payment/entity/student-payment.entity';
 
 describe('MissionService', () => {
   let service: MissionService;
@@ -66,12 +74,22 @@ describe('MissionService', () => {
         StudiesService,
         DocumentTransferService,
         ConfigService,
+        MailService,
+        PaymentService,
         {
           provide: getRepositoryToken(Mission),
           useClass: Repository,
         },
         {
           provide: getRepositoryToken(CompanyUser),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(Payment),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(StudentPayment),
           useClass: Repository,
         },
         {
@@ -95,6 +113,12 @@ describe('MissionService', () => {
           useClass: Repository,
         },
         {
+          provide: 'MAILER_PROVIDER',
+          useValue: {
+            sendMail: jest.fn(),
+          },
+        },
+        {
           provide: getRepositoryToken(StudentUser),
           useClass: Repository,
         },
@@ -112,6 +136,22 @@ describe('MissionService', () => {
         },
         {
           provide: getRepositoryToken(Jobs),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(CompanyDocument),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(CompanyPreferences),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(StudentPreferences),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(StudentDocument),
           useClass: Repository,
         },
         {
@@ -137,6 +177,20 @@ describe('MissionService', () => {
         endOfMission: null,
         amount: 100,
         skills: 'Skills',
+        specifications: null
+      };
+
+      const file: Express.Multer.File = {
+        fieldname: 'file',
+        originalname: 'test-file.txt',
+        encoding: '7bit',
+        mimetype: 'text/plain',
+        destination: './uploads',
+        filename: 'test-file.txt',
+        path: './uploads/test-file.txt',
+        size: 1234,
+        stream: null,
+        buffer: Buffer.from(''),
       };
 
       const req = {
@@ -160,15 +214,16 @@ describe('MissionService', () => {
         groupId: null,
         comments: null,
         isNoted: false,
+        specificationsFile: null,
       };
 
       jest
         .spyOn(service, 'createMission')
         .mockResolvedValueOnce(expectedMission);
 
-      const response = await controller.createMission(req, createMissionDto);
+      const response = await controller.createMission(file, req, createMissionDto);
 
-      expect(service.createMission).toHaveBeenCalledWith(createMissionDto, req);
+      expect(service.createMission).toHaveBeenCalledWith(createMissionDto, req,file );
       expect(response).toEqual(expectedMission);
     });
   });
@@ -202,6 +257,7 @@ describe('MissionService', () => {
         amount: 150,
         skills: null,
         groupId: null,
+        specifications: null
       };
 
       const req = {
@@ -225,18 +281,33 @@ describe('MissionService', () => {
         skills: 'Skills',
         comments: null,
         isNoted: false,
+        specificationsFile: null
+      };
+
+      const file: Express.Multer.File = {
+        fieldname: 'file',
+        originalname: 'test-file.txt',
+        encoding: '7bit',
+        mimetype: 'text/plain',
+        destination: './uploads',
+        filename: 'test-file.txt',
+        path: './uploads/test-file.txt',
+        size: 1234,
+        stream: null,
+        buffer: Buffer.from(''),
       };
 
       jest
         .spyOn(service, 'updateMission')
         .mockResolvedValueOnce(expectedMission);
 
-      const response = await controller.updateMission(1, updateMissionDto, req);
+      const response = await controller.updateMission(file, 1, updateMissionDto, req);
 
       expect(service.updateMission).toHaveBeenCalledWith(
         1,
         updateMissionDto,
         req,
+        file
       );
       expect(response).toEqual(expectedMission);
     });
@@ -266,6 +337,7 @@ describe('MissionService', () => {
           groupId: null,
           comments: null,
           isNoted: false,
+          specificationsFile: null,
         },
       ];
 
@@ -613,9 +685,9 @@ describe('MissionService', () => {
         .spyOn(service, 'getMissionInvites')
         .mockResolvedValueOnce(expectedResponse);
 
-      const response = await controller.getStudentInvitations(req);
+      const response = await controller.getStudentInvitations(req, null);
 
-      expect(service.getMissionInvites).toHaveBeenCalledWith(req);
+      expect(service.getMissionInvites).toHaveBeenCalledWith(req, null);
 
       expect(response).toEqual(expectedResponse);
     });

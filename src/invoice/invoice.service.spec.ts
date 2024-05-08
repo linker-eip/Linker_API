@@ -33,6 +33,15 @@ import { GroupInvite } from '../group/entity/GroupInvite.entity';
 import { NotificationsService } from '../notifications/notifications.service';
 import { ConfigService } from '@nestjs/config';
 import { Notification } from '../notifications/entity/Notification.entity';
+import { LinkerInvoiceCompanyDto } from './dto/linker-invoice-company.dto';
+import { StudentPreferences } from '../student/entity/StudentPreferences.entity';
+import { StudentDocument } from '../student/entity/StudentDocuments.entity';
+import { CompanyPreferences } from '../company/entity/CompanyPreferences.entity';
+import { CompanyDocument } from '../company/entity/CompanyDocument.entity';
+import { MailService } from '../mail/mail.service';
+import { PaymentService } from '../payment/payment.service';
+import { Payment } from '../payment/entity/payment.entity';
+import { StudentPayment } from '../payment/entity/student-payment.entity';
 
 describe('InvoiceService', () => {
   let service: InvoiceService;
@@ -59,12 +68,22 @@ describe('InvoiceService', () => {
         DocumentTransferService,
         NotificationsService,
         ConfigService,
+        PaymentService,
+        MailService,
         {
           provide: getRepositoryToken(Mission),
           useClass: Repository,
         },
         {
           provide: getRepositoryToken(CompanyProfile),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(Payment),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(StudentPayment),
           useClass: Repository,
         },
         {
@@ -77,6 +96,22 @@ describe('InvoiceService', () => {
         },
         {
           provide: getRepositoryToken(StudentProfile),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(StudentPreferences),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(StudentDocument),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(CompanyPreferences),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(CompanyDocument),
           useClass: Repository,
         },
         {
@@ -94,7 +129,7 @@ describe('InvoiceService', () => {
         {
           provide: getRepositoryToken(Jobs),
           useClass: Repository,
-        },        {
+        }, {
           provide: getRepositoryToken(MissionTask),
           useClass: Repository,
         },
@@ -111,8 +146,56 @@ describe('InvoiceService', () => {
           useClass: Repository,
         },
         {
+          provide: 'MAILER_PROVIDER',
+          useValue: {
+            sendMail: jest.fn(),
+          },
+        },
+        {
           provide: getRepositoryToken(Notification),
           useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(Document),
+          useClass: Repository
+        },
+        {
+          provide: getRepositoryToken(CompanyProfile),
+          useClass: Repository
+        },
+        {
+          provide: getRepositoryToken(CompanyUser),
+          useClass: Repository
+        },
+        {
+          provide: getRepositoryToken(StudentUser),
+          useClass: Repository
+        },
+        {
+          provide: getRepositoryToken(StudentProfile),
+          useClass: Repository
+        },
+        {
+          provide: getRepositoryToken(Skills),
+          useClass: Repository
+        },
+        {
+          provide: getRepositoryToken(Jobs),
+          useClass: Repository
+        },
+        {
+          provide: getRepositoryToken(Studies),
+          useClass: Repository
+        },
+        {
+          provide: InvoiceService,
+          useValue: {
+            getInvoices: jest.fn(),
+            generateInvoice: jest.fn(),
+            downloadInvoice: jest.fn(),
+            deleteInvoice: jest.fn(),
+            generateInvoiceForCompany: jest.fn(),
+          },
         },
       ],
     }).compile();
@@ -290,6 +373,80 @@ describe('InvoiceService', () => {
 
       expect(service.deleteInvoice).toHaveBeenCalledWith(1);
       expect(response).toEqual(true);
+    });
+  });
+
+  describe('generateCompanyPdf', () => {
+    it('should return a pdf', async () => {
+      const req = {
+        user: {
+          email: 'tony@gmail.com',
+        },
+      };
+
+      const res = {
+        status: jest.fn(() => res),
+        sendFile: jest.fn(),
+        send: jest.fn(),
+      };
+
+      const linkerInvoiceCompanyDto: LinkerInvoiceCompanyDto = {
+        missionId: 1,
+        companyId: 1,
+        amount: 100,
+        headerFields: [
+          'Description',
+          'Quantité',
+          'Prix Unitaire(HT)',
+          'Total(HT)',
+        ],
+        rows: [
+          {
+            Description: "Page d'accueil",
+            Quantité: 1,
+            'Prix Unitaire(HT)': '120 €',
+            'Total(HT)': '120 €',
+          },
+          {
+            Description: 'Page formulaire',
+            Quantité: 1,
+            'Prix Unitaire(HT)': '90 €',
+            'Total(HT)': '90 €',
+          },
+          {
+            Description: 'Base de donnée',
+            Quantité: 1,
+            'Prix Unitaire(HT)': '140 €',
+            'Total(HT)': '140 €',
+          },
+        ],
+        companyEmail: 'company@gmail.com',
+      };
+
+      const document: Document = {
+        id: 1,
+        documentPath: 'test',
+        documentType: DocumentTypeEnum.INVOICE,
+        documentUser: DocumentUserEnum.COMPANY,
+        userId: 1,
+        createdAt: new Date(),
+      };
+
+      jest.spyOn(service, 'generateInvoiceForCompany').mockResolvedValueOnce();
+
+      const response = await controller.generateCompanyPdf(
+        res,
+        req,
+        linkerInvoiceCompanyDto,
+      );
+
+      expect(service.generateInvoiceForCompany).toHaveBeenCalledWith(
+        linkerInvoiceCompanyDto,
+      );
+
+      expect(response).toEqual(undefined);
+
+      expect(response).toEqual(undefined);
     });
   });
 

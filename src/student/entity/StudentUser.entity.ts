@@ -1,5 +1,6 @@
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Mission } from '../../mission/entity/mission.entity';
+import { StudentProfile } from './StudentProfile.entity';
 
 @Entity()
 export class StudentUser {
@@ -44,4 +45,11 @@ export class StudentUser {
 
   @Column({ type: 'int', default: null, nullable: true })
   groupId: number;
+
+  @OneToOne(() => StudentProfile, studentProfile => studentProfile.student, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'profileId' })
+  profile: StudentProfile;
 }

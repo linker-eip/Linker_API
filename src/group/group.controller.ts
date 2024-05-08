@@ -21,12 +21,13 @@ import { GroupService } from './group.service';
 import { CreateGroupDto } from './dto/create-group-dto';
 import { UpdateGroupDto } from './dto/update-group-dto';
 import { GetGroupeResponse } from './dto/get-group-response-dto';
-import { GetInvitesResponse } from './dto/get-invites-response-dto';
+import { GetInvitesResponse, GetPersonnalInvitesResponse } from './dto/get-invites-response-dto';
 import { GetCompanySearchGroupsDto } from './dto/get-company-search-groups.dto';
 import { CompanySearchGroupsFilterDto } from './dto/company-search-groups-filter.dto';
+import { VerifiedUserGuard } from '../admin/auth/guard/user.guard';
 
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(VerifiedUserGuard)
 @ApiTags('Group')
 @Controller('api/group')
 export class GroupController {
@@ -127,14 +128,14 @@ export class GroupController {
   @ApiResponse({
     status: 200,
     description: 'Successfully got invites',
-    type: GetInvitesResponse,
+    type: GetPersonnalInvitesResponse,
     isArray: true,
   })
   @ApiResponse({
     status: 400,
     description: 'You are not the group leader',
   })
-  async getGroupInvites(@Req() req): Promise<GetInvitesResponse[]> {
+  async getGroupInvites(@Req() req): Promise<GetPersonnalInvitesResponse[]> {
     return await this.groupService.getGroupInvites(req);
   }
 
@@ -178,6 +179,31 @@ export class GroupController {
   })
   async leaveGroup(@Req() req) {
     return await this.groupService.leaveGroup(req);
+  }
+
+  @Delete('/eject/:userId')
+  @ApiOperation({
+    description: 'Eject member from your group (only possible as a leader)',
+    summary: 'Eject member from your group (only possible as a leader)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Membre éjecté',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Mission en cours',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Vous devez être chef de groupe',
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Vous n'avez pas de groupe",
+  })
+  async ejectMember(@Req() req, @Param('userId') userId) {
+    return await this.groupService.ejectMember(req, userId);
   }
 
   @Get('/company/searchGroups')

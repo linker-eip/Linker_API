@@ -19,4 +19,7 @@ export class Group {
 
     @Column({ type: 'int', nullable: false })
     leaderId: number;
+
+    @Column({ type: 'boolean', default: true, nullable: true })
+    isActive: boolean;
 }
