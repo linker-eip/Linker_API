@@ -30,7 +30,6 @@ export class NotificationsService {
         notification.title = title;
         notification.text = text;
         notification.type = type;
-        console.log(studentId)
         if (studentId != null) {
             notification.studentId = studentId;
             const studentPref = await this.studentPreferencesRepository.findOne({ where: { studentId: studentId } })

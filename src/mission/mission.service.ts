@@ -30,6 +30,10 @@ import { PaymentService } from '../payment/payment.service';
 import { FileService } from 'src/filesystem/file.service';
 import { DocumentTransferModule } from 'src/document-transfer/src/document-transfer.module';
 import { DocumentTransferService } from 'src/document-transfer/src/services/document-transfer.service';
+import { CompanyUser } from 'src/company/entity/CompanyUser.entity';
+import { CompanyDocument } from 'src/company/entity/CompanyDocument.entity';
+import { DocumentStatus } from 'src/company/enum/CompanyDocument.enum';
+import { HttpStatusCode } from 'axios';
 
 @Injectable()
 export class MissionService {
@@ -44,10 +48,17 @@ export class MissionService {
     private readonly studentService: StudentService,
     @InjectRepository(MissionInvite)
     private readonly missionInviteRepository: Repository<MissionInvite>,
+    @InjectRepository(CompanyDocument)
+    private readonly companyDocumentsRepository: Repository<CompanyDocument>,
     @Inject(forwardRef(() => PaymentService))
     private readonly paymentService: PaymentService,
     private readonly DocumentService: DocumentTransferService,
   ) { }
+
+  async missionVerification(company: CompanyUser) {
+    let companyDocuments = await this.companyDocumentsRepository.findBy({ companyId: company.id, status: DocumentStatus.VERIFIED })
+    if (companyDocuments.length < 3) throw new HttpException("Vous ne pouvez pas créer de mission avant d'avoir fait vérifier tous vos documents", HttpStatusCode.Forbidden)
+  }
 
   async findMissionById(missionId: number): Promise<Mission> {
     const mission = await this.missionRepository.findOneBy({ id: missionId });
@@ -70,6 +81,8 @@ export class MissionService {
     } catch (err) {
       throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
     }
+
+    await this.missionVerification(company)
 
     const mission = new Mission();
     mission.name = createMissionDto.name;
@@ -160,6 +173,7 @@ export class MissionService {
 
   async getCompanyMissions(req: any) {
     let company = null;
+
     try {
       company = await this.companyService.findOne(req.user.email);
     } catch (err) {
@@ -184,6 +198,8 @@ export class MissionService {
       throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
     }
 
+    await this.missionVerification(company);
+    
     const mission = await this.findMissionById(missionId);
 
     if (mission == null || mission.companyId != company.id) {
@@ -764,6 +780,8 @@ export class MissionService {
       throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
     }
 
+    await this.missionVerification(company);
+
     if (company == null) {
       throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
     }
@@ -1075,6 +1093,9 @@ export class MissionService {
         HttpStatus.UNAUTHORIZED,
       );
     }
+
+    await this.missionVerification(company);
+
     if (mission.companyId != company.id) {
       throw new HttpException(
         'Cette mission ne vous appartient pas',
