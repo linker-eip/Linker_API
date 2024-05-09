@@ -743,6 +743,166 @@ describe('MissionService', () => {
     });
   });
 
+  //createMissionTaskStudent
+  describe('createMissionTaskStudent', () => {
+    it('should create a mission task for student', async () => {
+      const req = {
+        user: {
+          email: 'test@gmail.com',
+        },
+      };
+
+      const dto: CreateMissionTaskDto = {
+        name: 'Name',
+        description: 'Desc',
+        studentId: 1,
+        amount: 100,
+        skills: 'Skills',
+      };
+
+      const expectedResponse = null;
+
+      jest
+        .spyOn(service, 'createMissionTaskStudent')
+        .mockResolvedValueOnce(expectedResponse);
+
+      const response = await controller.createMissionTaskStudent(1, dto, req);
+
+      expect(service.createMissionTaskStudent).toHaveBeenCalledWith(1, dto, req);
+
+      expect(response).toEqual(expectedResponse);
+
+    });
+  });
+
+  //updateMissionTaskStudent
+  describe('updateMissionTaskStudent', () => {
+    it('should update a mission task for student', async () => {
+      const req = {
+        user: {
+          email: 'test@gmail.com',
+        },
+      };
+
+      const dto: UpdateMissionTaskDto = {
+        name: 'Name',
+        description: 'Desc',
+        studentId: 1,
+        amount: 100,
+        skills: 'Skills',
+      };
+
+      const expectedResponse = null;
+      
+      jest
+        .spyOn(service, 'updateMissionTaskStudent')
+        .mockResolvedValueOnce(expectedResponse);
+
+      const response = await controller.updateMissionTaskStudent(1, dto, req);
+
+      expect(service.updateMissionTaskStudent).toHaveBeenCalledWith(1, dto, req);
+
+      expect(response).toEqual(expectedResponse);
+
+    });
+  });
+
+  //deleteMissionTaskStudent
+  describe('deleteMissionTaskStudent', () => {
+    it('should delete a mission task for student', async () => {
+      const req = {
+        user: {
+          email: 'test@gmail.com',
+        },
+      };
+
+      const expectedResponse = null;
+
+      jest
+        .spyOn(service, 'deleteMissionTaskStudent')
+        .mockResolvedValueOnce(expectedResponse);
+
+      const response = await controller.deleteMissionTaskStudent(1, req);
+
+      expect(service.deleteMissionTaskStudent).toHaveBeenCalledWith(1, req);
+
+      expect(response).toEqual(expectedResponse);
+
+    });
+  });
+
+  //acceptGroup
+  describe('acceptGroup', () => {
+    it('should accept a group', async () => {
+      const req = {
+        user: {
+          email: 'test@gmail.com',
+        },
+      };
+
+      const expectedResponse = null;
+
+      jest
+        .spyOn(service, 'acceptGroup')
+        .mockResolvedValueOnce(expectedResponse);
+
+      const response = await controller.acceptGroup(1, 1, req);
+
+      expect(service.acceptGroup).toHaveBeenCalledWith(1, 1, req);
+
+      expect(response).toEqual(expectedResponse);
+
+    });
+  });
+
+  //refuseGroup
+  describe('refuseGroup', () => {
+    it('should refuse a group', async () => {
+      const req = {
+        user: {
+          email: 'test@gmail.com',
+        },
+      };
+
+      const expectedResponse = null;
+
+      jest
+        .spyOn(service, 'refuseGroup')
+        .mockResolvedValueOnce(expectedResponse);
+
+      const response = await controller.refuseGroup(1, 1, req);
+
+      expect(service.refuseGroup).toHaveBeenCalledWith(1, 1, req);
+
+      expect(response).toEqual(expectedResponse);
+
+    });
+  });
+
+  //getInvitedStudents
+  describe('getInvitedStudents', () => {
+    it('should get invited students', async () => {
+      const req = {
+        user: {
+          email: 'test@gmail.com',
+        },
+      };
+
+      const expectedResponse = null;
+
+      jest
+        .spyOn(service, 'getInvitedGroups')
+        .mockResolvedValueOnce(expectedResponse);
+
+      const response = await controller.getInvitedStudents(req, 1);
+
+      expect(service.getInvitedGroups).toHaveBeenCalledWith(req, 1);
+
+      expect(response).toEqual(expectedResponse);
+
+    });
+  });
+
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
