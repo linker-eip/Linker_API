@@ -18,6 +18,11 @@ import { CompanyDocument } from "./entity/CompanyDocument.entity";
 import { CompanyPreferences } from "./entity/CompanyPreferences.entity";
 import { DocumentTransferService } from "../document-transfer/src/services/document-transfer.service";
 import { ConfigService } from "@nestjs/config";
+import { StudentService } from "../student/student.service";
+import { StudentProfile } from "../student/entity/StudentProfile.entity";
+import { StudentPreferences } from "../student/entity/StudentPreferences.entity";
+import { StudentDocument } from "../student/entity/StudentDocuments.entity";
+import { StudentUser } from "../student/entity/StudentUser.entity";
 
 describe('CompanyService', () => {
   let service: CompanyService;
@@ -33,8 +38,8 @@ describe('CompanyService', () => {
         }),
       ],
       controllers: [CompanyController],
-      providers: [CompanyService, FileService,ConfigService, DocumentTransferService, SkillsService, JobsService, StudiesService,
-        {
+      providers: [CompanyService, DocumentTransferService, ConfigService, StudentService, SkillsService, JobsService, StudiesService, FileService,
+      {
           provide: getRepositoryToken(CompanyUser),
           useClass: Repository,
         },
@@ -51,7 +56,35 @@ describe('CompanyService', () => {
           useClass: Repository,
         },
         {
+          provide: getRepositoryToken(StudentUser),
+          useClass: Repository,
+        },
+        {
           provide: getRepositoryToken(CompanyDocument),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(StudentProfile),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(StudentPreferences),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(StudentDocument),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(Jobs),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(Studies),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(Skills),
           useClass: Repository,
         },
         {

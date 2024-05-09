@@ -7,8 +7,8 @@ import { HttpStatusCode } from 'axios';
 @Injectable()
 export class VerifiedUserGuard extends AuthGuard('jwt') {
     constructor(
+        private readonly companyService: CompanyService,
         private readonly studentService: StudentService,
-        private readonly companyService: CompanyService
     ) {
         super();
     }
