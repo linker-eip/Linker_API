@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { StudentPaymentStatus } from "../../../payment/enum/student-payment.status.enum copy";
+import { StudentPaymentStatus } from "../../../payment/enum/student-payment.status.enum";
 import { IsEnum, IsNumber } from "class-validator";
 
 

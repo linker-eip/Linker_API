@@ -29,7 +29,7 @@ import { JobsService } from '../student/jobs/jobs.service';
 import { StudiesService } from '../student/studies/studies.service';
 import { FileService } from '../filesystem/file.service';
 import { StudentPaymentResponseDto } from './dto/student-payment-response.dto';
-import { StudentPaymentStatus } from './enum/student-payment.status.enum copy';
+import { StudentPaymentStatus } from './enum/student-payment.status.enum';
 
 
 describe('PaymentService', () => {
@@ -130,6 +130,9 @@ describe('PaymentService', () => {
                         createProductAndCheckoutSession: jest.fn(),
                         paymentSuccess: jest.fn(),
                         getPayment: jest.fn(),
+                        getStudentPayment: jest.fn(),
+                        getStudentPaymentById: jest.fn(),
+                        receiveStudentPayment: jest.fn(),
                     },
                 }
 
@@ -249,41 +252,9 @@ describe('PaymentService', () => {
         });
     });
 
-    describe('getStudentPayments', () => {
+    describe('getStudentPaymentsFunc', () => {
         it('should get student payments', async () => {
-            /*
-               @Get('student')
-    @UseGuards(VerifiedUserGuard)
-    async getStudentPayments(
-        @Req() req
-    ) : Promise<StudentPaymentResponseDto[]> {
-        return this.stripeService.getStudentPayment(req);
-    }
-
-    async getStudentPayment(req: any) : Promise<StudentPaymentResponseDto[]> {
-        const student = await this.studentService.findOneByEmail(req.user.email);
-        const studentPayments = await this.studentPaymentRepository.find({
-            where: {
-                studentId: student.id,
-            },
-        });
-
-        const studentPaymentResponseDtos = studentPayments.map(async (studentPayment) => {
-            const mission = await this.missionService.findMissionById(studentPayment.missionId);
-            if (!mission) {
-                throw new NotFoundException('Mission not found');
-            }
-            return {
-                id: studentPayment.id,
-                missionName: mission.name,
-                status: studentPayment.status,
-                amount: studentPayment.amount,
-            }
-        });
-
-        return Promise.all(studentPaymentResponseDtos);
-    }*/
-
+ 
             const studentPaymentResponseDto: StudentPaymentResponseDto[] = [{
                 id: 1,
                 missionName: 'Test',
@@ -303,7 +274,7 @@ describe('PaymentService', () => {
 
             expect(service.getStudentPayment).toHaveBeenCalledWith(req);
 
-            expect([studentPaymentResponseDto]).toEqual(res);
+            expect(studentPaymentResponseDto).toEqual(res);
         });
     });
 
@@ -333,8 +304,33 @@ describe('PaymentService', () => {
         });
     });
 
-    it('should be defined', () => {
-        expect(service).toBeDefined();
-      });
+    describe('receiveStudentPayment', () => {
+        it('should receive student payment', async () => {
+            const studentPaymentResponseDto: StudentPaymentResponseDto = {
+                id: 1,
+                missionName: 'Test',
+                status: StudentPaymentStatus.WAITING,
+                amount: 100,
+            };
+
+            const req = {
+                user: {
+                    email: 'test@gmail.com',
+                },
+            };
+
+            jest.spyOn(service, 'receiveStudentPayment').mockResolvedValue(undefined);
+
+            const res = await controller.receiveStudentPayment(req, 1);
+
+            expect(service.receiveStudentPayment).toHaveBeenCalledWith(1, req);
+
+            expect(undefined).toEqual(res);
+        });
+    });
+
+            it('should be defined', () => {
+                expect(service).toBeDefined();
+            });
     });
 

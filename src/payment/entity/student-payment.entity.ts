@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-import { StudentPaymentStatus } from "../enum/student-payment.status.enum copy";
+import { StudentPaymentStatus } from "../enum/student-payment.status.enum";
 
 
 @Entity()

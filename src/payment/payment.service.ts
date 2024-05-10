@@ -9,7 +9,7 @@ import { MissionStatus } from '../mission/enum/mission-status.enum';
 import { StudentPayment } from './entity/student-payment.entity';
 import { StudentService } from '../student/student.service';
 import { StudentPaymentResponseDto } from '../payment/dto/student-payment-response.dto';
-import { StudentPaymentStatus } from './enum/student-payment.status.enum copy';
+import { StudentPaymentStatus } from './enum/student-payment.status.enum';
 
 @Injectable()
 export class PaymentService {
@@ -118,8 +118,8 @@ export class PaymentService {
                     quantity: 1,
                 }],
                 mode: 'payment',
-                success_url: `http://localhost:8080/api/payment/checkout/session?session_id={CHECKOUT_SESSION_ID}&mission_id=${missionId}`,
-                cancel_url: 'http://localhost:8080/cancel',
+                success_url: `http://${process.env.BASE_URL}/api/payment/checkout/session?session_id={CHECKOUT_SESSION_ID}&mission_id=${missionId}`,
+                cancel_url: `http://${process.env.BASE_URL}/cancel`,
             });
 
             const payment = new Payment();
