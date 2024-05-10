@@ -23,6 +23,8 @@ import { StudentProfile } from "../student/entity/StudentProfile.entity";
 import { StudentPreferences } from "../student/entity/StudentPreferences.entity";
 import { StudentDocument } from "../student/entity/StudentDocuments.entity";
 import { StudentUser } from "../student/entity/StudentUser.entity";
+import { DocumentStatusResponseDto } from "./dto/document-status-response.dto";
+import { CompanyDocumentType, DocumentStatus } from "./enum/CompanyDocument.enum";
 
 describe('CompanyService', () => {
   let service: CompanyService;
@@ -185,6 +187,31 @@ describe('CompanyService', () => {
       expect(response).toEqual(expectedProfile);
     });
   });
+
+  //getDocumentStatus
+
+  describe('getDocumentStatus', () => {
+    it('should return a companyDocument', async () => {
+      const req = {
+        user: {
+          email: "test@gmail.com",
+        }
+      }
+
+      const expectedDocument: DocumentStatusResponseDto = {
+        documentType: CompanyDocumentType.CNI,
+        status: DocumentStatus.VERIFIED,
+        comment: "Document validé",
+      };
+
+      jest.spyOn(service, 'getDocumentStatus').mockResolvedValueOnce([expectedDocument]);
+
+      const response = await controller.getDocumentStatus(req);
+
+      expect(response).toEqual([expectedDocument]);
+    });
+  });
+
 
 
   it('should be defined', () => {
