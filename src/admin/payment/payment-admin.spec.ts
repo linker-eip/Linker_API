@@ -6,7 +6,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { StudentPayment } from "../../payment/entity/student-payment.entity";
 import { Repository } from "typeorm";
-import { StudentPaymentStatus } from "../../payment/enum/student-payment.status.enum copy";
+import { StudentPaymentStatus } from "../../payment/enum/student-payment.status.enum";
 import { StudentPaymentResponseDto } from "./dto/student-payment-response.dto";
 import { UserAdminService } from "../user-admin/user-admin.service";
 import { MissionService } from "../mission/mission.service";

@@ -18,6 +18,13 @@ import { CompanyDocument } from "./entity/CompanyDocument.entity";
 import { CompanyPreferences } from "./entity/CompanyPreferences.entity";
 import { DocumentTransferService } from "../document-transfer/src/services/document-transfer.service";
 import { ConfigService } from "@nestjs/config";
+import { StudentService } from "../student/student.service";
+import { StudentProfile } from "../student/entity/StudentProfile.entity";
+import { StudentPreferences } from "../student/entity/StudentPreferences.entity";
+import { StudentDocument } from "../student/entity/StudentDocuments.entity";
+import { StudentUser } from "../student/entity/StudentUser.entity";
+import { DocumentStatusResponseDto } from "./dto/document-status-response.dto";
+import { CompanyDocumentType, DocumentStatus } from "./enum/CompanyDocument.enum";
 
 describe('CompanyService', () => {
   let service: CompanyService;
@@ -33,8 +40,8 @@ describe('CompanyService', () => {
         }),
       ],
       controllers: [CompanyController],
-      providers: [CompanyService, FileService,ConfigService, DocumentTransferService, SkillsService, JobsService, StudiesService,
-        {
+      providers: [CompanyService, DocumentTransferService, ConfigService, StudentService, SkillsService, JobsService, StudiesService, FileService,
+      {
           provide: getRepositoryToken(CompanyUser),
           useClass: Repository,
         },
@@ -51,7 +58,35 @@ describe('CompanyService', () => {
           useClass: Repository,
         },
         {
+          provide: getRepositoryToken(StudentUser),
+          useClass: Repository,
+        },
+        {
           provide: getRepositoryToken(CompanyDocument),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(StudentProfile),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(StudentPreferences),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(StudentDocument),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(Jobs),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(Studies),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(Skills),
           useClass: Repository,
         },
         {
@@ -152,6 +187,31 @@ describe('CompanyService', () => {
       expect(response).toEqual(expectedProfile);
     });
   });
+
+  //getDocumentStatus
+
+  describe('getDocumentStatus', () => {
+    it('should return a companyDocument', async () => {
+      const req = {
+        user: {
+          email: "test@gmail.com",
+        }
+      }
+
+      const expectedDocument: DocumentStatusResponseDto = {
+        documentType: CompanyDocumentType.CNI,
+        status: DocumentStatus.VERIFIED,
+        comment: "Document validé",
+      };
+
+      jest.spyOn(service, 'getDocumentStatus').mockResolvedValueOnce([expectedDocument]);
+
+      const response = await controller.getDocumentStatus(req);
+
+      expect(response).toEqual([expectedDocument]);
+    });
+  });
+
 
 
   it('should be defined', () => {

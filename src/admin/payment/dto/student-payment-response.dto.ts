@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { StudentPaymentStatus } from "../../../payment/enum/student-payment.status.enum copy";
+import { StudentPaymentStatus } from "../../../payment/enum/student-payment.status.enum";
 import { StudentAdminResponseDto } from "../../user-admin/dto/students-admin-response.dto";
 import { missionAdminResponseBasicDto } from "../../mission/dto/mission-admin-response.dto";
 

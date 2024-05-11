@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginStudentDto } from './dto/login-student.dto';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginStudentResponseDto } from './dto/login-student-response.dto';
 import { RegisterStudentDto } from './dto/register-student.dto';
 import { LoginCompanyDto } from './dto/login-company.dto';
@@ -275,5 +275,18 @@ export class AuthController {
   })
   async deleteCompanyAccount(@Req() req) {
     return this.authService.deleteCompanyAccount(req)
+  }
+
+  @Get('isVerified')
+  @ApiOperation({
+    description: 'Returns true or false depending on whether the student user is verified',
+    summary: 'Returns true or false depending on whether the student user is verified'
+  })
+  @ApiOkResponse({
+    type: Boolean
+  })
+  @UseGuards(AuthGuard('jwt'))
+  async isStudentVerified(@Req() req): Promise<Boolean> {
+    return await this.authService.isStudentVerified(req);
   }
 }

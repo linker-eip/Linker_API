@@ -16,8 +16,20 @@ import { CompanyDocument } from '../company/entity/CompanyDocument.entity';
 import { CompanyPreferences } from '../company/entity/CompanyPreferences.entity';
 import { DocumentTransferService } from '../document-transfer/src/services/document-transfer.service';
 import { ConfigService } from '@nestjs/config';
-
-
+import { StudentService } from '../student/student.service';
+import { StudentDocument } from '../student/entity/StudentDocuments.entity';
+import { StudentPreferences } from '../student/entity/StudentPreferences.entity';
+import { StudentProfile } from '../student/entity/StudentProfile.entity';
+import { Jobs } from '../student/jobs/entity/jobs.entity';
+import { Skills } from '../student/skills/entity/skills.entity';
+import { Studies } from '../student/studies/entity/studies.entity';
+import { StudentUser } from '../student/entity/StudentUser.entity';
+import { SkillsService } from '../student/skills/skills.service';
+import { JobsService } from '../student/jobs/jobs.service';
+import { StudiesService } from '../student/studies/studies.service';
+import { FileService } from '../filesystem/file.service';
+import { StudentPaymentResponseDto } from './dto/student-payment-response.dto';
+import { StudentPaymentStatus } from './enum/student-payment.status.enum';
 
 
 describe('PaymentService', () => {
@@ -35,7 +47,7 @@ describe('PaymentService', () => {
             ],
             controllers: [PaymentController],
             providers: [
-                PaymentService, CompanyService, DocumentTransferService, ConfigService,
+                PaymentService, CompanyService, StudentService,JobsService, StudiesService, FileService, DocumentTransferService, ConfigService, SkillsService,
                 {
                     provide: getRepositoryToken(Payment),
                     useClass: Repository
@@ -61,11 +73,66 @@ describe('PaymentService', () => {
                     useClass: Repository
                 },
                 {
+                    provide: getRepositoryToken(StudentProfile),
+                    useClass: Repository,
+                },
+                {
+                    provide: getRepositoryToken(StudentPreferences),
+                    useClass: Repository,
+                },
+                {
+                    provide: getRepositoryToken(StudentUser),
+                    useClass: Repository,
+                },
+                {
+                    provide: getRepositoryToken(StudentDocument),
+                    useClass: Repository,
+                },
+                {
+                    provide: getRepositoryToken(Jobs),
+                    useClass: Repository,
+                },
+                {
+                    provide: getRepositoryToken(Studies),
+                    useClass: Repository,
+                },
+                {
+                    provide: getRepositoryToken(Skills),
+                    useClass: Repository,
+                },
+                {
+                    provide: getRepositoryToken(StudentProfile),
+                    useClass: Repository,
+                },
+                {
+                    provide: getRepositoryToken(StudentPreferences),
+                    useClass: Repository,
+                },
+                {
+                    provide: getRepositoryToken(StudentDocument),
+                    useClass: Repository,
+                },
+                {
+                    provide: getRepositoryToken(Jobs),
+                    useClass: Repository,
+                },
+                {
+                    provide: getRepositoryToken(Studies),
+                    useClass: Repository,
+                },
+                {
+                    provide: getRepositoryToken(Skills),
+                    useClass: Repository,
+                },
+                {
                     provide: PaymentService,
                     useValue: {
                         createProductAndCheckoutSession: jest.fn(),
                         paymentSuccess: jest.fn(),
                         getPayment: jest.fn(),
+                        getStudentPayment: jest.fn(),
+                        getStudentPaymentById: jest.fn(),
+                        receiveStudentPayment: jest.fn(),
                     },
                 }
 
@@ -184,6 +251,86 @@ describe('PaymentService', () => {
             expect(payment).toEqual(res);
         });
     });
-}
-);
+
+    describe('getStudentPaymentsFunc', () => {
+        it('should get student payments', async () => {
+ 
+            const studentPaymentResponseDto: StudentPaymentResponseDto[] = [{
+                id: 1,
+                missionName: 'Test',
+                status: StudentPaymentStatus.WAITING,
+                amount: 100,
+            }];
+
+            const req = {
+                user: {
+                    email: 'test@gmail.com',
+                },
+            };
+
+            jest.spyOn(service, 'getStudentPayment').mockResolvedValue(studentPaymentResponseDto);
+
+            const res = await controller.getStudentPayments(req);
+
+            expect(service.getStudentPayment).toHaveBeenCalledWith(req);
+
+            expect(studentPaymentResponseDto).toEqual(res);
+        });
+    });
+
+    describe('getStudentPayment', () => {
+        it('should get student payment', async () => {
+            const studentPaymentResponseDto: StudentPaymentResponseDto = {
+                id: 1,
+                missionName: 'Test',
+                status: StudentPaymentStatus.WAITING,
+                amount: 100,
+            };
+
+            const req = {
+                user: {
+                    email: 'test@gmail.com',
+                },
+            };
+
+            jest.spyOn(service, 'getStudentPaymentById').mockResolvedValue(studentPaymentResponseDto);
+
+            const res = await controller.getStudentPayment(req, 1);
+
+            expect(service.getStudentPaymentById).toHaveBeenCalledWith(1, req);
+
+            expect(studentPaymentResponseDto).toEqual(res);
+
+        });
+    });
+
+    describe('receiveStudentPayment', () => {
+        it('should receive student payment', async () => {
+            const studentPaymentResponseDto: StudentPaymentResponseDto = {
+                id: 1,
+                missionName: 'Test',
+                status: StudentPaymentStatus.WAITING,
+                amount: 100,
+            };
+
+            const req = {
+                user: {
+                    email: 'test@gmail.com',
+                },
+            };
+
+            jest.spyOn(service, 'receiveStudentPayment').mockResolvedValue(undefined);
+
+            const res = await controller.receiveStudentPayment(req, 1);
+
+            expect(service.receiveStudentPayment).toHaveBeenCalledWith(1, req);
+
+            expect(undefined).toEqual(res);
+        });
+    });
+
+            it('should be defined', () => {
+                expect(service).toBeDefined();
+            });
+    });
 
