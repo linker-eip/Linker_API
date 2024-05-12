@@ -106,7 +106,7 @@ export class PaymentService {
             });
 
             const price = await stripe.prices.create({
-                unit_amount: mission.amount,
+                unit_amount: mission.amount * 100,
                 currency : 'eur',
                 product: product.id,
             });
