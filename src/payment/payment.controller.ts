@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Query, Req, UseGuards, Param, Put } from '@nestjs/common';
 import { PaymentService } from './payment.service';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { StudentPaymentResponseDto } from './dto/student-payment-response.dto';
 import { VerifiedUserGuard } from '../admin/auth/guard/user.guard';
 
@@ -12,6 +12,8 @@ export class PaymentController {
 
     @Get('checkout')
     @UseGuards(VerifiedUserGuard)
+    @ApiOperation({ summary: 'Create a checkout session' })
+    @ApiOkResponse({ description: 'Return a checkout session' })
     async createProductAndCheckoutSession(
         @Query('mission_id') missionId: string,
         @Req() req
@@ -20,6 +22,8 @@ export class PaymentController {
     }
 
     @Get('checkout/session')
+    @ApiOperation({ summary: 'Get a checkout session' })
+    @ApiOkResponse({ description: 'Return a checkout session' })
     async paymentSuccess(@Query('session_id') sessionId: string, @Query('mission_id') missionId: string
     ) {
         return this.stripeService.paymentSuccess(sessionId, missionId);
@@ -27,6 +31,8 @@ export class PaymentController {
 
     @Get('')
     @UseGuards(VerifiedUserGuard)
+    @ApiOperation({ summary: 'Get all payments for a mission' })
+    @ApiOkResponse({ description: 'Return all payments for a mission' })
     async getPayments(
         @Query('mission_id') missionId: string,
         @Req() req
@@ -36,6 +42,8 @@ export class PaymentController {
 
     @Get('student')
     @UseGuards(VerifiedUserGuard)
+    @ApiOperation({ summary: 'Get all payments for a student' })
+    @ApiOkResponse({ description: 'Return all payments for a student' })
     async getStudentPayments(
         @Req() req
     ) : Promise<StudentPaymentResponseDto[]> {
@@ -44,6 +52,8 @@ export class PaymentController {
 
     @Get('student/:studentPaymentId')
     @UseGuards(VerifiedUserGuard)
+    @ApiOperation({ summary: 'Get a payment for a student' })
+    @ApiOkResponse({ description: 'Return a payment for a student' })
     async getStudentPayment(
         @Req() req,
         @Param('studentPaymentId') studentPaymentId: number
@@ -53,6 +63,8 @@ export class PaymentController {
 
     @Put('student/receive/:studentPaymentId')
     @UseGuards(VerifiedUserGuard)
+    @ApiOperation({ summary: 'Receive a payment for a student' })
+    @ApiOkResponse({ description: 'Return a payment for a student' })
     async receiveStudentPayment(
         @Req() req,
         @Param('studentPaymentId') studentPaymentId: number
