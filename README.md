@@ -1,1 +1,1 @@
-# Linker API
+# Linker API.
