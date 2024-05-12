@@ -1,11 +1,12 @@
 import { Body, Controller, Get, Post, Query, Req, UseGuards, Param, Put } from '@nestjs/common';
 import { PaymentService } from './payment.service';
-import { ApiBearerAuth, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { StudentPaymentResponseDto } from './dto/student-payment-response.dto';
 import { VerifiedUserGuard } from '../admin/auth/guard/user.guard';
 
 @Controller('api/payment')
 @ApiBearerAuth()
+@ApiTags('Payment')
 export class PaymentController {
     constructor(private readonly stripeService: PaymentService,
 ) {}
