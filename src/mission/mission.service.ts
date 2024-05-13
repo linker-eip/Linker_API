@@ -55,7 +55,7 @@ export class MissionService {
 
   async missionVerification(company: CompanyUser) {
     let companyDocuments = await this.companyDocumentsRepository.findBy({ companyId: company.id, status: DocumentStatus.VERIFIED })
-    if (companyDocuments.length < 3) throw new HttpException("Vous ne pouvez pas créer de mission avant d'avoir fait vérifier tous vos documents", HttpStatusCode.Forbidden)
+    if (companyDocuments.length < 2) throw new HttpException("Vous ne pouvez pas créer de mission avant d'avoir fait vérifier tous vos documents", HttpStatusCode.Forbidden)
   }
 
   async findMissionById(missionId: number): Promise<Mission> {
