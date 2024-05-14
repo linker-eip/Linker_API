@@ -1,20 +1,18 @@
-import { HttpCode, HttpException, HttpStatus, OnModuleInit, UseGuards } from '@nestjs/common'
+import { OnModuleInit } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { AuthGuard } from '@nestjs/passport'
 import { WebSocketGateway, SubscribeMessage, MessageBody, WebSocketServer, ConnectedSocket } from '@nestjs/websockets'
-import { HttpStatusCode } from 'axios'
 import { Server, Socket } from 'socket.io'
 import { StudentUser } from '../student/entity/StudentUser.entity'
 import { StudentService } from '../student/student.service'
-import { StudiesDto } from '../student/studies/dto/studies.dto'
 import { Message, MessageType, UserType } from './entity/Message.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { CompanyUser } from '../company/entity/CompanyUser.entity'
 import { Mission } from '../mission/entity/mission.entity'
 import { MissionStatus } from '../mission/enum/mission-status.enum'
+import { CompanyService } from 'src/company/company.service'
 
-@WebSocketGateway({cors: true})
+@WebSocketGateway({ cors: true })
 export class Gateway implements OnModuleInit {
     constructor(
         @InjectRepository(Message)
@@ -24,6 +22,7 @@ export class Gateway implements OnModuleInit {
         @InjectRepository(Mission)
         private missionRepository: Repository<Mission>,
         private readonly studentService: StudentService,
+        private readonly companyService: CompanyService,
         private readonly jwtService: JwtService
     ) { }
 
@@ -83,9 +82,10 @@ export class Gateway implements OnModuleInit {
     }
 
     @SubscribeMessage('sendGroup')
-    onNewGroupMessage(@MessageBody() body: any, @ConnectedSocket() socket: Socket) {
+    async onNewGroupMessage(@MessageBody() body: any, @ConnectedSocket() socket: Socket) {
         console.log("Le socketId est: " + socket.id)
         const studentUser: StudentUser = this.studentUsers[socket.id]
+        let profile = await this.studentService.findStudentProfile(studentUser.email)
         console.log("Et donc l'utilisateur est: " + studentUser ?? "null")
         if (studentUser == null) {
             socket.emit('error', { message: 'Unauthorized access' });
@@ -99,7 +99,7 @@ export class Gateway implements OnModuleInit {
             content: body.message,
             firstName: studentUser.firstName,
             lastName: studentUser.lastName,
-            picture: studentUser.picture,
+            picture: profile.picture,
         }
         let storedMessage = new Message();
         storedMessage.author = studentUser.id,
@@ -158,6 +158,7 @@ export class Gateway implements OnModuleInit {
         }
 
         if (studentUser != null) {
+            let profile = await this.studentService.findStudentProfile(studentUser.email)
             let mission = await this.missionRepository.findOneBy({ id: body.id, groupId: studentUser.groupId })
             if (mission == null) {
                 socket.emit('error', { message: 'mission not found' })
@@ -167,7 +168,7 @@ export class Gateway implements OnModuleInit {
                 content: body.message,
                 firstName: studentUser.firstName,
                 lastName: studentUser.lastName,
-                picture: studentUser.picture,
+                picture: profile.picture,
                 type: UserType.STUDENT_USER,
                 missionId: mission.id
             }
@@ -179,6 +180,7 @@ export class Gateway implements OnModuleInit {
             storedMessage.channelId = mission.id.toString()
         } else if (companyUser != null) {
             let mission = await this.missionRepository.findOneBy({ id: body.id, companyId: companyUser.id })
+            let profile = await this.companyService.findCompanyProfile(companyUser.email)
             if (mission == null) {
                 socket.emit('error', { message: 'mission not found' })
                 return;
@@ -187,7 +189,7 @@ export class Gateway implements OnModuleInit {
                 content: body.message,
                 firstName: companyUser.companyName,
                 lastName: null,
-                picture: companyUser.picture,
+                picture: profile.picture,
                 type: UserType.COMPANY_USER,
                 missionId: mission.id
             }
@@ -226,22 +228,24 @@ export class Gateway implements OnModuleInit {
                 let user;
                 if (message.authorType == UserType.STUDENT_USER) {
                     user = await this.studentService.findOneById(message.author);
+                    let profile = await this.studentService.findStudentProfile(user.email)
                     return {
                         id: message.id,
                         firstName: user.firstName,
                         lastName: user.lastName,
-                        picture: user.picture,
+                        picture: profile.picture,
                         timestamp: message.timestamp,
                         content: message.content,
                         type: UserType.STUDENT_USER
                     };
                 } else {
-                    user = await this.companyRepository.findOneBy({id: message.author});
+                    user = await this.companyRepository.findOneBy({ id: message.author });
+                    let profile = await this.companyService.findCompanyProfile(user.email)
                     return {
                         id: message.id,
                         firstName: user.companyName,
                         lastName: null,
-                        picture: user.picture,
+                        picture: profile.picture,
                         timestamp: message.timestamp,
                         content: message.content,
                         type: UserType.COMPANY_USER
@@ -262,22 +266,25 @@ export class Gateway implements OnModuleInit {
                 let user;
                 if (message.authorType == UserType.STUDENT_USER) {
                     user = await this.studentService.findOneById(message.author);
+                    let profile = await this.studentService.findStudentProfile(user.email)
                     return {
                         id: message.id,
                         firstName: user.firstName,
                         lastName: user.lastName,
-                        picture: user.picture,
+                        picture: profile.picture,
                         timestamp: message.timestamp,
                         content: message.content,
                         type: UserType.STUDENT_USER,
                     };
                 } else {
-                    user = await this.companyRepository.findOneBy({id: message.author});
+                    user = await this.companyRepository.findOneBy({ id: message.author });
+                    let profile = await this.companyService.findCompanyProfile(user.email)
+
                     return {
                         id: message.id,
                         firstName: user.companyName,
                         lastName: null,
-                        picture: user.picture,
+                        picture: profile.picture,
                         timestamp: message.timestamp,
                         content: message.content,
                         type: UserType.COMPANY_USER
@@ -312,6 +319,8 @@ export class Gateway implements OnModuleInit {
                 return;
             }
             let mission = await this.missionRepository.findOneBy({ id: body.missionId, status: MissionStatus.PENDING })
+            let profile = await this.studentService.findStudentProfile(studentUser.email)
+
             if (mission == null) {
                 socket.emit('error', { message: 'mission not found' })
                 return;
@@ -320,7 +329,7 @@ export class Gateway implements OnModuleInit {
                 content: body.message,
                 firstName: studentUser.firstName,
                 lastName: studentUser.lastName,
-                picture: studentUser.picture,
+                picture: profile.picture,
                 type: UserType.STUDENT_USER,
                 missionId: mission.id,
                 groupId: studentUser.groupId,
@@ -338,6 +347,8 @@ export class Gateway implements OnModuleInit {
             }
 
             let mission = await this.missionRepository.findOneBy({ id: body.missionId, companyId: companyUser.id })
+            let profile = await this.companyService.findCompanyProfile(companyUser.email)
+
             if (mission == null) {
                 socket.emit('error', { message: 'mission not found' })
                 return;
@@ -346,7 +357,7 @@ export class Gateway implements OnModuleInit {
                 content: body.message,
                 firstName: companyUser.companyName,
                 lastName: null,
-                picture: companyUser.picture,
+                picture: profile.picture,
                 type: UserType.COMPANY_USER,
                 missionId: mission.id,
                 groupId: body.groupId,
@@ -390,22 +401,26 @@ export class Gateway implements OnModuleInit {
                 let user;
                 if (message.authorType == UserType.STUDENT_USER) {
                     user = await this.studentService.findOneById(message.author);
+                    let profile = await this.studentService.findStudentProfile(user.email)
+
                     return {
                         id: message.id,
                         firstName: user.firstName,
                         lastName: user.lastName,
-                        picture: user.picture,
+                        picture: profile.picture,
                         timestamp: message.timestamp,
                         content: message.content,
                         type: UserType.STUDENT_USER
                     };
                 } else {
-                    user = await this.companyRepository.findOneBy({id: message.author});
+                    user = await this.companyRepository.findOneBy({ id: message.author });
+                    let profile = await this.companyService.findCompanyProfile(user.email)
+
                     return {
                         id: message.id,
                         firstName: user.companyName,
                         lastName: null,
-                        picture: user.picture,
+                        picture: profile.picture,
                         timestamp: message.timestamp,
                         content: message.content,
                         type: UserType.COMPANY_USER
@@ -430,22 +445,26 @@ export class Gateway implements OnModuleInit {
                 let user;
                 if (message.authorType == UserType.STUDENT_USER) {
                     user = await this.studentService.findOneById(message.author);
+                    let profile = await this.studentService.findStudentProfile(user.email)
+
                     return {
                         id: message.id,
                         firstName: user.firstName,
                         lastName: user.lastName,
-                        picture: user.picture,
+                        picture: profile.picture,
                         timestamp: message.timestamp,
                         content: message.content,
                         type: UserType.STUDENT_USER,
                     };
                 } else {
-                    user = await this.companyRepository.findOneBy({id: message.author});
+                    user = await this.companyRepository.findOneBy({ id: message.author });
+                    let profile = await this.companyService.findCompanyProfile(user.email)
+
                     return {
                         id: message.id,
                         firstName: user.companyName,
                         lastName: null,
-                        picture: user.picture,
+                        picture: profile.picture,
                         timestamp: message.timestamp,
                         content: message.content,
                         type: UserType.COMPANY_USER
