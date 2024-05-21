@@ -236,6 +236,19 @@ export class StudentController {
     return this.studentService.updatePreferences(req, updatePreferencesDto)
   }
 
+
+  @Get('preferences')
+  @ApiOperation({
+    description: 'Get student preferences',
+    summary: 'Get student preferences',
+  })
+  @ApiOkResponse({
+    type: UpdatePreferencesDto
+  })
+  async getPreferences(@Req() req): Promise<UpdatePreferencesDto> {
+    return this.studentService.getPreferences(req)
+  }
+
   @Post('documentVerification')
   @ApiOperation({
     description: 'Upload student document',

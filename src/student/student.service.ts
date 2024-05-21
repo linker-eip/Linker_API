@@ -567,6 +567,30 @@ export class StudentService {
     return existingPreferences;
   }
 
+  async getPreferences(req: any): Promise<UpdatePreferencesDto> {
+    const student = await this.studentRepository.findOne({ where: { email: req.user.email } })
+
+    const existingPreferences = await this.studentPreferencesRepository.findOneBy({ studentId: student.id })
+
+    console.log(existingPreferences)
+
+    if (!existingPreferences) {
+      throw new HttpException(
+        'Preferences not found',
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    let preferences = new UpdatePreferencesDto
+
+    preferences.mailNotifDocument = existingPreferences.mailNotifDocument
+    preferences.mailNotifGroup = existingPreferences.mailNotifGroup
+    preferences.mailNotifMessage = existingPreferences.mailNotifMessage
+    preferences.mailNotifMission = existingPreferences.mailNotifMission
+
+    return preferences;
+  }
+
   async uploadStudentDocument(file: any, UploadStudentDocument: UploadStudentDocumentDto, user: any) {
     let student;
     student = await this.findOneByEmail(user.email)
