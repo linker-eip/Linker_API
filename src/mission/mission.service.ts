@@ -713,6 +713,7 @@ export class MissionService {
       if (!group) return null
       return { groupId: it.groupId, status: it.status, groupName: group.name }
     }))
+    dto = dto.filter(item => item !== null);
     return dto;
   }
 
