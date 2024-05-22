@@ -1146,7 +1146,7 @@ export class MissionService {
     for (let missionInvite of missionInvites) {
       const mission = await this.findMissionById(missionInvite.missionId);
       if (mission == null) {
-        throw new HttpException('Mission invalide', HttpStatus.NOT_FOUND);
+        continue;
       }
       const dto = new GetMissionDto();
       dto.id = mission.id;
