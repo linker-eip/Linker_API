@@ -710,6 +710,7 @@ export class MissionService {
 
     let dto = await Promise.all(missionsInvites.map(async (it) => {
       let group = await this.groupService.findGroupById(it.groupId)
+      if (!group) return null
       return { groupId: it.groupId, status: it.status, groupName: group.name }
     }))
     return dto;
