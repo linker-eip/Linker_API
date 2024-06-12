@@ -540,6 +540,20 @@ export class GroupService {
     if (!company)
       throw new HttpException('Groupe invalide', HttpStatus.NOT_FOUND);
 
+    const mission = await this.missionRepository.findOne({
+      where: { id: searchOption.missionId },
+    });
+
+    if (mission) {
+      if (mission.companyId != company.id) {
+        throw new HttpException(
+          'Mission non trouvée',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+    }
+
+
     let groupsQuery: SelectQueryBuilder<Group> =
       this.groupRepository.createQueryBuilder('group');
 
@@ -598,6 +612,10 @@ export class GroupService {
     );
 
     let filteredGroups = await dtos;
+
+    if (mission.skills) {
+      filteredGroups = filterGroupsBySkills(filteredGroups, mission.skills);
+    }
 
     if (searchOption.skills) {
       filteredGroups = filterGroupsBySkills(filteredGroups, searchOption.skills);
