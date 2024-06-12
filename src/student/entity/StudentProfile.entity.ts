@@ -44,7 +44,7 @@ export class StudentProfile {
   @Column({ nullable: true })
   website: string;
 
-  @OneToOne(() => StudentUser)
+  @OneToOne(() => StudentUser, studentUser => studentUser.profile)
   @JoinColumn({ name: 'studentId' })
   student: StudentUser;
 

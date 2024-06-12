@@ -28,6 +28,11 @@ import { DocumentStatus } from './enum/StudentDocument.enum';
 import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
 import { Jobs } from './jobs/entity/jobs.entity';
 import { Studies } from './studies/entity/studies.entity';
+import { StudentSearchNetworkOptionDto } from './dto/student-search-network-option.dto';
+import { StudentSearchNetworkResponseDto, formatToStudentSearchNetworkResponseDto } from './dto/student-search-network-response.dto';
+import { getNearbyLocations } from '../utils/getNearbyLocation';
+
+
 
 @Injectable()
 export class StudentService {
@@ -637,4 +642,140 @@ export class StudentService {
 
     return documentStatusesResponse
   }
+
+  async searchStudents(searchOption: StudentSearchNetworkOptionDto): Promise<StudentSearchNetworkResponseDto[]> {
+    const { searchString } = searchOption;
+
+    let studentsQuery: SelectQueryBuilder<StudentUser> =
+      this.studentRepository.createQueryBuilder('studentUser');
+
+    studentsQuery = studentsQuery.leftJoinAndSelect(
+      'studentUser.profile',
+      'studentProfile',
+      'studentProfile.studentId = studentUser.id'
+    );
+
+    const nearbyLocations = await getNearbyLocations(searchOption.location);
+
+    studentsQuery = studentsQuery.andWhere(new Brackets((qb) => {
+      if (searchString && searchString.trim().length > 0) {
+        const searchParams = searchString
+          .trim()
+          .split(',')
+          .map((elem) => elem.trim());
+
+        qb.andWhere(new Brackets((subQb) => {
+          searchParams.forEach((searchParam, index) => {
+            const emailSearch = `emailSearch${index}`;
+            const firstNameSearch = `firstNameSearch${index}`;
+            const lastNameSearch = `lastNameSearch${index}`;
+            const locationSearch = `locationSearch${index}`;
+
+            subQb.orWhere(`studentUser.email LIKE :${emailSearch}`, {
+              [emailSearch]: `%${searchParam}%`,
+            })
+            .orWhere(`studentUser.firstName LIKE :${firstNameSearch}`, {
+              [firstNameSearch]: `%${searchParam}%`,
+            })
+            .orWhere(`studentUser.lastName LIKE :${lastNameSearch}`, {
+              [lastNameSearch]: `%${searchParam}%`,
+            })
+            .orWhere(`studentProfile.location LIKE :${locationSearch}`, {
+              [locationSearch]: `%${searchParam}%`,
+            });
+          });
+        }));
+      }
+
+      qb.andWhere('studentUser.isActive = :isActive', {
+        isActive: true,
+      });
+
+      if (searchOption.lastName) {
+        qb.andWhere('studentUser.lastName = :lastName', {
+          lastName: searchOption.lastName,
+        });
+      }
+
+      if (searchOption.firstName) {
+        qb.andWhere('studentUser.firstName = :firstName', {
+          firstName: searchOption.firstName,
+        });
+      }
+
+      if (searchOption.email) {
+        qb.andWhere('studentUser.email = :email', {
+          email: searchOption.email,
+        });
+      }
+
+      if (searchOption.skills) {
+        qb.andWhere('studentProfile.skills = :skills', {
+          skills: searchOption.skills,
+        });
+      }
+
+      if (searchOption.tjmMin) {
+        qb.andWhere('studentProfile.tjm >= :tjmMin', {
+          tjmMin: searchOption.tjmMin,
+        });
+      }
+
+      if (searchOption.tjmMax) {
+        qb.andWhere('studentProfile.tjm <= :tjmMax', {
+          tjmMax: searchOption.tjmMax,
+        });
+      }
+
+      if (searchOption.noteMin) {
+        qb.andWhere('studentProfile.note >= :noteMin', {
+          noteMin: searchOption.noteMin,
+        });
+      }
+
+      if (searchOption.noteMax) {
+        qb.andWhere('studentProfile.note <= :noteMax', {
+          noteMax: searchOption.noteMax,
+        });
+      }
+
+      if (searchOption.isActive !== undefined) {
+        qb.andWhere('studentProfile.isActive = :isActive', {
+          isActive: searchOption.isActive,
+        });
+      }
+
+      if (searchOption.hasGroup === true) {
+        qb.andWhere('studentUser.groupId IS NOT NULL');
+      }
+
+      if (searchOption.hasGroup === false) {
+        qb.andWhere('studentUser.groupId IS NULL');
+      }
+
+      if (searchOption.location) {
+        qb.andWhere('studentProfile.location IN (:...nearbyLocations)', { nearbyLocations });
+      }
+    }));
+
+    const students = await studentsQuery.getMany();
+
+    return await Promise.all(
+      students.map(async (student) => {
+        try {
+          let studentProfile = await this.studentProfileRepository.findOneBy({
+            studentId: student.id,
+          });
+          return formatToStudentSearchNetworkResponseDto(
+            student,
+            studentProfile
+          );
+        } catch (e) {
+          throw new Error(e);
+        }
+      }),
+    );
+  }
+
+
 }
