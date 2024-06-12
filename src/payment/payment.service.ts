@@ -80,6 +80,11 @@ export class PaymentService {
             throw new NotFoundException('Mission not found');
         }
 
+        const missionTasks = await this.missionService.getMissionTasks(missionId, req);
+        if (missionTasks.length === 0) {
+            throw new NotFoundException('Mission has no tasks');
+        }
+
         const company = await this.companyService.findOne(req.user.email);
         if (!company) {
             throw new NotFoundException('Company not found');
@@ -105,8 +110,10 @@ export class PaymentService {
                 name: mission.name,
             });
 
+            const missionPrice = missionTasks.reduce((acc, task) => acc + task.amount, 0);
+
             const price = await stripe.prices.create({
-                unit_amount: mission.amount * 100,
+                unit_amount: missionPrice * 100,
                 currency : 'eur',
                 product: product.id,
             });
