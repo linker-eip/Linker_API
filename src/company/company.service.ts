@@ -186,15 +186,18 @@ export class CompanyService {
     }
 
     let companyDocument = await this.companyDocumentRepository.findOne({ where: { companyId: company.id, documentType: uploadCompanyDocument.documentType } })
-
+    console.log(companyDocument)
     if (companyDocument == null) {
+      console.log("Company doc null")
       return this.uploadCompanyDocument(file, uploadCompanyDocument, user)
     }
 
     if (companyDocument.status != DocumentStatus.VERIFIED) {
+      console.log("doc status verified")
       return this.uploadCompanyDocument(file, uploadCompanyDocument, user)
     }
     companyDocument = new CompanyDocument()
+    console.log("doc status pas verified")
 
     const url = await this.documentTransferService.uploadFileNotImage(file);
 
