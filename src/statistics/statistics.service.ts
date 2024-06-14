@@ -25,14 +25,12 @@ export class StatisticsService {
                 }
                 return false;
             });
-            console.log(response.incomes)
             response.incomes = response.incomes.filter(income => {
                 if (isNaN(endDate.getTime()) || income.paymentDate <= endDate) {
                     return true;
                 }
                 return false;
             });
-            console.log(response.incomes)
 
         }
     }

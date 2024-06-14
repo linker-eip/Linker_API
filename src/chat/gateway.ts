@@ -35,7 +35,6 @@ export class Gateway implements OnModuleInit {
     onModuleInit() {
         this.server.on('connection', async (socket: Socket) => {
             let jwtPayload;
-            console.log(socket.request.headers)
             try {
                 const jwt = socket.request.headers['authorization'].split(' ')[1]
                 jwtPayload = this.jwtService.verify(jwt, { secret: process.env.JWT_SECRET })
@@ -52,7 +51,6 @@ export class Gateway implements OnModuleInit {
                         return;
                     }
                     this.studentUsers[socket.id] = student;
-                    console.log("Le socketId: " + socket.id + "est bien associé à l'étudiant: " + student.firstName + " " + student.lastName)
 
                     if (student.groupId != null) {
                         socket.join("GROUP_" + student.groupId)
@@ -83,10 +81,8 @@ export class Gateway implements OnModuleInit {
 
     @SubscribeMessage('sendGroup')
     async onNewGroupMessage(@MessageBody() body: any, @ConnectedSocket() socket: Socket) {
-        console.log("Le socketId est: " + socket.id)
         const studentUser: StudentUser = this.studentUsers[socket.id]
         let profile = await this.studentService.findStudentProfile(studentUser.email)
-        console.log("Et donc l'utilisateur est: " + studentUser ?? "null")
         if (studentUser == null) {
             socket.emit('error', { message: 'Unauthorized access' });
             return;
@@ -116,9 +112,7 @@ export class Gateway implements OnModuleInit {
 
     @SubscribeMessage('groupHistory')
     async onGroupHistory(@MessageBody() body: any, @ConnectedSocket() socket: Socket) {
-        console.log("Le socketId est: " + socket.id)
         const studentUser: StudentUser = this.studentUsers[socket.id]
-        console.log("Et donc l'utilisateur est: " + studentUser ?? "null")
         if (studentUser == null) {
             socket.emit('error', { message: 'Unauthorized access' });
             return
@@ -137,7 +131,6 @@ export class Gateway implements OnModuleInit {
                 content: message.content
             };
         }));
-        console.log(historyDto)
         socket.emit("groupHistory", historyDto)
     }
 
@@ -396,7 +389,6 @@ export class Gateway implements OnModuleInit {
             }
 
             let history = await this.messageRepository.findBy({ type: MessageType.PREMISSION, channelId: mission.id.toString() + "/" + studentUser.groupId.toString() })
-            console.log(mission.id.toString + "/" + studentUser.groupId, history)
             let historyDto = await Promise.all(history.map(async (message) => {
                 let user;
                 if (message.authorType == UserType.STUDENT_USER) {
