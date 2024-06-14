@@ -619,6 +619,33 @@ export class StudentService {
     this.studentDocumentRepository.save(studentDocument);
   }
 
+  async replaceStudentDocument(file: any, UploadStudentDocument: UploadStudentDocumentDto, user: any) {
+    let student;
+    student = await this.findOneByEmail(user.email)
+    if (!student) {
+      throw new HttpException("Invalid student", HttpStatus.UNAUTHORIZED)
+    }
+
+    let studentDocument = await this.studentDocumentRepository.findOne({ where: { studentId: student.id, documentType: UploadStudentDocument.documentType } })
+
+    if (studentDocument == null) {
+      return this.uploadStudentDocument(file, UploadStudentDocument, user)
+    } else {
+      studentDocument = new StudentDocument()
+    }
+
+    const url = await this.documentTransferService.uploadFileNotImage(file);
+
+    studentDocument.file = url
+    studentDocument.studentId = student.id;
+    studentDocument.comment = "";
+    studentDocument.documentType = UploadStudentDocument.documentType;
+    studentDocument.status = DocumentStatus.PENDING;
+    studentDocument.bis = true;
+
+    this.studentDocumentRepository.save(studentDocument);
+  }
+
   async getDocumentStatus(user: any): Promise<DocumentStatusResponseDto[]> {
     const student = await this.findOneByEmail(user.email);
     if (!student) {
@@ -632,6 +659,7 @@ export class StudentService {
       it.documentType = doc.documentType
       it.status = doc.status
       it.comment = doc.comment
+      it.bis = doc.bis
       return it
     })
 

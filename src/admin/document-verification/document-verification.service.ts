@@ -18,9 +18,9 @@ export class DocumentVerificationService {
         @InjectRepository(CompanyDocument)
         private readonly companyDocumentRepository: Repository<CompanyDocument>,
         private readonly notificationService: NotificationsService
-    ) {}
+    ) { }
 
-    async getAllDocumentsStudent(): Promise<GetDocumentStatusStudentsResponseDto>{
+    async getAllDocumentsStudent(): Promise<GetDocumentStatusStudentsResponseDto> {
         const documents = await this.studentDocumentRepository.find();
         const dto = new GetDocumentStatusStudentsResponseDto
 
@@ -28,7 +28,7 @@ export class DocumentVerificationService {
         return dto
     }
 
-    async getAllDocumentsCompany(): Promise<GetDocumentStatusCompanyResponseDto>{
+    async getAllDocumentsCompany(): Promise<GetDocumentStatusCompanyResponseDto> {
         const documents = await this.companyDocumentRepository.find();
         const dto = new GetDocumentStatusCompanyResponseDto
 
@@ -37,18 +37,28 @@ export class DocumentVerificationService {
     }
 
     async validateDocumentStudent(dto: ValidateDocumentStudentDto) {
-        const document = await this.studentDocumentRepository.findOne({where: {studentId: dto.studentId, documentType: dto.documentType}})
+        const document = await this.studentDocumentRepository.findOne({ where: { studentId: dto.studentId, documentType: dto.documentType, bis: dto.bis } })
         if (!document) {
             throw new HttpException("Document invalide", HttpStatus.BAD_REQUEST);
         }
-        document.status = DocumentStatus.VERIFIED;
-        this.studentDocumentRepository.save(document);
+        if (document.bis) {
+            const docToReplace = await this.studentDocumentRepository.findOne({ where: { studentId: dto.studentId, documentType: dto.documentType, bis: false } })
+            if (!docToReplace) {
+                throw new HttpException("Il n'y a pas de document à remplacer", HttpStatus.BAD_REQUEST);
+            }
+            docToReplace.file = document.file;
+            this.studentDocumentRepository.delete(document)
+            this.studentDocumentRepository.save(docToReplace);
+        } else {
+            document.status = DocumentStatus.VERIFIED;
+            this.studentDocumentRepository.save(document);
+        }
 
         this.notificationService.createNotification("Document validé", "Votre document " + document.documentType + " a bien été validé par Linker.", NotificationType.DOCUMENT, dto.studentId, null)
     }
 
     async denyDocumentStudent(dto: DenyDocumentStudentDto) {
-        const document = await this.studentDocumentRepository.findOne({where: {studentId: dto.studentId, documentType: dto.documentType}})
+        const document = await this.studentDocumentRepository.findOne({ where: { studentId: dto.studentId, documentType: dto.documentType, bis: dto.bis } })
         if (!document) {
             throw new HttpException("Document invalide", HttpStatus.BAD_REQUEST);
         }
@@ -60,18 +70,28 @@ export class DocumentVerificationService {
     }
 
     async validateDocumentCompany(dto: ValidateDocumentCompanyDto) {
-        const document = await this.companyDocumentRepository.findOne({where: {companyId: dto.companyId, documentType: dto.documentType}})
+        const document = await this.companyDocumentRepository.findOne({ where: { companyId: dto.companyId, documentType: dto.documentType, bis: dto.bis } })
         if (!document) {
             throw new HttpException("Document invalide", HttpStatus.BAD_REQUEST);
         }
-        document.status = DocumentStatus.VERIFIED;
-        this.companyDocumentRepository.save(document);
+        if (document.bis) {
+            const docToReplace = await this.companyDocumentRepository.findOne({ where: { companyId: dto.companyId, documentType: dto.documentType, bis: false } })
+            if (!docToReplace) {
+                throw new HttpException("Il n'y a pas de document à remplacer", HttpStatus.BAD_REQUEST);
+            }
+            docToReplace.file = document.file;
+            this.companyDocumentRepository.delete(document)
+            this.companyDocumentRepository.save(docToReplace);
+        } else {
+            document.status = DocumentStatus.VERIFIED;
+            this.companyDocumentRepository.save(document);
+        }
 
         this.notificationService.createNotification("Document validé", "Votre document " + document.documentType + " a bien été validé par Linker.", NotificationType.DOCUMENT, null, dto.companyId)
     }
 
     async denyDocumentCompany(dto: DenyDocumentCompanyDto) {
-        const document = await this.companyDocumentRepository.findOne({where: {companyId: dto.companyId, documentType: dto.documentType}})
+        const document = await this.companyDocumentRepository.findOne({ where: { companyId: dto.companyId, documentType: dto.documentType, bis: dto.bis } })
         if (!document) {
             throw new HttpException("Document invalide", HttpStatus.BAD_REQUEST);
         }

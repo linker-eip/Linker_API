@@ -9,6 +9,9 @@ export class StudentDocument {
     @PrimaryColumn()
     documentType: StudentDocumentType
 
+    @PrimaryColumn({default: false})
+    bis: boolean
+
     @Column()
     file: string;
 

@@ -10,4 +10,7 @@ export class DocumentStatusResponseDto {
 
     @ApiProperty()
     comment: string
+
+    @ApiProperty()
+    bis: boolean
 }

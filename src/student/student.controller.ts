@@ -289,6 +289,42 @@ export class StudentController {
     );
   }
 
+  @Post('replaceDocument')
+  @ApiOperation({
+    description: 'Replace verified student document',
+    summary: 'Replace verified student document',
+  })
+  @ApiOkResponse({
+    status: 201,
+    description: 'Document uploaded successfully',
+  })
+  @UseInterceptors(FileInterceptor('file'))
+  async replaceStudentDocument(
+    @UploadedFile(
+      new ParseFilePipe({
+        fileIsRequired: true,
+        errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+        validators: [
+          new MaxFileSizeValidator({
+            maxSize: 3_500_000,
+          }),
+          new FileTypeValidator({
+            fileType: 'application/pdf',
+          }),
+        ],
+      }),
+    )
+    file,
+    @Req() req,
+    @Body() uploadStudentDocument: UploadStudentDocumentDto,
+  ) {
+    return this.studentService.replaceStudentDocument(
+      file,
+      uploadStudentDocument,
+      req.user,
+    );
+  }
+
   @Get('documentStatus')
   @ApiOperation({
     description: 'Get all documents statuses',

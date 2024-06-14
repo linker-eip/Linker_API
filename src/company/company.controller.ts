@@ -110,6 +110,43 @@ export class CompanyController {
     );
   }
 
+  @Post('replaceDocument')
+  @ApiOperation({
+    description: 'Replace company document',
+    summary: 'Replace company document',
+  })
+  @ApiOkResponse({
+    status: 201,
+    description: 'Document uploaded successfully',
+  })
+
+  @UseInterceptors(FileInterceptor('file'))
+  async replaceCompanyDocument(
+    @UploadedFile(
+      new ParseFilePipe({
+        fileIsRequired: true,
+        errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+        validators: [
+          new MaxFileSizeValidator({
+            maxSize: 3_500_000,
+          }),
+          new FileTypeValidator({
+            fileType: 'application/pdf',
+          }),
+        ],
+      }),
+    )
+    file,
+    @Req() req,
+    @Body() uploadCompanyDocument: UploadCompanyDocumentDto,
+  ) {
+    return this.companyService.uploadCompanyDocument(
+      file,
+      uploadCompanyDocument,
+      req.user,
+    );
+  }
+
   @Get('documentStatus')
   @ApiOperation({
     description: 'Get all documents statuses',

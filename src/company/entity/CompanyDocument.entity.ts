@@ -8,6 +8,9 @@ export class CompanyDocument {
 
     @PrimaryColumn()
     documentType: CompanyDocumentType
+    
+    @PrimaryColumn({default: false})
+    bis: boolean
 
     @Column()
     file: string;

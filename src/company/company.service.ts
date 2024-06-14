@@ -178,6 +178,33 @@ export class CompanyService {
     this.companyDocumentRepository.save(companyDocument);
   }
 
+  async replaceCompanyDocument(file: any, uploadCompanyDocument: UploadCompanyDocumentDto, user: any) {
+    let company;
+    company = await this.companyRepository.findOne({ where: { email: user.email } })
+    if (!company) {
+      throw new HttpException("Invalid company", HttpStatus.UNAUTHORIZED)
+    }
+
+    let companyDocument = await this.companyDocumentRepository.findOne({ where: { companyId: company.id, documentType: uploadCompanyDocument.documentType } })
+
+    if (companyDocument == null) {
+      return this.uploadCompanyDocument(file, uploadCompanyDocument, user)
+    } else {
+      companyDocument = new CompanyDocument()
+    }
+
+    const url = await this.documentTransferService.uploadFileNotImage(file);
+
+    companyDocument.file = url
+    companyDocument.companyId = company.id;
+    companyDocument.comment = "";
+    companyDocument.documentType = uploadCompanyDocument.documentType;
+    companyDocument.status = DocumentStatus.PENDING;
+    companyDocument.bis = true;
+
+    this.companyDocumentRepository.save(companyDocument);
+  }
+
   async getDocumentStatus(user: any): Promise<DocumentStatusResponseDto[]> {
     const company = await this.companyRepository.findOne({ where: { email: user.email } });
     if (!company) {
@@ -191,6 +218,7 @@ export class CompanyService {
       it.documentType = doc.documentType
       it.status = doc.status
       it.comment = doc.comment
+      it.bis = doc.bis
       return it
     })
 
