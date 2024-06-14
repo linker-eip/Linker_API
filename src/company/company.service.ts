@@ -189,13 +189,12 @@ export class CompanyService {
 
     if (companyDocument == null) {
       return this.uploadCompanyDocument(file, uploadCompanyDocument, user)
-    } else {
-      companyDocument = new CompanyDocument()
     }
 
     if (companyDocument.status != DocumentStatus.VERIFIED) {
       return this.uploadCompanyDocument(file, uploadCompanyDocument, user)
     }
+    companyDocument = new CompanyDocument()
 
     const url = await this.documentTransferService.uploadFileNotImage(file);
 
