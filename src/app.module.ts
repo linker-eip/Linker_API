@@ -36,7 +36,6 @@ import { LinkedinModule } from './linkedin/linkedin.module';
 import { StatisticsController } from './statistics/statistics.controller';
 import { StatisticsService } from './statistics/statistics.service';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -80,7 +79,7 @@ import { StatisticsService } from './statistics/statistics.service';
     PaymentModule,
     LinkedinModule
   ],
-  controllers: [FileController, SiretController, DocumentTransferController,StatisticsController],
-  providers: [JwtStrategy, SiretService,StatisticsService],
+  controllers: [FileController, SiretController, DocumentTransferController, StatisticsController],
+  providers: [JwtStrategy, SiretService, StatisticsService],
 })
 export class AppModule { }
