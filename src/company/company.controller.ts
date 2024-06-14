@@ -140,7 +140,7 @@ export class CompanyController {
     @Req() req,
     @Body() uploadCompanyDocument: UploadCompanyDocumentDto,
   ) {
-    return this.companyService.uploadCompanyDocument(
+    return this.companyService.replaceCompanyDocument(
       file,
       uploadCompanyDocument,
       req.user,
