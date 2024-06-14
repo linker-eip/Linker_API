@@ -439,6 +439,7 @@ describe('StudentService', () => {
           documentType: StudentDocumentType.CNI,
           status: DocumentStatus.PENDING,
           comment: null,
+          bis: false,
         }
       ]
 

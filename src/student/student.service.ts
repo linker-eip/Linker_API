@@ -597,10 +597,11 @@ export class StudentService {
     if (!student) {
       throw new HttpException("Invalid student", HttpStatus.UNAUTHORIZED)
     }
-
+    console.log("Si je suis là c'est que le doc est null")
     let studentDocument = await this.studentDocumentRepository.findOne({ where: { studentId: student.id, documentType: UploadStudentDocument.documentType } })
 
     if (studentDocument != null) {
+      console.log("Il est grave pas null")
       if (studentDocument.status == DocumentStatus.VERIFIED) {
         throw new HttpException("Ce fichier a déjà été validé", HttpStatus.CONFLICT)
       }
@@ -627,10 +628,12 @@ export class StudentService {
     }
 
     let studentDocument = await this.studentDocumentRepository.findOne({ where: { studentId: student.id, documentType: UploadStudentDocument.documentType } })
-
+    console.log(studentDocument)
     if (studentDocument == null) {
+      console.log("IL EST NULL")
       return this.uploadStudentDocument(file, UploadStudentDocument, user)
     } else {
+      console.log("IL EST PAS NULL")
       studentDocument = new StudentDocument()
     }
 

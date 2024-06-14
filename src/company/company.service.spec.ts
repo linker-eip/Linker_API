@@ -202,6 +202,7 @@ describe('CompanyService', () => {
         documentType: CompanyDocumentType.CNI,
         status: DocumentStatus.VERIFIED,
         comment: "Document validé",
+        bis: false
       };
 
       jest.spyOn(service, 'getDocumentStatus').mockResolvedValueOnce([expectedDocument]);
