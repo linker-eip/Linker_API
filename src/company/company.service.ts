@@ -193,6 +193,10 @@ export class CompanyService {
       companyDocument = new CompanyDocument()
     }
 
+    if (companyDocument.status != DocumentStatus.VERIFIED) {
+      return this.uploadCompanyDocument(file, uploadCompanyDocument, user)
+    }
+
     const url = await this.documentTransferService.uploadFileNotImage(file);
 
     companyDocument.file = url

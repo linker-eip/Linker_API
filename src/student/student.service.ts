@@ -634,6 +634,10 @@ export class StudentService {
       studentDocument = new StudentDocument()
     }
 
+    if (studentDocument.status != DocumentStatus.VERIFIED) {
+      return this.uploadStudentDocument(file, UploadStudentDocument, user)
+    }
+
     const url = await this.documentTransferService.uploadFileNotImage(file);
 
     studentDocument.file = url
