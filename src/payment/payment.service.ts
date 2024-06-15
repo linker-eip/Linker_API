@@ -23,7 +23,7 @@ export class PaymentService {
         private readonly studentPaymentRepository: Repository<StudentPayment>,
         private readonly studentService: StudentService,
     ) { }
-    
+
     async createProductAndCheckoutSession(missionId: string, req: any) {
         if (!missionId) {
             throw new NotFoundException('Mission ID not found');
@@ -34,7 +34,7 @@ export class PaymentService {
     }
 
     async paymentSuccess(sessionId: string, missionId: string) {
-        
+
         const Stripe = require('stripe');
         const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -50,12 +50,12 @@ export class PaymentService {
                 sessionId: sessionId,
             },
         });
-        
+
 
         if (!payment) {
             throw new NotFoundException('Payment not found');
         }
-        
+
         const mission = await this.missionService.findMissionById(parseInt(missionId));
         if (!mission) {
             throw new NotFoundException('Mission not found');
@@ -101,11 +101,11 @@ export class PaymentService {
                     missionId: missionId,
                 },
             });
-            
+
             if (actualPayment) {
                 return actualPayment;
             }
-            
+
             const product = await stripe.products.create({
                 name: mission.name,
             });
@@ -114,7 +114,7 @@ export class PaymentService {
 
             const price = await stripe.prices.create({
                 unit_amount: missionPrice * 100,
-                currency : 'eur',
+                currency: 'eur',
                 product: product.id,
             });
 
@@ -136,11 +136,11 @@ export class PaymentService {
             payment.priceId = price.id;
             payment.sessionId = session.id;
             payment.sessionUrl = session.url;
-            
+
             await this.paymentRepository.save(payment);
-            
+
             return payment;
-            
+
         } catch (error) {
             console.error('Error creating product and checkout session:', error);
             throw error;
@@ -148,7 +148,7 @@ export class PaymentService {
     }
 
 
-    async getPayment(missionId: string, req : any) {
+    async getPayment(missionId: string, req: any) {
         const mission = await this.missionService.findMissionById(parseInt(missionId));
         if (!mission) {
             throw new NotFoundException('Mission not found');
@@ -186,7 +186,7 @@ export class PaymentService {
         await this.studentPaymentRepository.save(studentPayment);
     }
 
-    async getStudentPayment(req: any) : Promise<StudentPaymentResponseDto[]> {
+    async getStudentPayment(req: any): Promise<StudentPaymentResponseDto[]> {
         const student = await this.studentService.findOneByEmail(req.user.email);
         const studentPayments = await this.studentPaymentRepository.find({
             where: {

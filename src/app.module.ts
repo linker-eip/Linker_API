@@ -35,6 +35,7 @@ import { LinkedinService } from './linkedin/linkedin.service';
 import { LinkedinModule } from './linkedin/linkedin.module';
 import { StatisticsController } from './statistics/statistics.controller';
 import { StatisticsService } from './statistics/statistics.service';
+import { StatisticsModule } from './statistics/statistics.module';
 
 @Module({
   imports: [
@@ -77,9 +78,10 @@ import { StatisticsService } from './statistics/statistics.service';
     GatewayModule,
     SkillsModule,
     PaymentModule,
-    LinkedinModule
+    LinkedinModule,
+    StatisticsModule
   ],
   controllers: [FileController, SiretController, DocumentTransferController, StatisticsController],
-  providers: [JwtStrategy, SiretService, StatisticsService],
+  providers: [JwtStrategy, SiretService],
 })
 export class AppModule { }

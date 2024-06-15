@@ -1,16 +1,21 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { userInfo } from 'os';
 import { GetMissionDto } from '../mission/dto/get-mission.dto';
 import { MissionService } from '../mission/mission.service';
-import { ReviewDto, StudentStatsResponse } from './dtos/student-stats-response.dto';
-import { StudentProfile } from '../student/entity/StudentProfile.entity';
+import { IncomeDto, ReviewDto, StudentStatsResponse } from './dtos/student-stats-response.dto';
 import { StudentService } from '../student/student.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { StudentPayment } from 'src/payment/entity/student-payment.entity';
+import { Repository } from 'typeorm';
+import { StudentPaymentStatus } from 'src/payment/enum/student-payment.status.enum';
 
 @Injectable()
 export class StatisticsService {
     constructor(
         private readonly missionService: MissionService,
-        private readonly studentService: StudentService
+        private readonly studentService: StudentService,
+        @InjectRepository(StudentPayment)
+        private readonly studentPaymentRepository: Repository<StudentPayment>,
+
     ) { }
 
     filterIncomes(response: any, startDate?: Date, endDate?: Date): void {
@@ -77,23 +82,15 @@ export class StatisticsService {
         response.reviews = reviewsDto
         response.note = profile.note
         response.noteNumber = profile.noteNumber
-        response.incomes = [
-            {
-                missionId: 1,
-                amount: 200,
-                paymentDate: new Date()
-            },
-            {
-                missionId: 2,
-                amount: 2000,
-                paymentDate: new Date('2024-04-09T12:00:00')
-            },
-            {
-                missionId: 3,
-                amount: 2000,
-                paymentDate: new Date('2024-02-09T12:00:00')
-            }
-        ]
+
+        const studentPayments = await this.studentPaymentRepository.find({ where: { studentId: student.id, status: StudentPaymentStatus.PAID } });
+        response.incomes = []
+        for (let it of studentPayments) {
+            const incomeDto = new IncomeDto()
+            incomeDto.amount = it.amount
+            incomeDto.missionId = it.missionId
+            incomeDto.paymentDate = it.paymentDate
+        }
 
         this.filterIncomes(response, startDate, endDate)
 

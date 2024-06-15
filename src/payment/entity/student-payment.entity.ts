@@ -18,4 +18,7 @@ export class StudentPayment {
 
     @Column({ type: 'int', nullable: false })
     amount: number;
+
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    paymentDate: Date;
 }
