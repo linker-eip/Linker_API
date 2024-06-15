@@ -4,9 +4,9 @@ import { MissionService } from '../mission/mission.service';
 import { IncomeDto, ReviewDto, StudentStatsResponse } from './dtos/student-stats-response.dto';
 import { StudentService } from '../student/student.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { StudentPayment } from 'src/payment/entity/student-payment.entity';
+import { StudentPayment } from '../payment/entity/student-payment.entity';
 import { Repository } from 'typeorm';
-import { StudentPaymentStatus } from 'src/payment/enum/student-payment.status.enum';
+import { StudentPaymentStatus } from '../payment/enum/student-payment.status.enum';
 
 @Injectable()
 export class StatisticsService {

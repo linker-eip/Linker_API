@@ -84,7 +84,7 @@ export class CompanyController {
     description: 'Document is already validated',
   })
   @UseInterceptors(FileInterceptor('file'))
-  async uploadStudentDocument(
+  async uploadCompanyDocument(
     @UploadedFile(
       new ParseFilePipe({
         fileIsRequired: true,

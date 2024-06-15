@@ -455,6 +455,46 @@ describe('StudentService', () => {
     });
   });
 
+  describe('replaceDocument', () => {
+    it('should replace a student document', async () => {
+      const req = {
+        user: {
+          email: 'test@exemple.com',
+        },
+      };
+      const file: Express.Multer.File = {
+        fieldname: 'file',
+        originalname: 'test-file.txt',
+        encoding: '7bit',
+        mimetype: 'text/plain',
+        destination: './uploads',
+        filename: 'test-file.txt',
+        path: './uploads/test-file.txt',
+        size: 1234,
+        stream: null,
+        buffer: Buffer.from(''),
+      };
+
+      const dto = {
+        file: file,
+        documentType: StudentDocumentType.CNI,
+      }
+
+      const expectedResponse = null;
+
+      jest
+        .spyOn(service, 'replaceStudentDocument')
+        .mockResolvedValueOnce(expectedResponse);
+
+      const response = await controller.replaceStudentDocument(file, req, dto);
+
+      expect(service.replaceStudentDocument).toHaveBeenCalledWith(file, dto, req.user);
+
+      expect(response).toEqual(expectedResponse);
+    });
+  });
+
+
   it('should be defined', () => {
     expect(service).toBeDefined();
   });

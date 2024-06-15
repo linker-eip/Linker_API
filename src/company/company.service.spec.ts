@@ -188,8 +188,6 @@ describe('CompanyService', () => {
     });
   });
 
-  //getDocumentStatus
-
   describe('getDocumentStatus', () => {
     it('should return a companyDocument', async () => {
       const req = {
@@ -213,7 +211,83 @@ describe('CompanyService', () => {
     });
   });
 
+  describe('uploadFile', () => {
+    it('should upload a specific file', async () => {
+      const req = {
+        user: {
+          email: 'test@exemple.com',
+        },
+      };
+      const file: Express.Multer.File = {
+        fieldname: 'file',
+        originalname: 'test-file.txt',
+        encoding: '7bit',
+        mimetype: 'text/plain',
+        destination: './uploads',
+        filename: 'test-file.txt',
+        path: './uploads/test-file.txt',
+        size: 1234,
+        stream: null,
+        buffer: Buffer.from(''),
+      };
 
+      const dto = {
+        file: file,
+        documentType: CompanyDocumentType.KBIS,
+      }
+
+      const expectedResponse = null;
+
+      jest
+        .spyOn(service, 'uploadCompanyDocument')
+        .mockResolvedValueOnce(expectedResponse);
+
+      const response = await controller.uploadCompanyDocument(file, req, dto);
+
+      expect(service.uploadCompanyDocument).toHaveBeenCalledWith(file, dto, req.user);
+
+      expect(response).toEqual(expectedResponse);
+    });
+  });
+
+  describe('replaceDocument', () => {
+    it('should replace a specific file', async () => {
+      const req = {
+        user: {
+          email: 'test@exemple.com',
+        },
+      };
+      const file: Express.Multer.File = {
+        fieldname: 'file',
+        originalname: 'test-file.txt',
+        encoding: '7bit',
+        mimetype: 'text/plain',
+        destination: './uploads',
+        filename: 'test-file.txt',
+        path: './uploads/test-file.txt',
+        size: 1234,
+        stream: null,
+        buffer: Buffer.from(''),
+      };
+
+      const dto = {
+        file: file,
+        documentType: CompanyDocumentType.KBIS,
+      }
+
+      const expectedResponse = null;
+
+      jest
+        .spyOn(service, 'replaceCompanyDocument')
+        .mockResolvedValueOnce(expectedResponse);
+
+      const response = await controller.replaceCompanyDocument(file, req, dto);
+
+      expect(service.replaceCompanyDocument).toHaveBeenCalledWith(file, dto, req.user);
+
+      expect(response).toEqual(expectedResponse);
+    });
+  });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
