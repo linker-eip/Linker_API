@@ -505,6 +505,7 @@ export class Gateway implements OnModuleInit {
             firstName: studentUser.firstName,
             lastName: studentUser.lastName,
             picture: profile.picture,
+            authorId: studentUser.id,
         }
         let storedMessage = new Message();
         storedMessage.author = studentUser.id,
@@ -543,6 +544,7 @@ export class Gateway implements OnModuleInit {
             let profile = await this.studentService.findStudentProfile(user.email)
             return {
                 id: message.id,
+                authorId: message.author,
                 firstName: user.firstName,
                 lastName: user.lastName,
                 picture: profile.picture,
