@@ -466,6 +466,93 @@ export class Gateway implements OnModuleInit {
             }));
             socket.emit("premissionHistory", historyDto)
         }
+
+    }
+
+    @SubscribeMessage('sendDirectMessage')
+    async onNewDirectMessage(@MessageBody() body: any, @ConnectedSocket() socket: Socket) {
+        const studentUser: StudentUser = this.studentUsers[socket.id]
+        let profile = await this.studentService.findStudentProfile(studentUser.email)
+        if (studentUser == null) {
+            socket.emit('error', { message: 'Unauthorized access' });
+            return;
+        }
+
+        if (body.message == null) {
+            socket.emit('error', { message: 'no message provided' })
+            return;
+        }
+
+        if (body.userId == null) {
+            socket.emit('error', { message: 'no userId provided' })
+            return;
+        }
+
+        const recipient = await this.studentService.findOneById(body.userId)
+        if (recipient == null) {
+            socket.emit('error', { message: 'recipient user not found' })
+            return;
+        }
+
+        const recipientSocket = Array.from(this.server.sockets.sockets.values()).find(socket => {
+            const studentUser: StudentUser = this.studentUsers[socket.id];
+            return studentUser && studentUser.id === body.userId;
+        });
+
+
+        let message = {
+            content: body.message,
+            firstName: studentUser.firstName,
+            lastName: studentUser.lastName,
+            picture: profile.picture,
+            authorId: studentUser.id,
+        }
+        let storedMessage = new Message();
+        storedMessage.author = studentUser.id,
+            storedMessage.authorType = UserType.STUDENT_USER,
+            storedMessage.type = MessageType.DM,
+            storedMessage.content = message.content,
+            storedMessage.channelId = studentUser.id.toString() + "/" + recipient.id.toString(),
+
+            this.messageRepository.save(storedMessage)
+
+        this.server.to(socket.id).emit("directMessage", message);
+
+        if (recipientSocket) {
+            this.server.to(recipientSocket.id).emit("directMessage", message);
+        }
+    }
+
+    @SubscribeMessage('directMessageHistory')
+    async onDirectMessageHistory(@MessageBody() body: any, @ConnectedSocket() socket: Socket) {
+        const studentUser: StudentUser = this.studentUsers[socket.id]
+        if (studentUser == null) {
+            socket.emit('error', { message: 'Unauthorized access' });
+            return
+        }
+
+        const pattern = `${studentUser.id}/\\d+|\\d+/${studentUser.id}`;
+        const regexep = new RegExp(pattern, 'g');
+
+        const history = await this.messageRepository.createQueryBuilder('message')
+            .where('message.type = :type', { type: MessageType.DM })
+            .andWhere('message.channelId ~ :pattern', { pattern: regexep.source })
+            .getMany();
+
+        let historyDto = await Promise.all(history.map(async (message) => {
+            let user = await this.studentService.findOneById(message.author);
+            let profile = await this.studentService.findStudentProfile(user.email)
+            return {
+                id: message.id,
+                authorId: message.author,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                picture: profile.picture,
+                timestamp: message.timestamp,
+                content: message.content
+            };
+        }));
+        socket.emit("directMessageHistory", historyDto)
     }
 }
 
