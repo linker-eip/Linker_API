@@ -521,6 +521,37 @@ export class Gateway implements OnModuleInit {
             this.server.to(recipientSocket.id).emit("directMessage", message);
         }
     }
+
+    @SubscribeMessage('directMessageHistory')
+    async onDirectMessageHistory(@MessageBody() body: any, @ConnectedSocket() socket: Socket) {
+        const studentUser: StudentUser = this.studentUsers[socket.id]
+        if (studentUser == null) {
+            socket.emit('error', { message: 'Unauthorized access' });
+            return
+        }
+
+        const pattern = `${studentUser.id}/\\d+|\\d+/${studentUser.id}`;
+        const regexep = new RegExp(pattern, 'g');
+
+        const history = await this.messageRepository.createQueryBuilder('message')
+            .where('message.type = :type', { type: MessageType.DM })
+            .andWhere('message.channelId ~ :pattern', { pattern: regexep.source })
+            .getMany();
+
+        let historyDto = await Promise.all(history.map(async (message) => {
+            let user = await this.studentService.findOneById(message.author);
+            let profile = await this.studentService.findStudentProfile(user.email)
+            return {
+                id: message.id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                picture: profile.picture,
+                timestamp: message.timestamp,
+                content: message.content
+            };
+        }));
+        socket.emit("directMessageHistory", historyDto)
+    }
 }
 
 
