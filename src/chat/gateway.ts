@@ -466,6 +466,60 @@ export class Gateway implements OnModuleInit {
             }));
             socket.emit("premissionHistory", historyDto)
         }
+
+    }
+
+    @SubscribeMessage('sendDirectMessage')
+    async onNewDirectMessage(@MessageBody() body: any, @ConnectedSocket() socket: Socket) {
+        const studentUser: StudentUser = this.studentUsers[socket.id]
+        let profile = await this.studentService.findStudentProfile(studentUser.email)
+        if (studentUser == null) {
+            socket.emit('error', { message: 'Unauthorized access' });
+            return;
+        }
+
+        if (body.message == null) {
+            socket.emit('error', { message: 'no message provided' })
+            return;
+        }
+
+        if (body.userId == null) {
+            socket.emit('error', { message: 'no userId provided' })
+            return;
+        }
+
+        const recipient = await this.studentService.findOneById(body.userId)
+        if (recipient == null) {
+            socket.emit('error', { message: 'recipient user not found' })
+            return;
+        }
+
+        const recipientSocket = Array.from(this.server.sockets.sockets.values()).find(socket => {
+            const studentUser: StudentUser = this.studentUsers[socket.id];
+            return studentUser && studentUser.id === body.userId;
+        });
+
+
+        let message = {
+            content: body.message,
+            firstName: studentUser.firstName,
+            lastName: studentUser.lastName,
+            picture: profile.picture,
+        }
+        let storedMessage = new Message();
+        storedMessage.author = studentUser.id,
+            storedMessage.authorType = UserType.STUDENT_USER,
+            storedMessage.type = MessageType.DM,
+            storedMessage.content = message.content,
+            storedMessage.channelId = studentUser.id.toString() + "/" + recipient.id.toString(),
+
+            this.messageRepository.save(storedMessage)
+
+        this.server.to(socket.id).emit("directMessage", message);
+
+        if (recipientSocket) {
+            this.server.to(recipientSocket.id).emit("directMessage", message);
+        }
     }
 }
 
