@@ -50,6 +50,6 @@ export class StudentUser {
     cascade: true,
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'profileId' })
+  @JoinColumn({ name: 'id', referencedColumnName: 'studentId' })
   profile: StudentProfile;
 }

@@ -40,6 +40,8 @@ import { UpdatePreferencesDto } from './dto/update-preferences.dto';
 import { UploadStudentDocumentDto } from './dto/upload-student-document.dto';
 import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
 import { VerifiedUserGuard } from '../admin/auth/guard/user.guard';
+import { StudentSearchNetworkOptionDto } from './dto/student-search-network-option.dto';
+import { StudentSearchNetworkResponseDto } from './dto/student-search-network-response.dto';
 
 @Controller('api/student')
 @UseGuards(VerifiedUserGuard)
@@ -340,5 +342,34 @@ export class StudentController {
   ): Promise<DocumentStatusResponseDto[]> {
     return await this.studentService.getDocumentStatus(req.user);
   }
-}
 
+  @Get('searchNetwork')
+  @ApiOperation({
+    description: 'Search students',
+    summary: 'Search students',
+  })
+  @ApiOkResponse({
+    description: 'Search students',
+    type: StudentSearchNetworkResponseDto,
+    isArray: true,
+  })
+  async searchStudents(
+    @Query() searchOption: StudentSearchNetworkOptionDto,
+    @Req() req,
+  ): Promise<StudentSearchNetworkResponseDto[]> {
+    return await this.studentService.searchStudents(searchOption, req);
+  }
+
+  @Get('searchNetwork/:id')
+  @ApiOperation({
+    description: 'Get student by id',
+    summary: 'Get student by id',
+  })
+  @ApiOkResponse({
+    description: 'Get student by id',
+    type: StudentSearchNetworkResponseDto,
+  })
+  async getStudentById(@Param('id') id: number, @Req() req) {
+    return await this.studentService.getStudentById(id, req);
+  }
+}

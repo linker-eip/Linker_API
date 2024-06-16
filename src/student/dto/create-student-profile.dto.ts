@@ -78,5 +78,9 @@ export class CreateStudentProfileDto {
   @IsString({ message: "Le site web doit être une chaîne de caractères" })
   @IsOptional()
   website: string;
-  
+
+  @ApiProperty({ description: "TJM de l'utilisateur" })
+  @IsNumber()
+  @IsOptional()
+  tjm: number;
 }

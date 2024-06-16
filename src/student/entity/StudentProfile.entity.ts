@@ -44,7 +44,7 @@ export class StudentProfile {
   @Column({ nullable: true })
   website: string;
 
-  @OneToOne(() => StudentUser)
+  @OneToOne(() => StudentUser, studentUser => studentUser.profile)
   @JoinColumn({ name: 'studentId' })
   student: StudentUser;
 
@@ -53,4 +53,7 @@ export class StudentProfile {
 
   @Column({ type: 'int', nullable: true, default: 0 })
   nbNotes: number;
+
+  @Column({ type: 'int', nullable: true, default: 0 })
+  tjm: number;
 }
