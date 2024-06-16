@@ -643,7 +643,13 @@ export class StudentService {
     return documentStatusesResponse
   }
 
-  async searchStudents(searchOption: StudentSearchNetworkOptionDto): Promise<StudentSearchNetworkResponseDto[]> {
+  async searchStudents(searchOption: StudentSearchNetworkOptionDto, req : any): Promise<StudentSearchNetworkResponseDto[]> {
+
+    const student = await this.findOneByEmail(req.user.email);
+    if (!student) {
+      throw new HttpException("Invalid student", HttpStatus.UNAUTHORIZED)
+    }
+
     const { searchString } = searchOption;
 
     let studentsQuery: SelectQueryBuilder<StudentUser> =
@@ -775,6 +781,22 @@ export class StudentService {
           throw new Error(e);
         }
       }),
+    );
+  }
+
+  async getStudentById(id: number, req: any) {
+    const student = await this.studentRepository.findOne({ where: { id: id } });
+    if (!student) {
+      throw new HttpException("Invalid student", HttpStatus.UNAUTHORIZED)
+    }
+
+    let studentProfile = await this.studentProfileRepository.findOneBy({
+      studentId: student.id,
+    });
+
+    return formatToStudentSearchNetworkResponseDto(
+      student,
+      studentProfile
     );
   }
 

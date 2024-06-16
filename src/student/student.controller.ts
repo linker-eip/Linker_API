@@ -321,6 +321,19 @@ export class StudentController {
     @Query() searchOption: StudentSearchNetworkOptionDto,
     @Req() req,
   ): Promise<StudentSearchNetworkResponseDto[]> {
-    return await this.studentService.searchStudents(searchOption);
+    return await this.studentService.searchStudents(searchOption, req);
+  }
+
+  @Get('searchNetwork/:id')
+  @ApiOperation({
+    description: 'Get student by id',
+    summary: 'Get student by id',
+  })
+  @ApiOkResponse({
+    description: 'Get student by id',
+    type: StudentSearchNetworkResponseDto,
+  })
+  async getStudentById(@Param('id') id: number, @Req() req) {
+    return await this.studentService.getStudentById(id, req);
   }
 }
