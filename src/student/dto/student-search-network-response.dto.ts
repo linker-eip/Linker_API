@@ -10,11 +10,6 @@ export class StudentSearchNetworkResponseDto {
 
   @ApiProperty()
   @IsString()
-  @IsEmail()
-  email: string;
-
-  @ApiProperty()
-  @IsString()
   firstName: string;
 
   @ApiProperty()
@@ -56,7 +51,6 @@ export class StudentSearchNetworkResponseDto {
 export function formatToStudentSearchNetworkResponseDto(student: StudentUser, studentProfile : StudentProfile) {
     const dto = new StudentSearchNetworkResponseDto();
     dto.id = student.id;
-    dto.email = student.email;
     dto.firstName = student.firstName;
     dto.lastName = student.lastName;
     dto.picture = studentProfile.picture;
