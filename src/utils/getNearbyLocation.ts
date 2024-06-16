@@ -53,9 +53,7 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 
 export async function getNearbyLocations(cityOrVillage: string): Promise<string[]> {
   const location = await getLocationInfo(cityOrVillage);
-  if (!location) {
-    throw new Error(`La ville ou le village "${cityOrVillage}" n'a pas été trouvé.`);
-  }
+  
 
   try {
     const response = await axios.get<GeoNamesResponse>('http://api.geonames.org/searchJSON', {

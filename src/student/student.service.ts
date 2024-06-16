@@ -655,7 +655,10 @@ export class StudentService {
       'studentProfile.studentId = studentUser.id'
     );
 
-    const nearbyLocations = await getNearbyLocations(searchOption.location);
+    let nearbyLocations = await getNearbyLocations(searchOption.location);
+    if (nearbyLocations.length === 0) {
+      nearbyLocations = [searchOption.location];
+    }
 
     studentsQuery = studentsQuery.andWhere(new Brackets((qb) => {
       if (searchString && searchString.trim().length > 0) {
@@ -710,9 +713,8 @@ export class StudentService {
       }
 
       if (searchOption.skills) {
-        qb.andWhere('studentProfile.skills = :skills', {
-          skills: searchOption.skills,
-        });
+        const skills = searchOption.skills.split(',').map(skill => skill.trim());
+        qb.andWhere('studentProfile.skills ILIKE ANY(:skills)', { skills: skills.map(skill => `%${skill}%`) });
       }
 
       if (searchOption.tjmMin) {
@@ -743,13 +745,12 @@ export class StudentService {
         qb.andWhere('studentProfile.isActive = :isActive', {
           isActive: searchOption.isActive,
         });
-      }
-
-      if (searchOption.hasGroup === true) {
+      }      
+      if (searchOption.hasGroup == true) {
         qb.andWhere('studentUser.groupId IS NOT NULL');
       }
 
-      if (searchOption.hasGroup === false) {
+      if (searchOption.hasGroup == false) {
         qb.andWhere('studentUser.groupId IS NULL');
       }
 

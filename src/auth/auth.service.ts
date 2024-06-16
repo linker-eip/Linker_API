@@ -111,6 +111,7 @@ export class AuthService {
         skills: {"Development":[],"No-code":[],"Design & Produit":[],"Data":[],"Marketing & Sales":[]},
         jobs: [],
         website: '',
+        tjm: 0,
       },
       savedUser,
     );
@@ -476,6 +477,7 @@ export class AuthService {
           skills: {"Development":[],"No-code":[],"Design & Produit":[],"Data":[],"Marketing & Sales":[]},
           jobs: [],
           website: '',
+          tjm: 0,
         },
         savedUser,
       );
@@ -532,6 +534,7 @@ export class AuthService {
           skills: {"Development":[],"No-code":[],"Design & Produit":[],"Data":[],"Marketing & Sales":[]},
           jobs: [],
           website: '',
+          tjm: 0,
         },
         savedUser,
       );

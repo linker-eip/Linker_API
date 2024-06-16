@@ -79,4 +79,8 @@ export class CreateStudentProfileDto {
   @IsOptional()
   website: string;
 
+  @ApiProperty({ description: "TJM de l'utilisateur" })
+  @IsNumber()
+  @IsOptional()
+  tjm: number;
 }

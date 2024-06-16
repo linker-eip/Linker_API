@@ -324,4 +324,3 @@ export class StudentController {
     return await this.studentService.searchStudents(searchOption);
   }
 }
-

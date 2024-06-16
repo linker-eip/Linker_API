@@ -50,7 +50,6 @@ export class StudentSearchNetworkResponseDto {
   isActive: boolean;
 
   @ApiProperty()
-  @IsString()
   hasGroup: boolean;
 }
 
@@ -65,7 +64,7 @@ export function formatToStudentSearchNetworkResponseDto(student: StudentUser, st
     dto.location = studentProfile.location;
     dto.skills = studentProfile.skills;
     dto.note = studentProfile.note;
-    dto.tjm = 0;
+    dto.tjm = studentProfile.tjm;
     dto.isActive = student.isActive;
     dto.hasGroup = student.groupId !== null;
     return dto;

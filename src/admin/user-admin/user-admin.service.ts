@@ -130,6 +130,7 @@ export class UserAdminService {
         skills:{"Development":[],"No-code":[],"Design & Produit":[],"Data":[],"Marketing & Sales":[]},
         jobs: [],
         website: '',
+        tjm: 0,
       },
       savedUser.email,
     );

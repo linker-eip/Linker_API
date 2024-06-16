@@ -32,12 +32,10 @@ export class StudentSearchNetworkOptionDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsNumber()
   tjmMin?: number;
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsNumber()
   tjmMax?: number;
 
   @ApiPropertyOptional()
