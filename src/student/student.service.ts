@@ -812,6 +812,12 @@ export class StudentService {
   }
 
   async getStudentById(id: number, req: any) {
+
+    const checkUserIfStudent = await this.findOneByEmail(req.user.email);
+    if (!checkUserIfStudent) {
+      throw new HttpException("Invalid student", HttpStatus.UNAUTHORIZED)
+    }
+
     const student = await this.studentRepository.findOne({ where: { id: id } });
     if (!student) {
       throw new HttpException("Invalid student", HttpStatus.UNAUTHORIZED)

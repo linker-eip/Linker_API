@@ -30,6 +30,8 @@ import { StudentDocument } from './entity/StudentDocuments.entity';
 import { CompanyDocument } from '../company/entity/CompanyDocument.entity';
 import { CompanyPreferences } from '../company/entity/CompanyPreferences.entity';
 import { DocumentStatus, StudentDocumentType } from './enum/StudentDocument.enum';
+import { StudentSearchNetworkOptionDto } from './dto/student-search-network-option.dto';
+import { StudentSearchNetworkResponseDto } from './dto/student-search-network-response.dto';
 
 describe('StudentService', () => {
   let service: StudentService;
@@ -161,6 +163,7 @@ describe('StudentService', () => {
         email: 'test@example.com',
         website: 'http://example.com',
         description: 'New Description',
+        tjm : 0
       };
 
       const expectedProfile = {
@@ -494,6 +497,79 @@ describe('StudentService', () => {
     });
   });
 
+
+  describe('searchStudent', () => {
+    it('should search for students', async () => {
+      const req = {
+        user: {
+          email: 'test@gmail.com',
+        },
+      };
+
+      const dto = new StudentSearchNetworkOptionDto();
+
+      const expectedResponse = [
+        {
+          id: 1,
+          firstName: 'John',
+          lastName: 'Doe',
+          description: 'I am John Doe',
+          picture: '',
+          location: 'Paris',
+          skills: 'JS, TS',
+          note: 0,
+          tjm: 0,
+          isActive: true,
+          hasGroup: false,
+        }
+      ];
+
+      jest
+        .spyOn(service, 'searchStudents')
+        .mockResolvedValueOnce(expectedResponse); 
+      
+      const response = await controller.searchStudents(dto, req);
+
+      expect(service.searchStudents).toHaveBeenCalledWith(dto, req);
+
+      expect(response).toEqual(expectedResponse);
+    })
+  });
+
+  //get student by id
+  describe('getStudentById', () => {
+    it('should return a studentProfile', async () => {
+      const req = {
+        user: {
+          email: 'test@gmail.com',
+        },
+      };
+
+      const expectedResponse = {
+        id: 1,
+        firstName: 'John',
+        lastName: 'Doe',
+        description: 'I am John Doe',
+        picture: '',
+        location: 'Paris',
+        skills: 'JS, TS',
+        note: 0,
+        tjm: 0,
+        isActive: true,
+        hasGroup: false,
+      };
+
+      jest
+        .spyOn(service, 'getStudentById')
+        .mockResolvedValueOnce(expectedResponse);
+
+      const response = await controller.getStudentById(1, req);
+
+      expect(service.getStudentById).toHaveBeenCalledWith(1, req);
+
+      expect(response).toEqual(expectedResponse);
+    })
+  });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
