@@ -135,6 +135,8 @@ export class DocumentAdminService {
       where: { studentId : studentId , documentType: StudentDocumentType.RIB, status: DocumentStatus.VERIFIED},
     });
     if (!document) throw new NotFoundException(`DOCUMENT_NOT_FOUND`);
-    return document.file;
+    return {
+      File : document.file,
+    }
   }
 }
