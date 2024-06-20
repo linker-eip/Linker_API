@@ -542,6 +542,16 @@ export class MissionService {
       throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
     }
     let mission = await this.findMissionById(missionId);
+    const missionTasks = await this.missionTaskRepository.find({
+      where: { missionId : missionId },
+    });
+    let totalAmount = 0;
+    for (let missionTask of missionTasks) {
+      totalAmount += missionTask.amount
+    }
+    if (totalAmount != mission.amount) {
+      mission.amount = totalAmount;
+    }
     if (mission == null) {
       throw new HttpException('Invalid mission', HttpStatus.NOT_FOUND);
     }
