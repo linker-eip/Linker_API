@@ -5,9 +5,10 @@ import { DocumentAdminController } from './document.admin.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Document } from '../../documents/entity/document.entity';
 import { UserAdminModule } from '../user-admin/user-admin.module';
+import { StudentDocument } from '../../student/entity/StudentDocuments.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Document]), FileModule, UserAdminModule],
+  imports: [TypeOrmModule.forFeature([Document, StudentDocument]), FileModule, UserAdminModule],
   controllers: [DocumentAdminController],
   providers: [DocumentAdminService],
 })
