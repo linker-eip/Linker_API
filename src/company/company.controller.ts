@@ -27,16 +27,16 @@ import { CompanyProfileResponseDto } from './dto/company-profile-response.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadCompanyDocumentDto } from './dto/upload-company-document.dto';
 import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
-import { VerifiedUserGuard } from '../admin/auth/guard/user.guard';
+import { UnverifiedUserGuard, VerifiedUserGuard } from '../admin/auth/guard/user.guard';
 
 @Controller('api/company')
-@UseGuards(VerifiedUserGuard)
 @ApiTags('Company')
 @ApiBearerAuth()
 export class CompanyController {
-  constructor(private readonly companyService: CompanyService) {}
+  constructor(private readonly companyService: CompanyService) { }
 
   @Get('profile')
+  @UseGuards(UnverifiedUserGuard)
   @ApiOperation({
     description: 'Get company profile',
     summary: 'Get company profile',
@@ -51,6 +51,7 @@ export class CompanyController {
   }
 
   @Put('profile')
+  @UseGuards(VerifiedUserGuard)
   @ApiOperation({
     description: 'Update company profile',
     summary: 'Update company profile',
@@ -71,6 +72,7 @@ export class CompanyController {
   }
 
   @Post('documentVerification')
+  @UseGuards(VerifiedUserGuard)
   @ApiOperation({
     description: 'Upload company document',
     summary: 'Upload company document',
@@ -111,6 +113,7 @@ export class CompanyController {
   }
 
   @Post('replaceDocument')
+  @UseGuards(VerifiedUserGuard)
   @ApiOperation({
     description: 'Replace company document',
     summary: 'Replace company document',
@@ -148,6 +151,7 @@ export class CompanyController {
   }
 
   @Get('documentStatus')
+  @UseGuards(VerifiedUserGuard)
   @ApiOperation({
     description: 'Get all documents statuses',
     summary: 'Get all documents statuses',
@@ -164,6 +168,7 @@ export class CompanyController {
   }
 
   @Post('createPref')
+  @UseGuards(VerifiedUserGuard)
   async createPref() {
     return this.companyService.createPref()
   }

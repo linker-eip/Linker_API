@@ -37,3 +37,34 @@ export class VerifiedUserGuard extends AuthGuard('jwt') {
         return false;
     }
 }
+
+@Injectable()
+export class UnverifiedUserGuard extends AuthGuard('jwt') {
+    constructor(
+        private readonly companyService: CompanyService,
+        private readonly studentService: StudentService,
+    ) {
+        super();
+    }
+
+    async canActivate(context: ExecutionContext): Promise<boolean> {
+        const canActivate = await super.canActivate(context);
+
+        if (canActivate) {
+            const request = context.switchToHttp().getRequest();
+            request.user = request.user;
+            if (request.user.userType == "USER_STUDENT") {
+                let student = await this.studentService.findOneByEmail(request.user.email)
+                if (student == null) return false
+                return true
+            }
+            if (request.user.userType == "USER_COMPANY") {
+                let company = await this.companyService.findOne(request.user.email)
+                if (company == null) return false
+                return true
+            }
+            return false;
+        }
+        return false;
+    }
+}
