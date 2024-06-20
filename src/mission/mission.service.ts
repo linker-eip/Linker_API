@@ -547,6 +547,7 @@ export class MissionService {
     });
     let totalAmount = 0;
     for (let missionTask of missionTasks) {
+      if (missionTask.groupId == groupId || missionTask.groupId == -1)
       totalAmount += missionTask.amount
     }
     if (totalAmount != mission.amount) {
