@@ -47,6 +47,7 @@ export class DocumentVerificationService {
                 throw new HttpException("Il n'y a pas de document à remplacer", HttpStatus.BAD_REQUEST);
             }
             docToReplace.file = document.file;
+            docToReplace.comment = ""
             this.studentDocumentRepository.delete(document)
             this.studentDocumentRepository.save(docToReplace);
         } else {
@@ -80,6 +81,7 @@ export class DocumentVerificationService {
                 throw new HttpException("Il n'y a pas de document à remplacer", HttpStatus.BAD_REQUEST);
             }
             docToReplace.file = document.file;
+            docToReplace.comment = ""
             this.companyDocumentRepository.delete(document)
             this.companyDocumentRepository.save(docToReplace);
         } else {
