@@ -140,7 +140,8 @@ export class StudentService {
       jobs: jobs,
       website: profile.website,
       note: profile.note,
-      noteNumber: profile.nbNotes
+      noteNumber: profile.nbNotes,
+      tjm: profile.tjm,
     };
   }
 
@@ -281,6 +282,9 @@ export class StudentService {
       studentProfile.skills = JSON.stringify(skillResult)
     }
 
+    if (CreateStudentProfile.tjm !== null) {
+      studentProfile.tjm = CreateStudentProfile.tjm;
+    }
 
 
     if (CreateStudentProfile.jobs !== null) {

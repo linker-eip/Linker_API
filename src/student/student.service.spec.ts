@@ -131,6 +131,7 @@ describe('StudentService', () => {
         website: 'http://example.com',
         note: 0,
         noteNumber: 0,
+        tjm: 0,
       };
 
       jest
@@ -161,6 +162,7 @@ describe('StudentService', () => {
         email: 'test@example.com',
         website: 'http://example.com',
         description: 'New Description',
+        tjm: 0,
       };
 
       const expectedProfile = {
@@ -180,6 +182,7 @@ describe('StudentService', () => {
         studentId: 0,
         student: null,
         noteNumber: 0,
+        tjm: 0,
       };
 
       jest
