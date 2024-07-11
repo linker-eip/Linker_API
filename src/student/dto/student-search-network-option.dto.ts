@@ -9,11 +9,6 @@ export class StudentSearchNetworkOptionDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsEmail()
-  email?: string;
-
-  @ApiPropertyOptional()
-  @IsOptional()
   firstName?: string;
 
   @ApiPropertyOptional()
@@ -50,8 +45,4 @@ export class StudentSearchNetworkOptionDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  hasGroup?: boolean;
 }

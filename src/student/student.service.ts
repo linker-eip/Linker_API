@@ -679,122 +679,27 @@ export class StudentService {
 
     const { searchString } = searchOption;
 
-    let studentsQuery: SelectQueryBuilder<StudentUser> =
-      this.studentRepository.createQueryBuilder('studentUser');
-
-    studentsQuery = studentsQuery.leftJoinAndSelect(
-      'studentUser.profile',
-      'studentProfile',
-      'studentProfile.studentId = studentUser.id'
-    );
-
     let nearbyLocations = await getNearbyLocations(searchOption.location);
     if (nearbyLocations.length === 0) {
       nearbyLocations = [searchOption.location];
     }
 
-    studentsQuery = studentsQuery.andWhere(new Brackets((qb) => {
-      if (searchString && searchString.trim().length > 0) {
-        const searchParams = searchString
-          .trim()
-          .split(',')
-          .map((elem) => elem.trim());
-
-        qb.andWhere(new Brackets((subQb) => {
-          searchParams.forEach((searchParam, index) => {
-            const emailSearch = `emailSearch${index}`;
-            const firstNameSearch = `firstNameSearch${index}`;
-            const lastNameSearch = `lastNameSearch${index}`;
-            const locationSearch = `locationSearch${index}`;
-
-            subQb.orWhere(`studentUser.email LIKE :${emailSearch}`, {
-              [emailSearch]: `%${searchParam}%`,
-            })
-            .orWhere(`studentUser.firstName LIKE :${firstNameSearch}`, {
-              [firstNameSearch]: `%${searchParam}%`,
-            })
-            .orWhere(`studentUser.lastName LIKE :${lastNameSearch}`, {
-              [lastNameSearch]: `%${searchParam}%`,
-            })
-            .orWhere(`studentProfile.location LIKE :${locationSearch}`, {
-              [locationSearch]: `%${searchParam}%`,
-            });
-          });
-        }));
-      }
-
-      qb.andWhere('studentUser.isActive = :isActive', {
-        isActive: true,
-      });
-
-      if (searchOption.lastName) {
-        qb.andWhere('studentUser.lastName = :lastName', {
-          lastName: searchOption.lastName,
-        });
-      }
-
-      if (searchOption.firstName) {
-        qb.andWhere('studentUser.firstName = :firstName', {
-          firstName: searchOption.firstName,
-        });
-      }
-
-      if (searchOption.email) {
-        qb.andWhere('studentUser.email = :email', {
-          email: searchOption.email,
-        });
-      }
-
-      if (searchOption.skills) {
-        const skills = searchOption.skills.split(',').map(skill => skill.trim());
-        qb.andWhere('studentProfile.skills ILIKE ANY(:skills)', { skills: skills.map(skill => `%${skill}%`) });
-      }
-
-      if (searchOption.tjmMin) {
-        qb.andWhere('studentProfile.tjm >= :tjmMin', {
-          tjmMin: searchOption.tjmMin,
-        });
-      }
-
-      if (searchOption.tjmMax) {
-        qb.andWhere('studentProfile.tjm <= :tjmMax', {
-          tjmMax: searchOption.tjmMax,
-        });
-      }
-
-      if (searchOption.noteMin) {
-        qb.andWhere('studentProfile.note >= :noteMin', {
-          noteMin: searchOption.noteMin,
-        });
-      }
-
-      if (searchOption.noteMax) {
-        qb.andWhere('studentProfile.note <= :noteMax', {
-          noteMax: searchOption.noteMax,
-        });
-      }
-
-      if (searchOption.isActive !== undefined) {
-        qb.andWhere('studentProfile.isActive = :isActive', {
-          isActive: searchOption.isActive,
-        });
-      }      
-      if (searchOption.hasGroup == true) {
-        qb.andWhere('studentUser.groupId IS NOT NULL');
-      }
-
-      if (searchOption.hasGroup == false) {
-        qb.andWhere('studentUser.groupId IS NULL');
-      }
-
-      if (searchOption.location) {
-        qb.andWhere('studentProfile.location IN (:...nearbyLocations)', { nearbyLocations });
-      }
-    }));
-
     let students = await this.getAllStudentsWithTheirProfile();
 
-    
+    if (searchOption.searchString) {
+      students = students.filter(student => {
+        return student.firstName.toLowerCase().includes(searchOption.searchString.toLowerCase()) || student.lastName.toLowerCase().includes(searchOption.searchString.toLowerCase());
+      });
+    }
+
+    if (searchOption.firstName) {
+      students = students.filter(student => student.firstName.toLowerCase().includes(searchOption.firstName.toLowerCase()));
+    }
+
+    if (searchOption.lastName) {
+      students = students.filter(student => student.lastName.toLowerCase().includes(searchOption.lastName.toLowerCase()));
+    }
+
     if (searchOption.skills) {
       const skills = searchOption.skills.split(',').map(skill => skill.trim().toLowerCase());
       students = students.filter(student => {
