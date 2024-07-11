@@ -67,4 +67,8 @@ export class GetCompanySearchGroupsDto {
 
   @ApiProperty({ type: StudentProfileResponseDto, isArray: true })
   studentsProfiles: StudentProfileResponseDto[];
+
+  @ApiProperty()
+  @IsNumber()
+  score: number;
 }
