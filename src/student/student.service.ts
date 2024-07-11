@@ -792,23 +792,52 @@ export class StudentService {
       }
     }));
 
-    const students = await studentsQuery.getMany();
+    let students = await this.getAllStudentsWithTheirProfile();
 
-    return await Promise.all(
-      students.map(async (student) => {
-        try {
-          let studentProfile = await this.studentProfileRepository.findOneBy({
-            studentId: student.id,
-          });
-          return formatToStudentSearchNetworkResponseDto(
-            student,
-            studentProfile
-          );
-        } catch (e) {
-          throw new Error(e);
-        }
-      }),
-    );
+
+    //now apply the filters on students
+    
+    if (searchOption.skills) {
+      const skills = searchOption.skills.split(',').map(skill => skill.trim().toLowerCase());
+      students = students.filter(student => {
+      let studentSkills = JSON.parse(student.skills);
+      let studentSkillsArray = [];
+      for (let key in studentSkills.skills) {
+        studentSkillsArray = studentSkillsArray.concat(studentSkills.skills[key]);
+      }
+      return skills.every(skill => studentSkillsArray.some(studentSkill => studentSkill.toLowerCase() === skill));
+      });      
+    }
+
+    if (searchOption.tjmMin) {
+      students = students.filter(student => student.tjm >= searchOption.tjmMin);
+    }
+
+    if (searchOption.tjmMax) {
+      students = students.filter(student => student.tjm <= searchOption.tjmMax);
+    }
+
+    if (searchOption.noteMin) {
+      students = students.filter(student => student.note >= searchOption.noteMin);
+    }
+
+    if (searchOption.noteMax) {
+      students = students.filter(student => student.note <= searchOption.noteMax);
+    }
+
+    if (searchOption.isActive !== undefined) {
+      students = students.filter(student => student.isActive === searchOption.isActive);
+    }
+
+    if (searchOption.location) {
+      students = students.filter(student => nearbyLocations.includes(student.location));
+    }
+
+    
+
+    console.log(students);
+
+    return students;
   }
 
   async getStudentById(id: number, req: any) {
@@ -833,5 +862,23 @@ export class StudentService {
     );
   }
 
+  async getAllStudentsWithTheirProfile() {
+    const students = await this.studentRepository.find();
+    return await Promise.all(
+      students.map(async (student) => {
+        try {
+          let studentProfile = await this.studentProfileRepository.findOneBy({
+            studentId: student.id,
+          });
+          return formatToStudentSearchNetworkResponseDto(
+            student,
+            studentProfile
+          );
+        } catch (e) {
+          throw new Error(e);
+        }
+      }),
+    );
+  }
 
 }
