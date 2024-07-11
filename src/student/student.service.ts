@@ -794,8 +794,6 @@ export class StudentService {
 
     let students = await this.getAllStudentsWithTheirProfile();
 
-
-    //now apply the filters on students
     
     if (searchOption.skills) {
       const skills = searchOption.skills.split(',').map(skill => skill.trim().toLowerCase());
@@ -832,10 +830,6 @@ export class StudentService {
     if (searchOption.location) {
       students = students.filter(student => nearbyLocations.includes(student.location));
     }
-
-    
-
-    console.log(students);
 
     return students;
   }
