@@ -19,6 +19,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { LoginStudentResponseDto } from './dto/login-student-response.dto';
 import { RegisterStudentDto } from './dto/register-student.dto';
@@ -214,6 +215,14 @@ export class AuthController {
   @Post('student/change-password')
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Change student password' })
+  @ApiResponse({
+    status: 401,
+    description: "Le nouveau mot de passe doit être différent de l'ancien",
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Mot de passe incorrect',
+  })
   async changeStudentPassword(@Req() req, @Body() body: ChangePasswordDto) {
     return this.authService.changeStudentPassword(req, body);
   }
@@ -221,6 +230,31 @@ export class AuthController {
   @Post('company/change-password')
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Change company password' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized',
+    content: {
+      'application/json': {
+        examples: {
+          passwordSameAsOld: {
+            summary: "Le nouveau mot de passe doit être différent de l'ancien",
+            value: {
+              statusCode: 401,
+              message:
+                "Le nouveau mot de passe doit être différent de l'ancien",
+            },
+          },
+          incorrectPassword: {
+            summary: 'Mot de passe incorrect',
+            value: {
+              statusCode: 401,
+              message: 'Mot de passe incorrect',
+            },
+          },
+        },
+      },
+    },
+  })
   async changeCompanyPassword(@Req() req, @Body() body: ChangePasswordDto) {
     return this.authService.changeCompanyPassword(req, body);
   }
