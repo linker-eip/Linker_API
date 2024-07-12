@@ -1,9 +1,4 @@
-import {
-  HttpCode,
-  HttpException,
-  HttpStatus,
-  Injectable,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { LoginStudentDto } from './dto/login-student.dto';
 import { RegisterStudentDto } from './dto/register-student.dto';
 import { StudentService } from '../student/student.service';
@@ -20,7 +15,7 @@ import { CompanyUser } from '../company/entity/CompanyUser.entity';
 import { ForgetPasswordDto } from '../auth/dto/forget-password.dto';
 import { SendMailDto } from '../mail/dto/send-mail.dto';
 import { MailService } from '../mail/mail.service';
-import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ChangePasswordDto, ResetPasswordDto } from './dto/reset-password.dto';
 import { GoogleLoginDto, GoogleLoginTokenDto } from './dto/google-login.dto';
 import { google } from 'googleapis';
 import axios from 'axios';
@@ -88,9 +83,9 @@ export class AuthService {
 
     const savedUser = await this.studentService.save(newUser);
 
-    const userPref = new StudentPreferences()
-    userPref.studentId = savedUser.id
-    await this.studentPreferencesRepository.save(userPref)
+    const userPref = new StudentPreferences();
+    userPref.studentId = savedUser.id;
+    await this.studentPreferencesRepository.save(userPref);
 
     const token = jwt.sign(
       { email: savedUser.email, userType: 'USER_STUDENT' },
@@ -108,7 +103,13 @@ export class AuthService {
         location: '',
         picture: null,
         studies: [],
-        skills: {"Development":[],"No-code":[],"Design & Produit":[],"Data":[],"Marketing & Sales":[]},
+        skills: {
+          Development: [],
+          'No-code': [],
+          'Design & Produit': [],
+          Data: [],
+          'Marketing & Sales': [],
+        },
         jobs: [],
         website: '',
         tjm: 0,
@@ -168,9 +169,9 @@ export class AuthService {
 
     const savedUser = await this.companyService.save(newUser);
 
-    const companyPrefs = new CompanyPreferences()
+    const companyPrefs = new CompanyPreferences();
     companyPrefs.companyId = savedUser.id;
-    await this.companyPreferencesRepository.save(companyPrefs)
+    await this.companyPreferencesRepository.save(companyPrefs);
 
     const token = jwt.sign(
       { email: savedUser.email, userType: 'USER_COMPANY' },
@@ -239,9 +240,9 @@ export class AuthService {
 
     const savedUser = await this.companyService.save(newUser);
 
-    const companyPrefs = new CompanyPreferences()
+    const companyPrefs = new CompanyPreferences();
     companyPrefs.companyId = savedUser.id;
-    await this.companyPreferencesRepository.save(companyPrefs)
+    await this.companyPreferencesRepository.save(companyPrefs);
 
     const token = jwt.sign(
       { email: savedUser.email, userType: 'USER_COMPANY' },
@@ -367,6 +368,56 @@ export class AuthService {
     return { message: 'Mot de passe rénitialisé avec succès' };
   }
 
+  async changeStudentPassword(req: any, body: ChangePasswordDto) {
+    const student = await this.studentService.findOneByEmail(req.user.email);
+    if (!student) {
+      throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED);
+    }
+
+    if (!(await this.comparePassword(body.oldPassword, student.password))) {
+      throw new HttpException(
+        'Mot de passe incorrect',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    if (await this.comparePassword(body.newPassword, student.password)) {
+      throw new HttpException(
+        "Le nouveau mot de passe doit être différent de l'ancien",
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    student.password = await this.hashPassword(body.newPassword);
+    this.studentService.save(student);
+    return;
+  }
+
+  async changeCompanyPassword(req: any, body: ChangePasswordDto) {
+    const company = await this.companyService.findOne(req.user.email);
+    if (!company) {
+      throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
+    }
+
+    if (!(await this.comparePassword(body.oldPassword, company.password))) {
+      throw new HttpException(
+        'Mot de passe incorrect',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    if (await this.comparePassword(body.newPassword, company.password)) {
+      throw new HttpException(
+        "Le nouveau mot de passe doit être différent de l'ancien",
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    company.password = await this.hashPassword(body.newPassword);
+    this.companyService.save(company);
+    return;
+  }
+
   async generateStudentResetPassword(body: ForgetPasswordDto) {
     const student = await this.studentService.findOneByEmail(body.email);
     if (!student) {
@@ -474,7 +525,13 @@ export class AuthService {
           location: '',
           picture: null,
           studies: [],
-          skills: {"Development":[],"No-code":[],"Design & Produit":[],"Data":[],"Marketing & Sales":[]},
+          skills: {
+            Development: [],
+            'No-code': [],
+            'Design & Produit': [],
+            Data: [],
+            'Marketing & Sales': [],
+          },
           jobs: [],
           website: '',
           tjm: 0,
@@ -531,7 +588,13 @@ export class AuthService {
           location: '',
           picture: null,
           studies: [],
-          skills: {"Development":[],"No-code":[],"Design & Produit":[],"Data":[],"Marketing & Sales":[]},
+          skills: {
+            Development: [],
+            'No-code': [],
+            'Design & Produit': [],
+            Data: [],
+            'Marketing & Sales': [],
+          },
           jobs: [],
           website: '',
           tjm: 0,
@@ -779,7 +842,7 @@ export class AuthService {
         HttpStatus.UNAUTHORIZED,
       );
     }
- 
+
     const sendMailDto = new SendMailDto();
     sendMailDto.to = company.email;
     sendMailDto.subject = 'Compte supprimé';
@@ -791,11 +854,11 @@ export class AuthService {
     return;
   }
 
-  async isStudentVerified(req: any): Promise<Boolean> {
+  async isStudentVerified(req: any): Promise<boolean> {
     const student = await this.studentService.findOneByEmail(req.user.email);
     if (!student) {
-      throw new HttpException("Invalid student", HttpStatus.UNAUTHORIZED)
+      throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED);
     }
-    return student.isVerified
+    return student.isVerified;
   }
 }
