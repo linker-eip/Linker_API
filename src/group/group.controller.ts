@@ -10,7 +10,6 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -204,6 +203,31 @@ export class GroupController {
   })
   async ejectMember(@Req() req, @Param('userId') userId) {
     return await this.groupService.ejectMember(req, userId);
+  }
+
+  @Post('/transfer/:userId')
+  @ApiOperation({
+    description: 'Transfer group leadership',
+    summary: 'Transfer group leadership',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Leadership transferred',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Mission en cours',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Vous devez être chef de groupe',
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Vous n'avez pas de groupe",
+  })
+  async transferLeadership(@Req() req, @Param('userId') userId: number) {
+    return await this.groupService.transferLeadership(req, userId);
   }
 
   @Get('/company/searchGroups')
