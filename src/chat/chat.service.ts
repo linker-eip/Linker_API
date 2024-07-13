@@ -49,20 +49,20 @@ export class ChatService {
     const studentMissions = await this.missionService.findAllByGroupId(
       student.groupId,
     );
-    const missionChannels: ChannelInfoDto[] = studentMissions
-      .filter((mission) => {
-        return mission.status != MissionStatus.PENDING;
-      })
-      .map(async (mission) => {
-        const companyPicture = (
-          await this.companyService.findCompanyById(mission.companyId)
-        ).picture;
-        return {
-          id: mission.id,
-          name: mission.name,
-          logo: companyPicture,
-        };
-      });
+    const missionChannels: ChannelInfoDto[] = await Promise.all(
+      studentMissions
+        .filter((mission) => mission.status != MissionStatus.PENDING)
+        .map(async (mission) => {
+          const companyPicture = (
+            await this.companyService.findCompanyById(mission.companyId)
+          ).picture;
+          return {
+            id: mission.id,
+            name: mission.name,
+            logo: companyPicture,
+          };
+        }),
+    );
 
     // Premission channels
 
@@ -145,17 +145,21 @@ export class ChatService {
     const companyMissions = await this.missionService.findAllByCompanyId(
       company.id,
     );
-    const missionChannels: CompanyChannelInfoDto[] = await Promise.all(companyMissions
-      .filter((mission) => mission.status != MissionStatus.PENDING)
-      .map(async (mission) => {
-        const groupPicture = await this.groupService.findGroupById(mission.groupId).then(group => group.picture);
-        return {
-          id: mission.id,
-          groupId: mission.groupId,
-          name: mission.name,
-          logo: groupPicture,
-        };
-      }));
+    const missionChannels: CompanyChannelInfoDto[] = await Promise.all(
+      companyMissions
+        .filter((mission) => mission.status != MissionStatus.PENDING)
+        .map(async (mission) => {
+          const groupPicture = await this.groupService
+            .findGroupById(mission.groupId)
+            .then((group) => group.picture);
+          return {
+            id: mission.id,
+            groupId: mission.groupId,
+            name: mission.name,
+            logo: groupPicture,
+          };
+        }),
+    );
 
     // Premission channels
 
