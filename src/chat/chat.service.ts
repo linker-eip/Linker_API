@@ -53,11 +53,14 @@ export class ChatService {
       .filter((mission) => {
         return mission.status != MissionStatus.PENDING;
       })
-      .map((mission) => {
+      .map(async (mission) => {
+        const companyPicture = (
+          await this.companyService.findCompanyById(mission.companyId)
+        ).picture;
         return {
           id: mission.id,
           name: mission.name,
-          logo: '',
+          logo: companyPicture,
         };
       });
 
@@ -82,10 +85,13 @@ export class ChatService {
         const mission = await this.missionService.findMissionById(
           parseInt(id.split('/')[0]),
         );
+        const companyPicture = (
+          await this.companyService.findCompanyById(mission.companyId)
+        ).picture;
         return {
           id: mission.id,
           name: mission.name,
-          logo: '',
+          logo: companyPicture,
         };
       }),
     );
@@ -139,18 +145,17 @@ export class ChatService {
     const companyMissions = await this.missionService.findAllByCompanyId(
       company.id,
     );
-    const missionChannels: CompanyChannelInfoDto[] = companyMissions
-      .filter((mission) => {
-        return mission.status != MissionStatus.PENDING;
-      })
-      .map((mission) => {
+    const missionChannels: CompanyChannelInfoDto[] = await Promise.all(companyMissions
+      .filter((mission) => mission.status != MissionStatus.PENDING)
+      .map(async (mission) => {
+        const groupPicture = await this.groupService.findGroupById(mission.groupId).then(group => group.picture);
         return {
           id: mission.id,
           groupId: mission.groupId,
           name: mission.name,
-          logo: '',
+          logo: groupPicture,
         };
-      });
+      }));
 
     // Premission channels
 
