@@ -4,23 +4,16 @@ import { StudentService } from '../student/student.service';
 import { Group } from './entity/Group.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
-  MoreThan,
-  ILike,
   Brackets,
-  Not,
   Repository,
   SelectQueryBuilder,
-  And,
-  Equal,
 } from 'typeorm';
 import { UpdateGroupDto } from './dto/update-group-dto';
 import {
   GetGroupeResponse,
-  groupMembersDto,
 } from './dto/get-group-response-dto';
 import { NotificationsService } from '../notifications/notifications.service';
 import { NotificationType } from '../notifications/entity/Notification.entity';
-import { Request } from 'express';
 import { GroupInvite } from './entity/GroupInvite.entity';
 import {
   GetInvitesResponse,
@@ -649,14 +642,68 @@ export class GroupService {
     });
     (groupMember);
 
-    if (groupMember) {
-      return true;
+    return groupMember;
+  }
+
+  async transferLeadership(req, userId: number) {
+    let student = await this.studentService.findOneByEmail(req.user.email);
+    let newLeader = await this.studentService.findOneById(userId);
+
+    if (!student) {
+      throw new HttpException('Etudiant non trouvé', HttpStatus.NOT_FOUND);
     }
 
-    return false;
+    if (student.groupId == null) {
+      throw new HttpException(
+        "Vous n'avez pas de groupe",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (student.id == userId) {
+      throw new HttpException(
+        'Vous ne pouvez pas vous transférer le leadership',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    let group = await this.getUserGroup(req);
+
+    if (student.id != group.leaderId) {
+      throw new HttpException(
+        'Vous devez être chef de groupe pour transférer le leadership',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    let missions = await this.missionRepository
+      .createQueryBuilder('mission')
+      .where('mission.groupId = :groupId', { groupId: group.id })
+      .andWhere('mission.status IN (:...statuses)', {
+        statuses: [
+          MissionStatus.IN_PROGRESS,
+          MissionStatus.ACCEPTED,
+          MissionStatus.PROVISIONED,
+        ],
+      })
+      .getMany();
+    if (missions.length > 0) {
+      throw new HttpException(
+        'Vous ne pouvez pas transférer le leadership si une mission est en cours',
+        HttpStatus.CONFLICT,
+      );
+    }
+    if (group.studentIds.includes(newLeader.id)) {
+      group.leaderId = newLeader.id;
+      this.groupRepository.save(group);
+    } else {
+      throw new HttpException(
+        "Cet étudiant n'est pas dans votre groupe",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }
-
 
 function filterGroupsBySkills(dto: GetCompanySearchGroupsDto[], skillsString: string): GetCompanySearchGroupsDto[] {
 

@@ -16,6 +16,7 @@ import { UploadDocumentAdminDto } from './dto/upload-document-admin.dto';
 import { DocumentUserEnum } from '../../documents/enum/document-user.enum';
 import { DocumentTypeEnum } from '../../documents/enum/document-type.enum';
 import { DocumentSearchOptionAdminDto } from './dto/document-search-option-admin.dto';
+import { StudentDocument } from '../../student/entity/StudentDocuments.entity';
 
 describe('DocumentAdminService', () => {
   let service: DocumentAdminService;
@@ -49,6 +50,10 @@ describe('DocumentAdminService', () => {
         },
         {
           provide: getRepositoryToken(StudentUser),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(StudentDocument),
           useClass: Repository,
         },
         {

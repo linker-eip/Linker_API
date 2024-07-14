@@ -399,6 +399,23 @@ describe('NotificationsService', () => {
     });
   });
 
+  describe('transfer', () => {
+    it('should transfer group property', async () => {
+      const req = {
+        user: {
+          email: "test@example.com",
+        }
+      }
+
+      jest.spyOn(service, 'transferLeadership').mockResolvedValueOnce(null);
+
+      const response = await controller.transferLeadership(req, 2);
+
+      expect(service.transferLeadership).toHaveBeenCalledWith(req, 2);
+      expect(response).toEqual(null);
+    });
+  });
+
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
