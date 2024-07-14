@@ -11,7 +11,7 @@ import { StudentProfile } from '../entity/StudentProfile.entity';
 
     @ApiProperty()
     @IsString()
-    "No-Code": string[];
+    "No-code": string[];
 
     @ApiProperty()
     @IsString()

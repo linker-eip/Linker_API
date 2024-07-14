@@ -116,7 +116,7 @@ export class StudentService {
     dto['Design & Produit'] = json.skills['Design & Produit'];
     dto.Development = json.skills['Development'];
     dto['Marketing & Sales'] = json.skills['Marketing & Sales'];
-    dto['No-code'] = json.skills['No-Code'];
+    dto['No-code'] = json.skills['No-code'];
     return dto;
   }
 
@@ -208,7 +208,7 @@ export class StudentService {
       var skillResult = {
         "skills": {
           "Development": [],
-          "No-Code": [],
+          "No-code": [],
           "Design & Produit": [],
           "Data": [],
           "Marketing & Sales": [],
@@ -249,7 +249,7 @@ export class StudentService {
               HttpStatus.BAD_REQUEST,
             );
           }
-          skillResult.skills['No-Code'].push(skill);
+          skillResult.skills['No-code'].push(skill);
         }
       }
       if (CreateStudentProfile.skills['Design & Produit']) {
@@ -707,8 +707,8 @@ export class StudentService {
             return true;
           }
         }
-        for (let i = 0; i < student.skills.skills['No-Code'].length; i++) {
-          if (searchOption.skills.includes(student.skills.skills['No-Code'][i])) {
+        for (let i = 0; i < student.skills.skills['No-code'].length; i++) {
+          if (searchOption.skills.includes(student.skills.skills['No-code'][i])) {
             return true;
           }
         }
