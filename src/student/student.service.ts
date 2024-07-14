@@ -128,6 +128,7 @@ export class StudentService {
     const jobs = await this.jobsservice.findJobs(profile.id);
     const studies = await this.studiesService.findStudies(profile.id);
     return {
+      id: profile.studentId,
       lastName: profile.lastName,
       firstName: profile.firstName,
       description: profile.description,
