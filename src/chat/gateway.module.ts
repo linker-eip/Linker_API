@@ -11,6 +11,7 @@ import { ChatController } from './chat.controller';
 import { ChatService } from './chat.service';
 import { GroupModule } from '../group/group.module';
 import { MissionModule } from '../mission/mission.module';
+import { DocumentTransferModule } from '../document-transfer/src/document-transfer.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { MissionModule } from '../mission/mission.module';
     JwtModule,
     GroupModule,
     MissionModule,
+    DocumentTransferModule,
   ],
   providers: [Gateway, ChatService],
   controllers: [ChatController],

@@ -30,7 +30,8 @@ export class Gateway implements OnModuleInit {
     private readonly studentService: StudentService,
     private readonly companyService: CompanyService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) {
+  }
 
   private studentUsers: Map<string, StudentUser> = new Map();
   private companyUsers: Map<string, CompanyUser> = new Map();
@@ -98,7 +99,7 @@ export class Gateway implements OnModuleInit {
     @MessageBody() body: any,
     @ConnectedSocket() socket: Socket,
   ) {
-    const studentUser: StudentUser = this.studentUsers[socket.id];
+    const studentUser: StudentUser = body.student || this.studentUsers[socket.id];
     const profile = await this.studentService.findStudentProfile(
       studentUser.email,
     );
@@ -115,6 +116,7 @@ export class Gateway implements OnModuleInit {
       firstName: studentUser.firstName,
       lastName: studentUser.lastName,
       picture: profile.picture,
+      isFile: body.isFile,
     };
     const storedMessage = new Message();
     (storedMessage.author = studentUser.id),
@@ -122,6 +124,7 @@ export class Gateway implements OnModuleInit {
       (storedMessage.type = MessageType.GROUP),
       (storedMessage.content = message.content),
       (storedMessage.channelId = studentUser.groupId.toString()),
+      (storedMessage.isFile) = body.isFile,
       this.messageRepository.save(storedMessage);
 
     this.server
@@ -134,7 +137,7 @@ export class Gateway implements OnModuleInit {
     @MessageBody() body: any,
     @ConnectedSocket() socket: Socket,
   ) {
-    const studentUser: StudentUser = this.studentUsers[socket.id];
+    const studentUser: StudentUser = body.student || this.studentUsers[socket.id];
     if (studentUser == null) {
       socket.emit('error', { message: 'Unauthorized access' });
       return;
@@ -157,6 +160,7 @@ export class Gateway implements OnModuleInit {
           picture: profile.picture,
           timestamp: message.timestamp,
           content: message.content,
+          isFile: message.isFile,
         };
       }),
     );
@@ -164,12 +168,12 @@ export class Gateway implements OnModuleInit {
   }
 
   @SubscribeMessage('sendMission')
-  async onNewMissionpMessage(
+  async onNewMissionMessage(
     @MessageBody() body: any,
     @ConnectedSocket() socket: Socket,
   ) {
-    const studentUser: StudentUser = this.studentUsers[socket.id];
-    const companyUser: CompanyUser = this.companyUsers[socket.id];
+    const studentUser: StudentUser = body.student || this.studentUsers[socket.id];
+    const companyUser: CompanyUser = body.company || this.companyUsers[socket.id];
     let message;
     const storedMessage = new Message();
 
@@ -201,6 +205,7 @@ export class Gateway implements OnModuleInit {
         picture: profile.picture,
         type: UserType.STUDENT_USER,
         missionId: mission.id,
+        isFile: body.isFile,
       };
 
       storedMessage.author = studentUser.id;
@@ -208,6 +213,7 @@ export class Gateway implements OnModuleInit {
       storedMessage.type = MessageType.MISSION;
       storedMessage.content = message.content;
       storedMessage.channelId = mission.id.toString();
+      storedMessage.isFile = body.isFile;
     } else if (companyUser != null) {
       const mission = await this.missionRepository.findOneBy({
         id: body.id,
@@ -227,6 +233,7 @@ export class Gateway implements OnModuleInit {
         picture: profile.picture,
         type: UserType.COMPANY_USER,
         missionId: mission.id,
+        isFile: body.isFile,
       };
 
       storedMessage.author = companyUser.id;
@@ -234,6 +241,7 @@ export class Gateway implements OnModuleInit {
       storedMessage.type = MessageType.MISSION;
       storedMessage.content = message.content;
       storedMessage.channelId = mission.id.toString();
+      storedMessage.isFile = body.isFile;
     }
 
     this.messageRepository.save(storedMessage);
@@ -248,8 +256,8 @@ export class Gateway implements OnModuleInit {
     @MessageBody() body: any,
     @ConnectedSocket() socket: Socket,
   ) {
-    const studentUser: StudentUser = this.studentUsers[socket.id];
-    const companyUser: CompanyUser = this.companyUsers[socket.id];
+    const studentUser: StudentUser = body.student || this.studentUsers[socket.id];
+    const companyUser: CompanyUser = body.company || this.companyUsers[socket.id];
     if (body.id == null) {
       socket.emit('error', { message: 'no mission id provided' });
       return;
@@ -285,6 +293,7 @@ export class Gateway implements OnModuleInit {
               timestamp: message.timestamp,
               content: message.content,
               type: UserType.STUDENT_USER,
+              isFile: message.isFile
             };
           } else {
             user = await this.companyRepository.findOneBy({
@@ -301,6 +310,7 @@ export class Gateway implements OnModuleInit {
               timestamp: message.timestamp,
               content: message.content,
               type: UserType.COMPANY_USER,
+              isFile: message.isFile
             };
           }
         }),
@@ -336,6 +346,7 @@ export class Gateway implements OnModuleInit {
               timestamp: message.timestamp,
               content: message.content,
               type: UserType.STUDENT_USER,
+              isFile: message.isFile
             };
           } else {
             user = await this.companyRepository.findOneBy({
@@ -353,6 +364,7 @@ export class Gateway implements OnModuleInit {
               timestamp: message.timestamp,
               content: message.content,
               type: UserType.COMPANY_USER,
+              isFile: message.isFile,
             };
           }
         }),
@@ -362,12 +374,12 @@ export class Gateway implements OnModuleInit {
   }
 
   @SubscribeMessage('sendPremission')
-  async onNewPreMissionpMessage(
+  async onNewPreMissionMessage(
     @MessageBody() body: any,
     @ConnectedSocket() socket: Socket,
   ) {
-    const studentUser: StudentUser = this.studentUsers[socket.id];
-    const companyUser: CompanyUser = this.companyUsers[socket.id];
+    const studentUser: StudentUser = body.student || this.studentUsers[socket.id];
+    const companyUser: CompanyUser = body.company || this.companyUsers[socket.id];
     let message;
     const storedMessage = new Message();
 
@@ -406,12 +418,14 @@ export class Gateway implements OnModuleInit {
         type: UserType.STUDENT_USER,
         missionId: mission.id,
         groupId: studentUser.groupId,
+        isFile: body.isFile,
       };
 
       storedMessage.author = studentUser.id;
       storedMessage.authorType = UserType.STUDENT_USER;
       storedMessage.type = MessageType.PREMISSION;
       storedMessage.content = message.content;
+      storedMessage.isFile = body.isFile;
       storedMessage.channelId =
         mission.id.toString() + '/' + studentUser.groupId.toString();
     } else if (companyUser != null) {
@@ -440,12 +454,14 @@ export class Gateway implements OnModuleInit {
         type: UserType.COMPANY_USER,
         missionId: mission.id,
         groupId: body.groupId,
+        isFile: body.isFile
       };
 
       storedMessage.author = companyUser.id;
       storedMessage.authorType = UserType.COMPANY_USER;
       storedMessage.type = MessageType.PREMISSION;
       storedMessage.content = message.content;
+      storedMessage.isFile = body.isFile;
       storedMessage.channelId =
         mission.id.toString() + '/' + body.groupId.toString();
     }
@@ -462,8 +478,8 @@ export class Gateway implements OnModuleInit {
     @MessageBody() body: any,
     @ConnectedSocket() socket: Socket,
   ) {
-    const studentUser: StudentUser = this.studentUsers[socket.id];
-    const companyUser: CompanyUser = this.companyUsers[socket.id];
+    const studentUser: StudentUser = body.student || this.studentUsers[socket.id];
+    const companyUser: CompanyUser = body.company || this.companyUsers[socket.id];
     if (body.missionId == null) {
       socket.emit('error', { message: 'no mission id provided' });
       return;
@@ -504,6 +520,7 @@ export class Gateway implements OnModuleInit {
               timestamp: message.timestamp,
               content: message.content,
               type: UserType.STUDENT_USER,
+              isFile: message.isFile
             };
           } else {
             user = await this.companyRepository.findOneBy({
@@ -521,6 +538,7 @@ export class Gateway implements OnModuleInit {
               timestamp: message.timestamp,
               content: message.content,
               type: UserType.COMPANY_USER,
+              isFile: message.isFile
             };
           }
         }),
@@ -561,6 +579,7 @@ export class Gateway implements OnModuleInit {
               timestamp: message.timestamp,
               content: message.content,
               type: UserType.STUDENT_USER,
+              isFile: message.isFile
             };
           } else {
             user = await this.companyRepository.findOneBy({
@@ -578,6 +597,7 @@ export class Gateway implements OnModuleInit {
               timestamp: message.timestamp,
               content: message.content,
               type: UserType.COMPANY_USER,
+              isFile: message.isFile
             };
           }
         }),
@@ -591,7 +611,7 @@ export class Gateway implements OnModuleInit {
     @MessageBody() body: any,
     @ConnectedSocket() socket: Socket,
   ) {
-    const studentUser: StudentUser = this.studentUsers[socket.id];
+    const studentUser: StudentUser = body.student || this.studentUsers[socket.id];
     const profile = await this.studentService.findStudentProfile(
       studentUser.email,
     );
@@ -619,7 +639,7 @@ export class Gateway implements OnModuleInit {
     const recipientSocket = Array.from(
       this.server.sockets.sockets.values(),
     ).find((socket) => {
-      const studentUser: StudentUser = this.studentUsers[socket.id];
+      const studentUser: StudentUser = body.student || this.studentUsers[socket.id];
       return studentUser && studentUser.id === body.userId;
     });
 
@@ -629,12 +649,15 @@ export class Gateway implements OnModuleInit {
       lastName: studentUser.lastName,
       picture: profile.picture,
       authorId: studentUser.id,
+      recipientId: recipient.id,
+      isFile: body.isFile,
     };
     const storedMessage = new Message();
     (storedMessage.author = studentUser.id),
       (storedMessage.authorType = UserType.STUDENT_USER),
       (storedMessage.type = MessageType.DM),
       (storedMessage.content = message.content),
+      (storedMessage.isFile = body.isFile)
       (storedMessage.channelId =
         studentUser.id.toString() + '/' + recipient.id.toString()),
       this.messageRepository.save(storedMessage);
@@ -651,7 +674,7 @@ export class Gateway implements OnModuleInit {
     @MessageBody() body: any,
     @ConnectedSocket() socket: Socket,
   ) {
-    const studentUser: StudentUser = this.studentUsers[socket.id];
+    const studentUser: StudentUser = body.student || this.studentUsers[socket.id];
     if (studentUser == null) {
       socket.emit('error', { message: 'Unauthorized access' });
       return;
@@ -685,6 +708,7 @@ export class Gateway implements OnModuleInit {
           picture: profile.picture,
           timestamp: message.timestamp,
           content: message.content,
+          isFile: message.isFile,
         };
       }),
     );
