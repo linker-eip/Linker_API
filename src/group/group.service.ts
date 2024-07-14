@@ -586,7 +586,7 @@ export class GroupService {
 
     filteredGroups = groupMatchingAlgorithm(filteredGroups, mission.skills);
 
-    console.log('mission', mission);
+    filteredGroups.sort((a, b) => b.score - a.score);
 
     return filteredGroups;
   }
@@ -658,9 +658,6 @@ function assignSkillsScore(groups: GetCompanySearchGroupsDto[], missionSkills: s
     }).flat().map(skill => skill.toLowerCase());
 
     const missionSkillsArray = missionSkills.split(',').map(skill => skill.trim().toLowerCase());
-
-    console.log(groupSkills, missionSkillsArray);
-
     let score = 0;
     groupSkills.forEach(skill => {
       if (missionSkillsArray.includes(skill)) {
