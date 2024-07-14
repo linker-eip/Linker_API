@@ -17,7 +17,7 @@ import { CompanyUser } from '../company/entity/CompanyUser.entity';
 import { Mission } from '../mission/entity/mission.entity';
 import { MissionStatus } from '../mission/enum/mission-status.enum';
 import { CompanyService } from '../company/company.service';
-import { MessageType} from './enum/MessageType.enum';
+import { MessageType } from './enum/MessageType.enum';
 
 @WebSocketGateway({ cors: true })
 export class Gateway implements OnModuleInit {
@@ -294,7 +294,7 @@ export class Gateway implements OnModuleInit {
               timestamp: message.timestamp,
               content: message.content,
               type: UserType.STUDENT_USER,
-              isFile: message.isFile
+              isFile: message.isFile,
             };
           } else {
             user = await this.companyRepository.findOneBy({
@@ -311,7 +311,7 @@ export class Gateway implements OnModuleInit {
               timestamp: message.timestamp,
               content: message.content,
               type: UserType.COMPANY_USER,
-              isFile: message.isFile
+              isFile: message.isFile,
             };
           }
         }),
@@ -347,7 +347,7 @@ export class Gateway implements OnModuleInit {
               timestamp: message.timestamp,
               content: message.content,
               type: UserType.STUDENT_USER,
-              isFile: message.isFile
+              isFile: message.isFile,
             };
           } else {
             user = await this.companyRepository.findOneBy({
@@ -455,7 +455,7 @@ export class Gateway implements OnModuleInit {
         type: UserType.COMPANY_USER,
         missionId: mission.id,
         groupId: body.groupId,
-        isFile: body.isFile
+        isFile: body.isFile,
       };
 
       storedMessage.author = companyUser.id;
@@ -521,7 +521,7 @@ export class Gateway implements OnModuleInit {
               timestamp: message.timestamp,
               content: message.content,
               type: UserType.STUDENT_USER,
-              isFile: message.isFile
+              isFile: message.isFile,
             };
           } else {
             user = await this.companyRepository.findOneBy({
@@ -539,7 +539,7 @@ export class Gateway implements OnModuleInit {
               timestamp: message.timestamp,
               content: message.content,
               type: UserType.COMPANY_USER,
-              isFile: message.isFile
+              isFile: message.isFile,
             };
           }
         }),
@@ -580,7 +580,7 @@ export class Gateway implements OnModuleInit {
               timestamp: message.timestamp,
               content: message.content,
               type: UserType.STUDENT_USER,
-              isFile: message.isFile
+              isFile: message.isFile,
             };
           } else {
             user = await this.companyRepository.findOneBy({
@@ -598,7 +598,7 @@ export class Gateway implements OnModuleInit {
               timestamp: message.timestamp,
               content: message.content,
               type: UserType.COMPANY_USER,
-              isFile: message.isFile
+              isFile: message.isFile,
             };
           }
         }),
@@ -620,6 +620,8 @@ export class Gateway implements OnModuleInit {
       socket.emit('error', { message: 'Unauthorized access' });
       return;
     }
+
+    console.log(studentUser);
 
     if (body.message == null) {
       socket.emit('error', { message: 'no message provided' });
@@ -658,7 +660,7 @@ export class Gateway implements OnModuleInit {
       (storedMessage.authorType = UserType.STUDENT_USER),
       (storedMessage.type = MessageType.DM),
       (storedMessage.content = message.content),
-      (storedMessage.isFile = body.isFile)
+      (storedMessage.isFile = body.isFile),
       (storedMessage.channelId =
         studentUser.id.toString() + '/' + recipient.id.toString()),
       this.messageRepository.save(storedMessage);
@@ -716,3 +718,4 @@ export class Gateway implements OnModuleInit {
     socket.emit('directMessageHistory', historyDto);
   }
 }
+
