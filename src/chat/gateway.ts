@@ -10,13 +10,14 @@ import {
 import { Server, Socket } from 'socket.io';
 import { StudentUser } from '../student/entity/StudentUser.entity';
 import { StudentService } from '../student/student.service';
-import { Message, MessageType, UserType } from './entity/Message.entity';
+import { Message, UserType } from './entity/Message.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CompanyUser } from '../company/entity/CompanyUser.entity';
 import { Mission } from '../mission/entity/mission.entity';
 import { MissionStatus } from '../mission/enum/mission-status.enum';
 import { CompanyService } from '../company/company.service';
+import { MessageType} from './enum/MessageType.enum';
 
 @WebSocketGateway({ cors: true })
 export class Gateway implements OnModuleInit {

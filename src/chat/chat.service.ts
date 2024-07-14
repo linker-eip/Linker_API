@@ -1,6 +1,6 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Message, MessageType } from './entity/Message.entity';
+import { Message } from './entity/Message.entity';
 import { Repository } from 'typeorm';
 import { StudentService } from '../student/student.service';
 import { ChannelInfoDto, StudentConversationResponseDto } from './dto/student-conversation-response.dto';
@@ -12,6 +12,7 @@ import { CompanyService } from '../company/company.service';
 import { SendFileInChatDto } from './dto/chat-send-file.dto';
 import { DocumentTransferService } from '../document-transfer/src/services/document-transfer.service';
 import { Gateway } from './gateway';
+import { MessageType } from './enum/MessageType.enum';
 
 @Injectable()
 export class ChatService {

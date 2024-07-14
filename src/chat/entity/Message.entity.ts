@@ -1,14 +1,8 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { MessageType } from '../enum/MessageType.enum';
 
 export enum UserType {
   STUDENT_USER = 'STUDENT_USER', COMPANY_USER = 'COMPANY_USER'
-}
-
-export enum MessageType {
-  GROUP,
-  MISSION,
-  PREMISSION,
-  DM,
 }
 
 @Entity()
