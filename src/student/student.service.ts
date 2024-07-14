@@ -701,15 +701,36 @@ export class StudentService {
     }
 
     if (searchOption.skills) {
-      const skills = searchOption.skills.split(',').map(skill => skill.trim().toLowerCase());
       students = students.filter(student => {
-      let studentSkills = JSON.parse(student.skills);
-      let studentSkillsArray = [];
-      for (let key in studentSkills.skills) {
-        studentSkillsArray = studentSkillsArray.concat(studentSkills.skills[key]);
-      }
-      return skills.every(skill => studentSkillsArray.some(studentSkill => studentSkill.toLowerCase() === skill));
-      });      
+        for (let i = 0; i < student.skills.skills.Development.length; i++) {
+          if (searchOption.skills.includes(student.skills.skills.Development[i])) {
+            return true;
+          }
+        }
+        for (let i = 0; i < student.skills.skills['No-Code'].length; i++) {
+          if (searchOption.skills.includes(student.skills.skills['No-Code'][i])) {
+            return true;
+          }
+        }
+        for (let i = 0; i < student.skills.skills['Design & Produit'].length; i++) {
+          if (searchOption.skills.includes(student.skills.skills['Design & Produit'][i])) {
+            return true;
+          }
+        }
+        for (let i = 0; i < student.skills.skills.Data.length; i++) {
+          if (searchOption.skills.includes(student.skills.skills.Data[i])) {
+            return true;
+          }
+        }
+
+        for (let i = 0; i < student.skills.skills['Marketing & Sales'].length; i++) {
+          if (searchOption.skills.includes(student.skills.skills['Marketing & Sales'][i])) {
+            return true;
+          }
+        }
+
+        return false;
+      });
     }
 
     if (searchOption.tjmMin) {

@@ -3,6 +3,34 @@ import { IsBoolean, IsDate, IsEmail, IsNumber, IsString, isString } from 'class-
 import { StudentUser } from '../entity/StudentUser.entity';
 import { StudentProfile } from '../entity/StudentProfile.entity';
 
+
+  class SkillListt {
+    @ApiProperty()
+    @IsString()
+    "Development": string[];
+
+    @ApiProperty()
+    @IsString()
+    "No-Code": string[];
+
+    @ApiProperty()
+    @IsString()
+    "Design & Produit": string[];
+
+    @ApiProperty()
+    @IsString()
+    "Data": string[];
+
+    @ApiProperty()
+    @IsString()
+    "Marketing & Sales": string[];
+  }
+
+  class SkillList {
+    @ApiProperty()
+    skills: SkillListt
+}
+
 export class StudentSearchNetworkResponseDto {
   @ApiProperty()
   @IsNumber()
@@ -29,8 +57,7 @@ export class StudentSearchNetworkResponseDto {
   location: string;
 
   @ApiProperty()
-  @IsString()
-  skills: string;
+  skills: SkillList;
 
   @ApiProperty()
   @IsNumber()
@@ -56,7 +83,7 @@ export function formatToStudentSearchNetworkResponseDto(student: StudentUser, st
     dto.picture = studentProfile.picture;
     dto.description = studentProfile.description;
     dto.location = studentProfile.location;
-    dto.skills = studentProfile.skills;
+    dto.skills = JSON.parse(studentProfile.skills);
     dto.note = studentProfile.note;
     dto.tjm = studentProfile.tjm;
     dto.isActive = student.isActive;
