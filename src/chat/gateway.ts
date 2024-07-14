@@ -16,7 +16,7 @@ import { Repository } from 'typeorm';
 import { CompanyUser } from '../company/entity/CompanyUser.entity';
 import { Mission } from '../mission/entity/mission.entity';
 import { MissionStatus } from '../mission/enum/mission-status.enum';
-import { CompanyService } from 'src/company/company.service';
+import { CompanyService } from '../company/company.service';
 
 @WebSocketGateway({ cors: true })
 export class Gateway implements OnModuleInit {

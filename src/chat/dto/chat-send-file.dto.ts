@@ -9,7 +9,7 @@ export class SendFileInChatDto {
 
   @ApiProperty({description: "Id du salon (mission id ou user id)"})
   @IsOptional()
-  channelId: number;
+  channelId?: number;
 
   @ApiProperty( {description: "Id secondaire du salon (group id dans le cas d'une premission pour une company)"})
   @IsOptional()
