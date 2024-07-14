@@ -718,3 +718,4 @@ export class Gateway implements OnModuleInit {
     socket.emit('directMessageHistory', historyDto);
   }
 }
+
