@@ -38,6 +38,8 @@ import { CompanyDocument } from '../company/entity/CompanyDocument.entity';
 import { CompanyPreferences } from '../company/entity/CompanyPreferences.entity';
 import { MailService } from '../mail/mail.service';
 import { AiService } from '../ai/ai.service';
+import { GetCompanySearchGroupsDto } from "./dto/get-company-search-groups.dto";
+import {CompanySearchGroupsFilterDto} from "./dto/company-search-groups-filter.dto";
 
 describe('NotificationsService', () => {
   let service: GroupService;
@@ -432,6 +434,39 @@ describe('NotificationsService', () => {
 
       expect(service.transferLeadership).toHaveBeenCalledWith(req, 2);
       expect(response).toEqual(null);
+
+    });
+  });
+
+  describe('getAllGroups', () => {
+    it('should get all groups', async () => {
+      const req = {
+        user: {
+          email: "test@gmail.com",
+        }
+      }
+
+      const dto: CompanySearchGroupsFilterDto = {
+        groupName: "Test group",
+      }
+
+      const expectedResponse: GetCompanySearchGroupsDto[] = [
+        {
+          id: 1,
+          name: "Test group",
+          description: "Test group description",
+          studentsProfiles: [],
+          score: 0,
+        }
+      ]
+
+      jest.spyOn(service, 'getAllGroups').mockResolvedValueOnce(expectedResponse);
+
+      const response = await controller.getAllGroups(dto, req);
+
+      expect(service.getAllGroups).toHaveBeenCalledWith(req, dto);
+
+      expect(response).toEqual(expectedResponse);
     });
   });
 
