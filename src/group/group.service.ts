@@ -588,7 +588,38 @@ export class GroupService {
 
     filteredGroups.sort((a, b) => b.score - a.score);
 
-    return filteredGroups;
+    if (searchOption.groupName) {
+      filteredGroups = filteredGroups.filter((group) =>
+      group.name.includes(searchOption.groupName),
+      );
+      filteredGroups = filteredGroups.map((group) => {
+        return { ...group, score: group.score + 5 };
+      });
+    }
+
+    if (searchOption.location) {
+      filteredGroups = filteredGroups.filter((group) =>
+        group.studentsProfiles.some((studentProfile) =>
+          studentProfile.location.includes(searchOption.location),
+        ),
+      );
+      filteredGroups = filteredGroups.map((group) => {
+        return { ...group, score: group.score + 5 };
+      });
+    }
+
+    if (searchOption.size) {
+      filteredGroups = filteredGroups.filter(
+        (group) => group.studentsProfiles.length == searchOption.size,
+      );
+      filteredGroups = filteredGroups.map((group) => {
+        return { ...group, score: group.score + 5 };
+      });
+    }
+
+
+    return filteredGroups.slice(0, 10);
+
   }
 
   async checkIfStudentIsInGroup(student: any) {

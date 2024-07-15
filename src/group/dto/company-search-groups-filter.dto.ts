@@ -6,4 +6,32 @@ export class CompanySearchGroupsFilterDto {
   @IsOptional()
   missionId?: number;
 
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  groupName?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  page?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  location?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  size?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  firstName?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  lastName?: string;
 }
