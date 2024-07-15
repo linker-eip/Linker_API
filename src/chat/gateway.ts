@@ -100,12 +100,16 @@ export class Gateway implements OnModuleInit {
     @MessageBody() body: any,
     @ConnectedSocket() socket: Socket,
   ) {
-    console.log(body)
-    const studentUser: StudentUser = body.student || this.studentUsers[socket.id];
+    console.log(body);
+    let studentUser: StudentUser;
+    if (body.student) {
+      studentUser = body.student;
+    } else {
+      this.studentUsers[socket.id];
+    }
     const profile = await this.studentService.findStudentProfile(
       studentUser.email,
     );
-    console.log(profile);
     if (studentUser == null) {
       socket.emit('error', { message: 'Unauthorized access' });
       return;
@@ -140,7 +144,12 @@ export class Gateway implements OnModuleInit {
     @MessageBody() body: any,
     @ConnectedSocket() socket: Socket,
   ) {
-    const studentUser: StudentUser = body.student || this.studentUsers[socket.id];
+    let studentUser: StudentUser;
+    if (body.student) {
+      studentUser = body.student;
+    } else {
+      this.studentUsers[socket.id];
+    }
     if (studentUser == null) {
       socket.emit('error', { message: 'Unauthorized access' });
       return;
@@ -175,8 +184,18 @@ export class Gateway implements OnModuleInit {
     @MessageBody() body: any,
     @ConnectedSocket() socket: Socket,
   ) {
-    const studentUser: StudentUser = body.student || this.studentUsers[socket.id];
-    const companyUser: CompanyUser = body.company || this.companyUsers[socket.id];
+    let studentUser: StudentUser;
+    if (body.student) {
+      studentUser = body.student;
+    } else {
+      this.studentUsers[socket.id];
+    }
+    let companyUser: CompanyUser;
+    if (body.company) {
+      companyUser = body.company;
+    } else {
+      this.companyUsers[socket.id];
+    }
     let message;
     const storedMessage = new Message();
 
@@ -259,8 +278,13 @@ export class Gateway implements OnModuleInit {
     @MessageBody() body: any,
     @ConnectedSocket() socket: Socket,
   ) {
-    const studentUser: StudentUser = body.student || this.studentUsers[socket.id];
-    const companyUser: CompanyUser = body.company || this.companyUsers[socket.id];
+    let studentUser: StudentUser;
+    if (body.student) {
+      studentUser = body.student;
+    } else {
+      this.studentUsers[socket.id];
+    }
+
     if (body.id == null) {
       socket.emit('error', { message: 'no mission id provided' });
       return;
@@ -381,8 +405,18 @@ export class Gateway implements OnModuleInit {
     @MessageBody() body: any,
     @ConnectedSocket() socket: Socket,
   ) {
-    const studentUser: StudentUser = body.student || this.studentUsers[socket.id];
-    const companyUser: CompanyUser = body.company || this.companyUsers[socket.id];
+    let studentUser: StudentUser;
+    if (body.student) {
+      studentUser = body.student;
+    } else {
+      this.studentUsers[socket.id];
+    }
+    let companyUser: CompanyUser;
+    if (body.company) {
+      companyUser = body.company;
+    } else {
+      this.companyUsers[socket.id];
+    }
     let message;
     const storedMessage = new Message();
 
@@ -481,8 +515,18 @@ export class Gateway implements OnModuleInit {
     @MessageBody() body: any,
     @ConnectedSocket() socket: Socket,
   ) {
-    const studentUser: StudentUser = body.student || this.studentUsers[socket.id];
-    const companyUser: CompanyUser = body.company || this.companyUsers[socket.id];
+    let studentUser: StudentUser;
+    if (body.student) {
+      studentUser = body.student;
+    } else {
+      this.studentUsers[socket.id];
+    }
+    let companyUser: CompanyUser;
+    if (body.company) {
+      companyUser = body.company;
+    } else {
+      this.companyUsers[socket.id];
+    }
     if (body.missionId == null) {
       socket.emit('error', { message: 'no mission id provided' });
       return;
@@ -614,7 +658,12 @@ export class Gateway implements OnModuleInit {
     @MessageBody() body: any,
     @ConnectedSocket() socket: Socket,
   ) {
-    const studentUser: StudentUser = body.student || this.studentUsers[socket.id];
+    let studentUser: StudentUser;
+    if (body.student) {
+      studentUser = body.student;
+    } else {
+      this.studentUsers[socket.id];
+    }
     const profile = await this.studentService.findStudentProfile(
       studentUser.email,
     );
@@ -644,7 +693,12 @@ export class Gateway implements OnModuleInit {
     const recipientSocket = Array.from(
       this.server.sockets.sockets.values(),
     ).find((socket) => {
-      const studentUser: StudentUser = body.student || this.studentUsers[socket.id];
+      let studentUser: StudentUser;
+      if (body.student) {
+        studentUser = body.student;
+      } else {
+        this.studentUsers[socket.id];
+      }
       return studentUser && studentUser.id === body.userId;
     });
 
@@ -679,7 +733,12 @@ export class Gateway implements OnModuleInit {
     @MessageBody() body: any,
     @ConnectedSocket() socket: Socket,
   ) {
-    const studentUser: StudentUser = body.student || this.studentUsers[socket.id];
+    let studentUser: StudentUser;
+    if (body.student) {
+      studentUser = body.student;
+    } else {
+      this.studentUsers[socket.id];
+    }
     if (studentUser == null) {
       socket.emit('error', { message: 'Unauthorized access' });
       return;
