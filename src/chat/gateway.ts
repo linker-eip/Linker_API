@@ -101,7 +101,7 @@ export class Gateway implements OnModuleInit {
     @ConnectedSocket() socket: Socket,
   ) {
     let studentUser: StudentUser;
-    if (body.student) {
+    if (body && body.student) {
       studentUser = body.student;
     } else {
       studentUser = this.studentUsers[socket.id];
@@ -144,7 +144,7 @@ export class Gateway implements OnModuleInit {
     @ConnectedSocket() socket: Socket,
   ) {
     let studentUser: StudentUser;
-    if (body.student) {
+    if (body && body.student) {
       studentUser = body.student;
     } else {
       studentUser = this.studentUsers[socket.id];
@@ -184,13 +184,13 @@ export class Gateway implements OnModuleInit {
     @ConnectedSocket() socket: Socket,
   ) {
     let studentUser: StudentUser;
-    if (body.student) {
+    if (body && body.student) {
       studentUser = body.student;
     } else {
       studentUser = this.studentUsers[socket.id];
     }
     let companyUser: CompanyUser;
-    if (body.company) {
+    if (body && body.company) {
       companyUser = body.company;
     } else {
       companyUser = this.companyUsers[socket.id];
@@ -278,13 +278,13 @@ export class Gateway implements OnModuleInit {
     @ConnectedSocket() socket: Socket,
   ) {
     let studentUser: StudentUser;
-    if (body.student) {
+    if (body && body.student) {
       studentUser = body.student;
     } else {
       studentUser = this.studentUsers[socket.id];
     }
     let companyUser: CompanyUser;
-    if (body.company) {
+    if (body && body.company) {
       companyUser = body.company;
     } else {
       companyUser = this.companyUsers[socket.id];
@@ -411,13 +411,13 @@ export class Gateway implements OnModuleInit {
     @ConnectedSocket() socket: Socket,
   ) {
     let studentUser: StudentUser;
-    if (body.student) {
+    if (body && body.student) {
       studentUser = body.student;
     } else {
       studentUser = this.studentUsers[socket.id];
     }
     let companyUser: CompanyUser;
-    if (body.company) {
+    if (body && body.company) {
       companyUser = body.company;
     } else {
       companyUser = this.companyUsers[socket.id];
@@ -521,13 +521,13 @@ export class Gateway implements OnModuleInit {
     @ConnectedSocket() socket: Socket,
   ) {
     let studentUser: StudentUser;
-    if (body.student) {
+    if (body && body.student) {
       studentUser = body.student;
     } else {
       studentUser = this.studentUsers[socket.id];
     }
     let companyUser: CompanyUser;
-    if (body.company) {
+    if (body && body.company) {
       companyUser = body.company;
     } else {
       companyUser = this.companyUsers[socket.id];
@@ -664,7 +664,7 @@ export class Gateway implements OnModuleInit {
     @ConnectedSocket() socket: Socket,
   ) {
     let studentUser: StudentUser;
-    if (body.student) {
+    if (body && body.student) {
       studentUser = body.student;
     } else {
       studentUser = this.studentUsers[socket.id];
@@ -697,7 +697,7 @@ export class Gateway implements OnModuleInit {
       this.server.sockets.sockets.values(),
     ).find((socket) => {
       let studentUser: StudentUser;
-      if (body.student) {
+      if (body && body.student) {
         studentUser = body.student;
       } else {
         studentUser = this.studentUsers[socket.id];
@@ -737,7 +737,7 @@ export class Gateway implements OnModuleInit {
     @ConnectedSocket() socket: Socket,
   ) {
     let studentUser: StudentUser;
-    if (body.student) {
+    if (body && body.student) {
       studentUser = body.student;
     } else {
       studentUser = this.studentUsers[socket.id];
