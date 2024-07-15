@@ -284,6 +284,12 @@ export class Gateway implements OnModuleInit {
     } else {
       this.studentUsers[socket.id];
     }
+    let companyUser: CompanyUser;
+    if (body.company) {
+      companyUser = body.company;
+    } else {
+      this.companyUsers[socket.id];
+    }
 
     if (body.id == null) {
       socket.emit('error', { message: 'no mission id provided' });
