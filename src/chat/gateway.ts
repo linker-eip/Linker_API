@@ -551,6 +551,7 @@ export class Gateway implements OnModuleInit {
         return;
       }
 
+
       const history = await this.messageRepository.findBy({
         type: MessageType.PREMISSION,
         channelId: mission.id.toString() + '/' + studentUser.groupId.toString(),
