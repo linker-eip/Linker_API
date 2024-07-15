@@ -100,7 +100,7 @@ export class Gateway implements OnModuleInit {
     @MessageBody() body: any,
     @ConnectedSocket() socket: Socket,
   ) {
-    console.log("body")
+    console.log(body)
     const studentUser: StudentUser = body.student || this.studentUsers[socket.id];
     const profile = await this.studentService.findStudentProfile(
       studentUser.email,
