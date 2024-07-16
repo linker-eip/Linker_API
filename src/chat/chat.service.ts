@@ -115,6 +115,7 @@ export class ChatService {
       }),
     );
 
+    console.log(dmChannelsIds)
     const dmChannels: ChannelInfoDto[] = await Promise.all(
       Array.from(dmChannelsIds).map(async (id) => {
         const student = await this.studentService.findOneById(parseInt(id));
