@@ -701,7 +701,7 @@ export class GroupService {
         HttpStatus.CONFLICT,
       );
     }
-    if (group.id != newLeader.id) {
+    if (group.id == newLeader.groupId) {
       group.leaderId = newLeader.id;
       await this.groupRepository.save(group);
     } else {
