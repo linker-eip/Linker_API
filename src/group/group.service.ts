@@ -43,11 +43,15 @@ export class GroupService {
     private readonly studentService: StudentService,
     private readonly notificationService: NotificationsService,
     private readonly CompanyService: CompanyService,
-  ) { }
+  ) {
+  }
 
   async groupVerification(student: StudentUser) {
-    let studentDocuments = await this.studentDocumentRepository.findBy({ studentId: student.id, status: DocumentStatus.VERIFIED })
-    if (studentDocuments.length < 4) throw new HttpException("Vous ne pouvez pas avoir de groupe avant d'avoir fait vérifier tous vos documents", HttpStatusCode.Forbidden)
+    let studentDocuments = await this.studentDocumentRepository.findBy({
+      studentId: student.id,
+      status: DocumentStatus.VERIFIED,
+    });
+    if (studentDocuments.length < 4) throw new HttpException('Vous ne pouvez pas avoir de groupe avant d\'avoir fait vérifier tous vos documents', HttpStatusCode.Forbidden);
   }
 
   async getUserGroup(req: any): Promise<Group> {
@@ -63,7 +67,7 @@ export class GroupService {
 
     if (group == null) {
       throw new HttpException(
-        "Vous n'avez pas de groupe",
+        'Vous n\'avez pas de groupe',
         HttpStatus.NOT_FOUND,
       );
     }
@@ -143,7 +147,7 @@ export class GroupService {
 
     if (group == null)
       throw new HttpException(
-        "Vous n'êtes pas le chef d'un groupe",
+        'Vous n\'êtes pas le chef d\'un groupe',
         HttpStatus.BAD_REQUEST,
       );
 
@@ -176,7 +180,7 @@ export class GroupService {
 
     if (group == null)
       throw new HttpException(
-        "Vous n'êtes pas le chef d'un groupe",
+        'Vous n\'êtes pas le chef d\'un groupe',
         HttpStatus.BAD_REQUEST,
       );
 
@@ -194,7 +198,7 @@ export class GroupService {
     let student = await this.studentService.findOneByEmail(req.user.email);
     if (student.groupId == null) {
       throw new HttpException(
-        "Vous n'avez pas de groupe",
+        'Vous n\'avez pas de groupe',
         HttpStatus.NOT_FOUND,
       );
     }
@@ -208,7 +212,7 @@ export class GroupService {
 
     if (group == null) {
       throw new HttpException(
-        "Vous n'avez pas de groupe",
+        'Vous n\'avez pas de groupe',
         HttpStatus.NOT_FOUND,
       );
     }
@@ -248,20 +252,20 @@ export class GroupService {
     let student = await this.studentService.findOneByEmail(req.user.email);
 
     if (group.leaderId != student.id) {
-      throw new HttpException("Vous n'êtes pas le chef d'un groupe", 400);
+      throw new HttpException('Vous n\'êtes pas le chef d\'un groupe', 400);
     }
 
     let invitedStudent = await this.studentService.findOneById(userId);
     if (invitedStudent == null) {
       throw new HttpException(
-        "Cet étudiant n'existe pas",
+        'Cet étudiant n\'existe pas',
         HttpStatus.NOT_FOUND,
       );
     }
 
     if (invitedStudent.isActive == false) {
       throw new HttpException(
-        "Cet étudiant n'est pas actif",
+        'Cet étudiant n\'est pas actif',
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -303,7 +307,7 @@ export class GroupService {
     let student = await this.studentService.findOneByEmail(req.user.email);
 
     if (group.leaderId != student.id) {
-      throw new HttpException("Vous n'êtes pas le chef d'un groupe", 400);
+      throw new HttpException('Vous n\'êtes pas le chef d\'un groupe', 400);
     }
 
     let groupInvite = await this.groupInviteRepository.findOne({
@@ -319,7 +323,7 @@ export class GroupService {
     let student = await this.studentService.findOneByEmail(req.user.email);
 
     if (group.leaderId != student.id) {
-      throw new HttpException("Vous n'êtes pas le chef d'un groupe", 400);
+      throw new HttpException('Vous n\'êtes pas le chef d\'un groupe', 400);
     }
 
     let groupInvites = await this.groupInviteRepository.findBy({
@@ -373,7 +377,7 @@ export class GroupService {
 
   async acceptInvite(req: any, groupId: number) {
     let student = await this.studentService.findOneByEmail(req.user.email);
-    
+
     await this.groupVerification(student);
 
     let groupInvite = await this.groupInviteRepository.findOne({
@@ -440,7 +444,7 @@ export class GroupService {
 
     if (student.groupId == null) {
       throw new HttpException(
-        "Vous n'avez pas de groupe",
+        'Vous n\'avez pas de groupe',
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -466,7 +470,7 @@ export class GroupService {
 
     if (student.groupId == null) {
       throw new HttpException(
-        "Vous n'avez pas de groupe",
+        'Vous n\'avez pas de groupe',
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -491,7 +495,7 @@ export class GroupService {
 
     if (member == null || member.groupId != student.groupId) {
       throw new HttpException(
-        "Cet étudiant n'a pas été trouvé",
+        'Cet étudiant n\'a pas été trouvé',
         HttpStatus.NOT_FOUND,
       );
     }
@@ -653,9 +657,13 @@ export class GroupService {
       throw new HttpException('Etudiant non trouvé', HttpStatus.NOT_FOUND);
     }
 
+    if (!newLeader) {
+      throw new HttpException('Etudiant non trouvé', HttpStatus.NOT_FOUND);
+    }
+
     if (student.groupId == null) {
       throw new HttpException(
-        "Vous n'avez pas de groupe",
+        'Vous n\'avez pas de groupe',
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -693,13 +701,12 @@ export class GroupService {
         HttpStatus.CONFLICT,
       );
     }
-    console.log(group.studentIds,newLeader.id ,group.studentIds.includes((newLeader.id)))
-    if (group.studentIds.includes(newLeader.id)) {
+    if (group.id != newLeader.id) {
       group.leaderId = newLeader.id;
-      this.groupRepository.save(group);
+      await this.groupRepository.save(group);
     } else {
       throw new HttpException(
-        "Cet étudiant n'est pas dans votre groupe",
+        'Cet étudiant n\'est pas dans votre groupe',
         HttpStatus.BAD_REQUEST,
       );
     }
