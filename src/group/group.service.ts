@@ -693,6 +693,7 @@ export class GroupService {
         HttpStatus.CONFLICT,
       );
     }
+    console.log(group.studentIds, group.studentIds.includes((newLeader.id)))
     if (group.studentIds.includes(newLeader.id)) {
       group.leaderId = newLeader.id;
       this.groupRepository.save(group);
