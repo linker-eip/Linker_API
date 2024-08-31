@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsEmail, IsOptional, IsString } from 'class-validator';
+import { IsBoolean,  IsOptional } from 'class-validator';
 
-export class UpdatePreferencesDto {
+export class UpdateStudentPreferencesDto {
     @ApiPropertyOptional()
     @IsOptional()
     @IsBoolean()
@@ -11,6 +11,23 @@ export class UpdatePreferencesDto {
     @IsOptional()
     @IsBoolean()
     mailNotifGroup: boolean
+
+    @IsOptional()
+    @ApiPropertyOptional()
+    @IsBoolean()
+    mailNotifMission: boolean
+
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsBoolean()
+    mailNotifDocument: boolean
+}
+
+export class UpdateCompanyPreferencesDto {
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsBoolean()
+    mailNotifMessage: boolean
 
     @IsOptional()
     @ApiPropertyOptional()

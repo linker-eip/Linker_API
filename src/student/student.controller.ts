@@ -32,11 +32,10 @@ import { UpdateJobsDto } from './jobs/dto/update-jobs.dto';
 import { UpdateStudiesDto } from './studies/dto/update-studies.dto';
 import {
   StudentSearchResponseDto,
-  formatToStudentSearchResponseDto,
 } from './dto/student-search-response.dto';
 import { StudentSearchOptionDto } from './dto/student-search-option.dto';
 import { CompanyProfileResponseDto } from '../company/dto/company-profile-response.dto';
-import { UpdatePreferencesDto } from './dto/update-preferences.dto';
+import { UpdateStudentPreferencesDto } from './dto/update-student-preferences.dto';
 import { UploadStudentDocumentDto } from './dto/upload-student-document.dto';
 import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
 import { UnverifiedUserGuard, VerifiedUserGuard } from '../admin/auth/guard/user.guard';
@@ -245,7 +244,7 @@ export class StudentController {
 
   @Put('preferences')
   @UseGuards(VerifiedUserGuard)
-  async updatePreferences(@Req() req, @Body() updatePreferencesDto: UpdatePreferencesDto) {
+  async updatePreferences(@Req() req, @Body() updatePreferencesDto: UpdateStudentPreferencesDto) {
     return this.studentService.updatePreferences(req, updatePreferencesDto)
   }
 
@@ -257,9 +256,9 @@ export class StudentController {
     summary: 'Get student preferences',
   })
   @ApiOkResponse({
-    type: UpdatePreferencesDto
+    type: UpdateStudentPreferencesDto
   })
-  async getPreferences(@Req() req): Promise<UpdatePreferencesDto> {
+  async getPreferences(@Req() req): Promise<UpdateStudentPreferencesDto> {
     return this.studentService.getPreferences(req)
   }
 

@@ -1,11 +1,10 @@
-import { HttpCode, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {  HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, In, Repository, SelectQueryBuilder } from 'typeorm';
 import { StudentUser } from './entity/StudentUser.entity';
 import { StudentProfile } from './entity/StudentProfile.entity';
 import { CreateStudentProfileDto, UpdateSkillsDto } from './dto/create-student-profile.dto';
 import { SkillsService } from './skills/skills.service';
-import { StudentProfileResponseDto } from './dto/student-profile-response.dto';
 import { JobsService } from './jobs/jobs.service';
 import { StudiesService } from './studies/studies.service';
 import { FileService } from '../filesystem/file.service';
@@ -21,7 +20,7 @@ import {
 import { CompanyService } from '../company/company.service';
 import { SkillList } from './skills/consts/skills-list';
 import { StudentPreferences } from './entity/StudentPreferences.entity';
-import { UpdatePreferencesDto } from './dto/update-preferences.dto';
+import { UpdateStudentPreferencesDto } from './dto/update-student-preferences.dto';
 import { UploadStudentDocumentDto } from './dto/upload-student-document.dto';
 import { StudentDocument } from './entity/StudentDocuments.entity';
 import { DocumentStatus } from './enum/StudentDocument.enum';
@@ -554,7 +553,7 @@ export class StudentService {
     }
   }
 
-  async updatePreferences(req: any, updatePreferencesDto: UpdatePreferencesDto) {
+  async updatePreferences(req: any, updatePreferencesDto: UpdateStudentPreferencesDto) {
     const student = await this.studentRepository.findOne({ where: { email: req.user.email } })
 
     const existingPreferences = await this.studentPreferencesRepository.findOneBy({ studentId: student.id })
@@ -573,7 +572,7 @@ export class StudentService {
     return existingPreferences;
   }
 
-  async getPreferences(req: any): Promise<UpdatePreferencesDto> {
+  async getPreferences(req: any): Promise<UpdateStudentPreferencesDto> {
     const student = await this.studentRepository.findOne({ where: { email: req.user.email } })
 
     const existingPreferences = await this.studentPreferencesRepository.findOneBy({ studentId: student.id })
@@ -586,7 +585,7 @@ export class StudentService {
       );
     }
 
-    let preferences = new UpdatePreferencesDto
+    let preferences = new UpdateStudentPreferencesDto
 
     preferences.mailNotifDocument = existingPreferences.mailNotifDocument
     preferences.mailNotifGroup = existingPreferences.mailNotifGroup
