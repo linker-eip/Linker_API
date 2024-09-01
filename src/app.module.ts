@@ -36,6 +36,7 @@ import { LinkedinModule } from './linkedin/linkedin.module';
 import { StatisticsController } from './statistics/statistics.controller';
 import { StatisticsService } from './statistics/statistics.service';
 import { StatisticsModule } from './statistics/statistics.module';
+import { TicketModule } from './ticket/ticket.module';
 
 @Module({
   imports: [
@@ -79,7 +80,8 @@ import { StatisticsModule } from './statistics/statistics.module';
     SkillsModule,
     PaymentModule,
     LinkedinModule,
-    StatisticsModule
+    StatisticsModule,
+    TicketModule
   ],
   controllers: [FileController, SiretController, DocumentTransferController, StatisticsController],
   providers: [JwtStrategy, SiretService],

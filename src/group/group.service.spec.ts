@@ -404,6 +404,7 @@ describe('NotificationsService', () => {
       const req = {
         user: {
           email: "test@example.com",
+
         }
       }
 
