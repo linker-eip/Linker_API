@@ -14,7 +14,6 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { CompanyService } from './company.service';
-import { AuthGuard } from '@nestjs/passport';
 import { CreateCompanyProfileDto } from './dto/create-company-profile.dto';
 import {
   ApiBearerAuth,
@@ -27,6 +26,9 @@ import { CompanyProfileResponseDto } from './dto/company-profile-response.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadCompanyDocumentDto } from './dto/upload-company-document.dto';
 import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
+import {
+  UpdateCompanyPreferencesDto,
+} from '../student/dto/update-student-preferences.dto';
 import {
   UnverifiedUserGuard,
   VerifiedUserGuard,
@@ -172,5 +174,24 @@ export class CompanyController {
   @UseGuards(VerifiedUserGuard)
   async createPref() {
     return this.companyService.createPref();
+  }
+
+  @Put('preferences')
+  @UseGuards(VerifiedUserGuard)
+  async updatePreferences(@Req() req, @Body() updatePreferencesDto: UpdateCompanyPreferencesDto) {
+    return this.companyService.updatePreferences(req, updatePreferencesDto);
+  }
+
+  @Get('preferences')
+  @UseGuards(VerifiedUserGuard)
+  @ApiOperation({
+    description: 'Get company preferences',
+    summary: 'Get company preferences',
+  })
+  @ApiOkResponse({
+    type: UpdateCompanyPreferencesDto,
+  })
+  async getPreferences(@Req() req): Promise<UpdateCompanyPreferencesDto> {
+    return this.companyService.getPreferences(req);
   }
 }

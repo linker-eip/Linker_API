@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CompanyProfile } from './entity/CompanyProfile.entity';
 import { CompanyUser } from './entity/CompanyUser.entity';
@@ -10,6 +10,7 @@ import { DocumentStatus } from './enum/CompanyDocument.enum';
 import { DocumentTransferService } from '../document-transfer/src/services/document-transfer.service';
 import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
 import { CompanyPreferences } from './entity/CompanyPreferences.entity';
+import { UpdateCompanyPreferencesDto } from '../student/dto/update-student-preferences.dto';
 
 @Injectable()
 export class CompanyService {
@@ -180,6 +181,7 @@ export class CompanyService {
       companyDocument = new CompanyDocument();
     }
 
+    companyDocument.file = await this.documentTransferService.uploadFileNotImage(file);
     const url = await this.documentTransferService.uploadFileNotImage(file);
 
     companyDocument.file = url;
@@ -263,5 +265,46 @@ export class CompanyService {
       prefs.companyId = company.id;
       this.companyPreferencesRepository.save(prefs);
     }
+  }
+
+  async updatePreferences(req: any, updatePreferencesDto: UpdateCompanyPreferencesDto) {
+    const company = await this.companyRepository.findOne({ where: { email: req.user.email } });
+
+    const existingPreferences = await this.companyPreferencesRepository.findOneBy({ companyId: company.id });
+
+    if (!existingPreferences) {
+      throw new HttpException(
+        'Preferences not found',
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    Object.assign(existingPreferences, updatePreferencesDto);
+
+    await this.companyPreferencesRepository.save(existingPreferences);
+
+    return existingPreferences;
+  }
+
+  async getPreferences(req: any): Promise<UpdateCompanyPreferencesDto> {
+    const company = await this.companyRepository.findOne({ where: { email: req.user.email } });
+
+    const existingPreferences = await this.companyPreferencesRepository.findOneBy({ companyId: company.id });
+
+
+    if (!existingPreferences) {
+      throw new HttpException(
+        'Preferences not found',
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    let preferences = new UpdateCompanyPreferencesDto();
+
+    preferences.mailNotifDocument = existingPreferences.mailNotifDocument;
+    preferences.mailNotifMessage = existingPreferences.mailNotifMessage;
+    preferences.mailNotifMission = existingPreferences.mailNotifMission;
+
+    return preferences;
   }
 }
