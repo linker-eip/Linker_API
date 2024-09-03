@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from './file.service';
-import 'multer'
+import 'multer';
 import { ApiTags } from '@nestjs/swagger';
 
 @Controller('api/file')

@@ -6,7 +6,7 @@ import { FileController } from './file.controller';
 
 describe('FileService', () => {
   let service: FileService;
-  let controller: FileController
+  let controller: FileController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -30,12 +30,12 @@ describe('FileService', () => {
 
   describe('getFile', () => {
     it('should return a file object', async () => {
-      jest.spyOn(service, 'getFile').mockReturnValueOnce(null)
+      jest.spyOn(service, 'getFile').mockReturnValueOnce(null);
 
-      const response = await controller.getFile("fileName", null)
+      const response = await controller.getFile('fileName', null);
       expect(response).toEqual(null);
-    })
-  })
+    });
+  });
 
   describe('uploadFile', () => {
     it('should upload a file', async () => {
@@ -50,22 +50,22 @@ describe('FileService', () => {
         size: 12345,
         stream: null,
         buffer: Buffer.from(''),
-
       };
 
-      jest.spyOn(service, 'storeFile').mockReturnValueOnce(Promise.resolve("linker-external/public/test-file.txt"));
+      jest
+        .spyOn(service, 'storeFile')
+        .mockReturnValueOnce(
+          Promise.resolve('linker-external/public/test-file.txt'),
+        );
 
-      const response = await controller.uploadFile(file)
+      const response = await controller.uploadFile(file);
 
       expect(response).toEqual('linker-external/public/test-file.txt');
       expect(service.storeFile).toHaveBeenCalledWith(file);
-    })
+    });
   });
-
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 });
-
-

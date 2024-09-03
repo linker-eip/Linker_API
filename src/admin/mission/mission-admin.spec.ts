@@ -163,8 +163,6 @@ describe('MissionService', () => {
     });
   });
 
-  
-
   describe('getMission', () => {
     it('should return a mission', async () => {
       const id = 1;

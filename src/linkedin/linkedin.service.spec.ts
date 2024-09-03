@@ -52,10 +52,25 @@ describe('LinkedinService', () => {
         }),
       ],
       controllers: [LinkedinController],
-      providers: [LinkedinService, DocumentTransferService, ConfigService, NotificationsService, CompanyService, MissionService, StudentService, GroupService, MailService, PaymentService, JobsService, StudiesService, FileService, SkillsService, {
-        provide: getRepositoryToken(Mission),
-        useClass: Repository,
-      },
+      providers: [
+        LinkedinService,
+        DocumentTransferService,
+        ConfigService,
+        NotificationsService,
+        CompanyService,
+        MissionService,
+        StudentService,
+        GroupService,
+        MailService,
+        PaymentService,
+        JobsService,
+        StudiesService,
+        FileService,
+        SkillsService,
+        {
+          provide: getRepositoryToken(Mission),
+          useClass: Repository,
+        },
         {
           provide: getRepositoryToken(CompanyUser),
           useClass: Repository,
@@ -127,7 +142,8 @@ describe('LinkedinService', () => {
         {
           provide: getRepositoryToken(Studies),
           useClass: Repository,
-        }, {
+        },
+        {
           provide: 'MAILER_PROVIDER',
           useValue: {
             sendMail: jest.fn(),
@@ -176,7 +192,9 @@ describe('LinkedinService', () => {
 
       const dto = { url: 'https://www.linkedin.com/in/jeremy-calvo/' };
 
-      jest.spyOn(service, 'findProfile').mockResolvedValueOnce(expectedResponse);
+      jest
+        .spyOn(service, 'findProfile')
+        .mockResolvedValueOnce(expectedResponse);
 
       const response = await controller.getProfile(req, dto);
 

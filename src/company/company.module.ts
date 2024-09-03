@@ -23,10 +23,32 @@ import { FileService } from 'src/filesystem/file.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([CompanyUser, CompanyProfile, CompanyDocument, CompanyPreferences, StudentUser, StudentProfile, StudentPreferences, StudentDocument, Jobs, Studies, Skills]),
+    TypeOrmModule.forFeature([
+      CompanyUser,
+      CompanyProfile,
+      CompanyDocument,
+      CompanyPreferences,
+      StudentUser,
+      StudentProfile,
+      StudentPreferences,
+      StudentDocument,
+      Jobs,
+      Studies,
+      Skills,
+    ]),
   ],
-  providers: [CompanyService, DocumentTransferService, ConfigService, StudentService, SkillsService, JobsService, StudiesService, FileService],
+  providers: [
+    CompanyService,
+    DocumentTransferService,
+    ConfigService,
+    StudentService,
+    SkillsService,
+    JobsService,
+    StudiesService,
+    FileService,
+  ],
   controllers: [CompanyController],
-  exports: [CompanyService,],
+  exports: [CompanyService],
 })
-export class CompanyModule { }
+export class CompanyModule {
+}

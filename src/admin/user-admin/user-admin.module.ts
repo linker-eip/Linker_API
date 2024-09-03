@@ -9,10 +9,15 @@ import { CompanyProfile } from '../../company/entity/CompanyProfile.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([StudentUser, StudentProfile, CompanyUser, CompanyProfile]),
+    TypeOrmModule.forFeature([
+      StudentUser,
+      StudentProfile,
+      CompanyUser,
+      CompanyProfile,
+    ]),
   ],
   providers: [UserAdminService],
   controllers: [UserAdminController],
-  exports: [UserAdminService]
+  exports: [UserAdminService],
 })
 export class UserAdminModule {}

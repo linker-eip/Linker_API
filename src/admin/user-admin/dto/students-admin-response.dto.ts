@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsDate, IsEmail, IsNumber, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsDate,
+  IsEmail,
+  IsNumber,
+  IsString,
+} from 'class-validator';
 import { StudentUser } from '../../../student/entity/StudentUser.entity';
 
 export class StudentAdminResponseDto {

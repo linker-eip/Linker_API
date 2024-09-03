@@ -23,27 +23,26 @@ export class missionAdminResponseDto{
     numberOfStudents: number;
 }*/
 
-import { ApiProperty } from "@nestjs/swagger";
-import { DocumentTypeEnum } from "../../../documents/enum/document-type.enum";
-import { DocumentUserEnum } from "../../../documents/enum/document-user.enum";
+import { ApiProperty } from '@nestjs/swagger';
+import { DocumentTypeEnum } from '../../../documents/enum/document-type.enum';
+import { DocumentUserEnum } from '../../../documents/enum/document-user.enum';
 
 export class DocumentAdminReponseDto {
+  @ApiProperty()
+  id: number;
 
-    @ApiProperty()
-    id: number;
+  @ApiProperty()
+  documentPath: string;
 
-    @ApiProperty()
-    documentPath: string;
+  @ApiProperty({ enum: DocumentTypeEnum })
+  documentType: DocumentTypeEnum;
 
-    @ApiProperty({enum: DocumentTypeEnum})
-    documentType: DocumentTypeEnum;
+  @ApiProperty({ enum: DocumentUserEnum })
+  documentUser: DocumentUserEnum;
 
-    @ApiProperty({enum: DocumentUserEnum})
-    documentUser: DocumentUserEnum;
+  @ApiProperty()
+  userId: number;
 
-    @ApiProperty()
-    userId: number;
-
-    @ApiProperty()
-    createdAt: Date;
+  @ApiProperty()
+  createdAt: Date;
 }

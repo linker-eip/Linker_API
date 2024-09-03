@@ -35,7 +35,7 @@ describe('ContactAdminService', () => {
         {
           provide: getRepositoryToken(Contact),
           useClass: Repository,
-        }
+        },
       ],
       exports: [ContactAdminService],
     }).compile();
@@ -46,7 +46,7 @@ describe('ContactAdminService', () => {
 
   describe('get contact', () => {
     it('should get all contact', async () => {
-      const contacts : Contact[] = [
+      const contacts: Contact[] = [
         {
           id: 1,
           email: 'test@gmail.com',
@@ -62,29 +62,27 @@ describe('ContactAdminService', () => {
           content: 'test',
           createdAt: new Date(),
           isTreated: false,
-        }];
+        },
+      ];
 
-        
       jest.spyOn(service, 'findAll').mockResolvedValue(contacts);
 
       const res = await controller.findAll();
 
       expect(service.findAll).toHaveBeenCalled();
       expect(contacts).toEqual(res);
-    }
-    );
-  }
-  );
+    });
+  });
 
   describe('delete contact', () => {
     it('should delete a contact', async () => {
-      const contact : Contact = {
-          id: 1,
-          email: 'test@gmail.com',
-          object: 'test',
-          content: 'test',
-          createdAt: new Date(),
-          isTreated: false,
+      const contact: Contact = {
+        id: 1,
+        email: 'test@gmail.com',
+        object: 'test',
+        content: 'test',
+        createdAt: new Date(),
+        isTreated: false,
       };
 
       jest.spyOn(service, 'delete').mockResolvedValue(contact);
@@ -94,11 +92,8 @@ describe('ContactAdminService', () => {
       expect(service.delete).toHaveBeenCalled();
 
       expect(contact).toEqual(res);
-
-    }
-    );
-  }
-  );
+    });
+  });
 
   describe('update contact', () => {
     it('should update a contact', async () => {
@@ -109,13 +104,13 @@ describe('ContactAdminService', () => {
         isTreated: true,
       };
 
-      const contact : Contact = {
-          id: 1,
-          email: 'test@gmail.com',
-          object: 'test',
-          content: 'test',
-          createdAt: new Date(),
-          isTreated: false,
+      const contact: Contact = {
+        id: 1,
+        email: 'test@gmail.com',
+        object: 'test',
+        content: 'test',
+        createdAt: new Date(),
+        isTreated: false,
       };
 
       jest.spyOn(service, 'update').mockResolvedValue(contact);
@@ -125,11 +120,8 @@ describe('ContactAdminService', () => {
       expect(service.update).toHaveBeenCalled();
 
       expect(contact).toEqual(res);
-
-    }
-    );
-  }
-  );
+    });
+  });
 
   it('should be defined', () => {
     expect(service).toBeDefined();

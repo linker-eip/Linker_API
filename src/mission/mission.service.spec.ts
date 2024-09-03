@@ -177,7 +177,7 @@ describe('MissionService', () => {
         endOfMission: null,
         amount: 100,
         skills: 'Skills',
-        specifications: null
+        specifications: null,
       };
 
       const file: Express.Multer.File = {
@@ -221,9 +221,17 @@ describe('MissionService', () => {
         .spyOn(service, 'createMission')
         .mockResolvedValueOnce(expectedMission);
 
-      const response = await controller.createMission(file, req, createMissionDto);
+      const response = await controller.createMission(
+        file,
+        req,
+        createMissionDto,
+      );
 
-      expect(service.createMission).toHaveBeenCalledWith(createMissionDto, req,file );
+      expect(service.createMission).toHaveBeenCalledWith(
+        createMissionDto,
+        req,
+        file,
+      );
       expect(response).toEqual(expectedMission);
     });
   });
@@ -257,7 +265,7 @@ describe('MissionService', () => {
         amount: 150,
         skills: null,
         groupId: null,
-        specifications: null
+        specifications: null,
       };
 
       const req = {
@@ -281,7 +289,7 @@ describe('MissionService', () => {
         skills: 'Skills',
         comments: null,
         isNoted: false,
-        specificationsFile: null
+        specificationsFile: null,
       };
 
       const file: Express.Multer.File = {
@@ -301,13 +309,18 @@ describe('MissionService', () => {
         .spyOn(service, 'updateMission')
         .mockResolvedValueOnce(expectedMission);
 
-      const response = await controller.updateMission(file, 1, updateMissionDto, req);
+      const response = await controller.updateMission(
+        file,
+        1,
+        updateMissionDto,
+        req,
+      );
 
       expect(service.updateMission).toHaveBeenCalledWith(
         1,
         updateMissionDto,
         req,
-        file
+        file,
       );
       expect(response).toEqual(expectedMission);
     });
@@ -768,10 +781,13 @@ describe('MissionService', () => {
 
       const response = await controller.createMissionTaskStudent(1, dto, req);
 
-      expect(service.createMissionTaskStudent).toHaveBeenCalledWith(1, dto, req);
+      expect(service.createMissionTaskStudent).toHaveBeenCalledWith(
+        1,
+        dto,
+        req,
+      );
 
       expect(response).toEqual(expectedResponse);
-
     });
   });
 
@@ -793,17 +809,20 @@ describe('MissionService', () => {
       };
 
       const expectedResponse = null;
-      
+
       jest
         .spyOn(service, 'updateMissionTaskStudent')
         .mockResolvedValueOnce(expectedResponse);
 
       const response = await controller.updateMissionTaskStudent(1, dto, req);
 
-      expect(service.updateMissionTaskStudent).toHaveBeenCalledWith(1, dto, req);
+      expect(service.updateMissionTaskStudent).toHaveBeenCalledWith(
+        1,
+        dto,
+        req,
+      );
 
       expect(response).toEqual(expectedResponse);
-
     });
   });
 
@@ -827,7 +846,6 @@ describe('MissionService', () => {
       expect(service.deleteMissionTaskStudent).toHaveBeenCalledWith(1, req);
 
       expect(response).toEqual(expectedResponse);
-
     });
   });
 
@@ -851,7 +869,6 @@ describe('MissionService', () => {
       expect(service.acceptGroup).toHaveBeenCalledWith(1, 1, req);
 
       expect(response).toEqual(expectedResponse);
-
     });
   });
 
@@ -875,7 +892,6 @@ describe('MissionService', () => {
       expect(service.refuseGroup).toHaveBeenCalledWith(1, 1, req);
 
       expect(response).toEqual(expectedResponse);
-
     });
   });
 
@@ -899,7 +915,6 @@ describe('MissionService', () => {
       expect(service.getInvitedGroups).toHaveBeenCalledWith(req, 1);
 
       expect(response).toEqual(expectedResponse);
-
     });
   });
 

@@ -14,12 +14,15 @@ export class ContactAdminController {
   }
 
   @Put('/:id')
-  async update(@Body() updateContactDto : UpdateContactDto, @Param('id') id: number){
+  async update(
+    @Body() updateContactDto: UpdateContactDto,
+    @Param('id') id: number,
+  ) {
     return await this.contactAdminService.update(id, updateContactDto);
   }
 
   @Delete('/:id')
-  async delete(@Param('id') id: number){
+  async delete(@Param('id') id: number) {
     return await this.contactAdminService.delete(id);
   }
 }

@@ -30,13 +30,13 @@ export class StudentProfileResponseDto {
   @ApiProperty()
   picture: string;
 
-  @ApiProperty({type : StudiesDto, isArray : true})
+  @ApiProperty({ type: StudiesDto, isArray: true })
   studies: Studies[];
 
-  @ApiProperty({type : UpdateSkillsDto})
+  @ApiProperty({ type: UpdateSkillsDto })
   skills: UpdateSkillsDto;
 
-  @ApiProperty({type : JobsDto, isArray : true})
+  @ApiProperty({ type: JobsDto, isArray: true })
   jobs: Jobs[];
 
   @ApiProperty()

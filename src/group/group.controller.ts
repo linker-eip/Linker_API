@@ -20,7 +20,10 @@ import { GroupService } from './group.service';
 import { CreateGroupDto } from './dto/create-group-dto';
 import { UpdateGroupDto } from './dto/update-group-dto';
 import { GetGroupeResponse } from './dto/get-group-response-dto';
-import { GetInvitesResponse, GetPersonnalInvitesResponse } from './dto/get-invites-response-dto';
+import {
+  GetInvitesResponse,
+  GetPersonnalInvitesResponse,
+} from './dto/get-invites-response-dto';
 import { GetCompanySearchGroupsDto } from './dto/get-company-search-groups.dto';
 import { CompanySearchGroupsFilterDto } from './dto/company-search-groups-filter.dto';
 import { VerifiedUserGuard } from '../admin/auth/guard/user.guard';

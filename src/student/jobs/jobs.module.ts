@@ -7,6 +7,6 @@ import { Jobs } from './entity/jobs.entity';
   imports: [TypeOrmModule.forFeature([Jobs])],
   controllers: [],
   providers: [JobsService],
-  exports: [JobsService]
+  exports: [JobsService],
 })
 export class JobsModule {}

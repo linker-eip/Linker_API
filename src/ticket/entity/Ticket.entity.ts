@@ -2,9 +2,14 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { UserType } from '../../chat/entity/Message.entity';
 
 export enum TicketTypeEnum {
-  GENERAL= 'GENERAL',
-  MISSION= 'MISSION',
-  GROUP= 'GROUP',
+  GENERAL = 'GENERAL',
+  MISSION = 'MISSION',
+  GROUP = 'GROUP',
+}
+
+export enum TicketStateEnum {
+  OPEN = 'OPEN',
+  CLOSED = 'CLOSED',
 }
 
 @Entity()
@@ -24,12 +29,15 @@ export class Ticket {
   @Column()
   content: string;
 
-  @Column()
+  @Column({ nullable: true })
   attachment?: string;
 
   @Column()
   ticketType: TicketTypeEnum;
 
-  @Column()
+  @Column({ nullable: true })
   entityId?: number;
+
+  @Column()
+  state: TicketStateEnum;
 }

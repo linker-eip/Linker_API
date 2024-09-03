@@ -1,16 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { CompanyDocumentType, DocumentStatus } from '../enum/CompanyDocument.enum';
+import {
+  CompanyDocumentType,
+  DocumentStatus,
+} from '../enum/CompanyDocument.enum';
 
 export class DocumentStatusResponseDto {
-    @ApiProperty()
-    documentType: CompanyDocumentType
+  @ApiProperty()
+  documentType: CompanyDocumentType;
 
-    @ApiProperty()
-    status: DocumentStatus
+  @ApiProperty()
+  status: DocumentStatus;
 
-    @ApiProperty()
-    comment: string
+  @ApiProperty()
+  comment: string;
 
-    @ApiProperty()
-    bis: boolean
+  @ApiProperty()
+  bis: boolean;
 }

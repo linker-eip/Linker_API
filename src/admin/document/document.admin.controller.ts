@@ -123,9 +123,7 @@ export class DocumentAdminController {
   @ApiOkResponse({
     description: 'Get a student rib',
   })
-  async getStudentRib(
-    @Param('studentId') studentId: number,
-  ): Promise<any> {
+  async getStudentRib(@Param('studentId') studentId: number): Promise<any> {
     return this.documentService.getStudentRib(studentId);
   }
 }

@@ -1,32 +1,29 @@
-import { ApiProperty } from "@nestjs/swagger";
-
+import { ApiProperty } from '@nestjs/swagger';
 
 export class GetInvitesResponse {
-    @ApiProperty()
-    id: number;
+  @ApiProperty()
+  id: number;
 
-    @ApiProperty()
-    name: string;
+  @ApiProperty()
+  name: string;
 
-    @ApiProperty()
-    description: string;
+  @ApiProperty()
+  description: string;
 
-    @ApiProperty()
-    picture: string;
+  @ApiProperty()
+  picture: string;
 
-    @ApiProperty()
-    leaderName: string;
+  @ApiProperty()
+  leaderName: string;
 }
 
 export class GetPersonnalInvitesResponse {
-    @ApiProperty()
-    id: number;
+  @ApiProperty()
+  id: number;
 
-    @ApiProperty()
-    name: string;
+  @ApiProperty()
+  name: string;
 
-
-    @ApiProperty()
-    picture: string;
-
+  @ApiProperty()
+  picture: string;
 }

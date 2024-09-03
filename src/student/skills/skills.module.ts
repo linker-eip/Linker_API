@@ -18,9 +18,29 @@ import { DocumentTransferService } from 'src/document-transfer/src/services/docu
 import { ConfigService } from '@nestjs/config';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Skills, StudentUser, StudentProfile, StudentPreferences, StudentDocument, Jobs, Studies, Skills]), CompanyModule],
+  imports: [
+    TypeOrmModule.forFeature([
+      Skills,
+      StudentUser,
+      StudentProfile,
+      StudentPreferences,
+      StudentDocument,
+      Jobs,
+      Studies,
+      Skills,
+    ]),
+    CompanyModule,
+  ],
   controllers: [SkillsController],
-  providers: [SkillsService, StudentService, JobsService, StudiesService, FileService, DocumentTransferService, ConfigService],
+  providers: [
+    SkillsService,
+    StudentService,
+    JobsService,
+    StudiesService,
+    FileService,
+    DocumentTransferService,
+    ConfigService,
+  ],
   exports: [SkillsService],
 })
 export class SkillsModule {}

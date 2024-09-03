@@ -3,15 +3,9 @@ import { CreateGroupDto } from './dto/create-group-dto';
 import { StudentService } from '../student/student.service';
 import { Group } from './entity/Group.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  Brackets,
-  Repository,
-  SelectQueryBuilder,
-} from 'typeorm';
+import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { UpdateGroupDto } from './dto/update-group-dto';
-import {
-  GetGroupeResponse,
-} from './dto/get-group-response-dto';
+import { GetGroupeResponse } from './dto/get-group-response-dto';
 import { NotificationsService } from '../notifications/notifications.service';
 import { NotificationType } from '../notifications/entity/Notification.entity';
 import { GroupInvite } from './entity/GroupInvite.entity';
@@ -47,16 +41,20 @@ export class GroupService {
   }
 
   async groupVerification(student: StudentUser) {
-    let studentDocuments = await this.studentDocumentRepository.findBy({
+    const studentDocuments = await this.studentDocumentRepository.findBy({
       studentId: student.id,
       status: DocumentStatus.VERIFIED,
     });
-    if (studentDocuments.length < 4) throw new HttpException('Vous ne pouvez pas avoir de groupe avant d\'avoir fait vérifier tous vos documents', HttpStatusCode.Forbidden);
+    if (studentDocuments.length < 4)
+      throw new HttpException(
+        'Vous ne pouvez pas avoir de groupe avant d\'avoir fait vérifier tous vos documents',
+        HttpStatusCode.Forbidden,
+      );
   }
 
   async getUserGroup(req: any): Promise<Group> {
     let group;
-    let student = await this.studentService.findOneByEmail(req.user.email);
+    const student = await this.studentService.findOneByEmail(req.user.email);
     try {
       group = await this.groupRepository.findOne({
         where: { id: student.groupId },
@@ -136,7 +134,7 @@ export class GroupService {
 
   async updateGroup(req: any, updateGroupDto: UpdateGroupDto) {
     let group;
-    let student = await this.studentService.findOneByEmail(req.user.email);
+    const student = await this.studentService.findOneByEmail(req.user.email);
     try {
       group = await this.groupRepository.findOne({
         where: { leaderId: student.id },
@@ -169,7 +167,7 @@ export class GroupService {
 
   async deleteGroup(req: any) {
     let group;
-    let student = await this.studentService.findOneByEmail(req.user.email);
+    const student = await this.studentService.findOneByEmail(req.user.email);
     try {
       group = await this.groupRepository.findOne({
         where: { leaderId: student.id },
@@ -185,7 +183,7 @@ export class GroupService {
       );
 
     group.studentIds.forEach(async (id) => {
-      let student = await this.studentService.findOneById(id);
+      const student = await this.studentService.findOneById(id);
       student.groupId = null;
       this.studentService.save(student);
     });
@@ -195,7 +193,7 @@ export class GroupService {
 
   async getGroup(req: any): Promise<GetGroupeResponse> {
     let group;
-    let student = await this.studentService.findOneByEmail(req.user.email);
+    const student = await this.studentService.findOneByEmail(req.user.email);
     if (student.groupId == null) {
       throw new HttpException(
         'Vous n\'avez pas de groupe',
@@ -217,13 +215,15 @@ export class GroupService {
       );
     }
 
-    let groupMember = await this.studentService.findAllByIdIn(group.studentIds);
-    let groupMemberDtos = await Promise.all(
+    const groupMember = await this.studentService.findAllByIdIn(
+      group.studentIds,
+    );
+    const groupMemberDtos = await Promise.all(
       groupMember.map(async (it) => {
-        let studentProfile = await this.studentService.findStudentProfile(
+        const studentProfile = await this.studentService.findStudentProfile(
           it.email,
         );
-        let dto = {
+        const dto = {
           firstName: it.firstName,
           lastName: it.lastName,
           id: it.id,
@@ -234,7 +234,7 @@ export class GroupService {
       }),
     );
 
-    let response: GetGroupeResponse = {
+    const response: GetGroupeResponse = {
       name: group.name,
       description: group.description,
       picture: group.picture,
@@ -248,14 +248,14 @@ export class GroupService {
   }
 
   async inviteUser(req: any, userId: number) {
-    let group = await this.getUserGroup(req);
-    let student = await this.studentService.findOneByEmail(req.user.email);
+    const group = await this.getUserGroup(req);
+    const student = await this.studentService.findOneByEmail(req.user.email);
 
     if (group.leaderId != student.id) {
       throw new HttpException('Vous n\'êtes pas le chef d\'un groupe', 400);
     }
 
-    let invitedStudent = await this.studentService.findOneById(userId);
+    const invitedStudent = await this.studentService.findOneById(userId);
     if (invitedStudent == null) {
       throw new HttpException(
         'Cet étudiant n\'existe pas',
@@ -288,7 +288,7 @@ export class GroupService {
       );
     }
 
-    let groupInvite = new GroupInvite();
+    const groupInvite = new GroupInvite();
 
     groupInvite.groupId = group.id;
     groupInvite.userId = invitedStudent.id;
@@ -303,14 +303,14 @@ export class GroupService {
   }
 
   async cancelInvite(req: any, userId: number) {
-    let group = await this.getUserGroup(req);
-    let student = await this.studentService.findOneByEmail(req.user.email);
+    const group = await this.getUserGroup(req);
+    const student = await this.studentService.findOneByEmail(req.user.email);
 
     if (group.leaderId != student.id) {
       throw new HttpException('Vous n\'êtes pas le chef d\'un groupe', 400);
     }
 
-    let groupInvite = await this.groupInviteRepository.findOne({
+    const groupInvite = await this.groupInviteRepository.findOne({
       where: { userId: userId, groupId: group.id },
     });
     if (groupInvite) {
@@ -319,24 +319,24 @@ export class GroupService {
   }
 
   async getGroupInvites(req: any): Promise<GetPersonnalInvitesResponse[]> {
-    let group = await this.getUserGroup(req);
-    let student = await this.studentService.findOneByEmail(req.user.email);
+    const group = await this.getUserGroup(req);
+    const student = await this.studentService.findOneByEmail(req.user.email);
 
     if (group.leaderId != student.id) {
       throw new HttpException('Vous n\'êtes pas le chef d\'un groupe', 400);
     }
 
-    let groupInvites = await this.groupInviteRepository.findBy({
+    const groupInvites = await this.groupInviteRepository.findBy({
       groupId: group.id,
     });
 
     return Promise.all(
       groupInvites.map(async (it) => {
-        let user = await this.studentService.findOneById(it.userId);
-        let userProfile = await this.studentService.findStudentProfile(
+        const user = await this.studentService.findOneById(it.userId);
+        const userProfile = await this.studentService.findStudentProfile(
           user.email,
         );
-        let groupInviteResponse: GetPersonnalInvitesResponse = {
+        const groupInviteResponse: GetPersonnalInvitesResponse = {
           id: user.id,
           name: user.firstName + ' ' + user.lastName,
           picture: userProfile.picture,
@@ -347,20 +347,20 @@ export class GroupService {
   }
 
   async getInvites(req: any): Promise<GetInvitesResponse[]> {
-    let student = await this.studentService.findOneByEmail(req.user.email);
-    let groupInvites = await this.groupInviteRepository.findBy({
+    const student = await this.studentService.findOneByEmail(req.user.email);
+    const groupInvites = await this.groupInviteRepository.findBy({
       userId: student.id,
     });
-    let groups = await Promise.all(
+    const groups = await Promise.all(
       groupInvites.map(async (it) => {
-        let group = await this.groupRepository.findOne({
+        const group = await this.groupRepository.findOne({
           where: { id: it.groupId },
         });
         if (group == null) {
           return;
         }
-        let leader = await this.studentService.findOneById(group.leaderId);
-        let response: GetInvitesResponse = {
+        const leader = await this.studentService.findOneById(group.leaderId);
+        const response: GetInvitesResponse = {
           id: group.id,
           name: group.name,
           description: group.description,
@@ -376,11 +376,11 @@ export class GroupService {
   }
 
   async acceptInvite(req: any, groupId: number) {
-    let student = await this.studentService.findOneByEmail(req.user.email);
+    const student = await this.studentService.findOneByEmail(req.user.email);
 
     await this.groupVerification(student);
 
-    let groupInvite = await this.groupInviteRepository.findOne({
+    const groupInvite = await this.groupInviteRepository.findOne({
       where: { userId: student.id, groupId: groupId },
     });
 
@@ -388,7 +388,7 @@ export class GroupService {
       throw new HttpException('Invitation invalide', HttpStatus.BAD_REQUEST);
     }
 
-    let group = await this.groupRepository.findOne({
+    const group = await this.groupRepository.findOne({
       where: { id: groupInvite.groupId },
     });
 
@@ -412,9 +412,9 @@ export class GroupService {
   }
 
   async refuseInvite(req: any, groupId: number) {
-    let student = await this.studentService.findOneByEmail(req.user.email);
+    const student = await this.studentService.findOneByEmail(req.user.email);
 
-    let groupInvite = await this.groupInviteRepository.findOne({
+    const groupInvite = await this.groupInviteRepository.findOne({
       where: { userId: student.id, groupId: groupId },
     });
 
@@ -422,7 +422,7 @@ export class GroupService {
       throw new HttpException('Invitation invalide', HttpStatus.BAD_REQUEST);
     }
 
-    let group = await this.groupRepository.findOne({
+    const group = await this.groupRepository.findOne({
       where: { id: groupInvite.groupId },
     });
 
@@ -440,7 +440,7 @@ export class GroupService {
   }
 
   async leaveGroup(req: any) {
-    let student = await this.studentService.findOneByEmail(req.user.email);
+    const student = await this.studentService.findOneByEmail(req.user.email);
 
     if (student.groupId == null) {
       throw new HttpException(
@@ -449,7 +449,7 @@ export class GroupService {
       );
     }
 
-    let group = await this.getUserGroup(req);
+    const group = await this.getUserGroup(req);
 
     if (student.id == group.leaderId) {
       throw new HttpException(
@@ -466,7 +466,7 @@ export class GroupService {
   }
 
   async ejectMember(req: any, userId: any) {
-    let student = await this.studentService.findOneByEmail(req.user.email);
+    const student = await this.studentService.findOneByEmail(req.user.email);
 
     if (student.groupId == null) {
       throw new HttpException(
@@ -482,7 +482,7 @@ export class GroupService {
       );
     }
 
-    let group = await this.getUserGroup(req);
+    const group = await this.getUserGroup(req);
 
     if (student.id != group.leaderId) {
       throw new HttpException(
@@ -491,7 +491,7 @@ export class GroupService {
       );
     }
 
-    let member = await this.studentService.findOneById(userId);
+    const member = await this.studentService.findOneById(userId);
 
     if (member == null || member.groupId != student.groupId) {
       throw new HttpException(
@@ -500,7 +500,7 @@ export class GroupService {
       );
     }
 
-    let missions = await this.missionRepository
+    const missions = await this.missionRepository
       .createQueryBuilder('mission')
       .where('mission.groupId = :groupId', { groupId: group.id })
       .andWhere('mission.status IN (:...statuses)', {
@@ -543,13 +543,9 @@ export class GroupService {
 
     if (mission) {
       if (mission.companyId != company.id) {
-        throw new HttpException(
-          'Mission non trouvée',
-          HttpStatus.NOT_FOUND,
-        );
+        throw new HttpException('Mission non trouvée', HttpStatus.NOT_FOUND);
       }
     }
-
 
     let groupsQuery: SelectQueryBuilder<Group> =
       this.groupRepository.createQueryBuilder('group');
@@ -589,16 +585,16 @@ export class GroupService {
 
     const dtos = Promise.all(
       groups.map(async (it) => {
-        let students = await this.studentService.findAllByIdIn(it.studentIds);
-        let studentProfiles = await Promise.all(
+        const students = await this.studentService.findAllByIdIn(it.studentIds);
+        const studentProfiles = await Promise.all(
           students.map(async (it) => {
-            let studentProfile = await this.studentService.findStudentProfile(
+            const studentProfile = await this.studentService.findStudentProfile(
               it.email,
             );
             return studentProfile;
           }),
         );
-        let dto: GetCompanySearchGroupsDto = {
+        const dto: GetCompanySearchGroupsDto = {
           id: it.id,
           name: it.name,
           description: it.description,
@@ -615,7 +611,10 @@ export class GroupService {
     }
 
     if (searchOption.skills) {
-      filteredGroups = filterGroupsBySkills(filteredGroups, searchOption.skills);
+      filteredGroups = filterGroupsBySkills(
+        filteredGroups,
+        searchOption.skills,
+      );
     }
 
     if (searchOption.size) {
@@ -644,14 +643,14 @@ export class GroupService {
         groupMember = true;
       }
     });
-    (groupMember);
+    groupMember;
 
     return groupMember;
   }
 
   async transferLeadership(req, userId: number) {
-    let student = await this.studentService.findOneByEmail(req.user.email);
-    let newLeader = await this.studentService.findOneById(userId);
+    const student = await this.studentService.findOneByEmail(req.user.email);
+    const newLeader = await this.studentService.findOneById(userId);
 
     if (!student) {
       throw new HttpException('Etudiant non trouvé', HttpStatus.NOT_FOUND);
@@ -675,7 +674,7 @@ export class GroupService {
       );
     }
 
-    let group = await this.getUserGroup(req);
+    const group = await this.getUserGroup(req);
 
     if (student.id != group.leaderId) {
       throw new HttpException(
@@ -684,7 +683,7 @@ export class GroupService {
       );
     }
 
-    let missions = await this.missionRepository
+    const missions = await this.missionRepository
       .createQueryBuilder('mission')
       .where('mission.groupId = :groupId', { groupId: group.id })
       .andWhere('mission.status IN (:...statuses)', {
@@ -713,20 +712,29 @@ export class GroupService {
   }
 }
 
-function filterGroupsBySkills(dto: GetCompanySearchGroupsDto[], skillsString: string): GetCompanySearchGroupsDto[] {
+function filterGroupsBySkills(
+  dto: GetCompanySearchGroupsDto[],
+  skillsString: string,
+): GetCompanySearchGroupsDto[] {
+  const skillsArray = skillsString
+    .split(',')
+    .map((skill) => skill.trim().toLowerCase());
 
-  const skillsArray = skillsString.split(',').map(skill => skill.trim().toLowerCase());
-
-  const filteredGroups = dto.filter(group => {
-    return group.studentsProfiles.some(studentProfile => {
-      const studentSkills = Object.values(studentProfile.skills).flat().map(skill => skill.toLowerCase());
-      return skillsArray.some(skill => studentSkills.includes(skill));
+  const filteredGroups = dto.filter((group) => {
+    return group.studentsProfiles.some((studentProfile) => {
+      const studentSkills = Object.values(studentProfile.skills)
+        .flat()
+        .map((skill) => skill.toLowerCase());
+      return skillsArray.some((skill) => studentSkills.includes(skill));
     });
   });
 
   return filteredGroups;
 }
 
-function filterGroupBySize(dto: GetCompanySearchGroupsDto[], size: number): GetCompanySearchGroupsDto[] {
-  return dto.filter(group => group.studentsProfiles.length >= size);
+function filterGroupBySize(
+  dto: GetCompanySearchGroupsDto[],
+  size: number,
+): GetCompanySearchGroupsDto[] {
+  return dto.filter((group) => group.studentsProfiles.length >= size);
 }

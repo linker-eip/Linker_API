@@ -9,6 +9,6 @@ import { UserAdminModule } from '../user-admin/user-admin.module';
   imports: [TypeOrmModule.forFeature([Mission]), UserAdminModule],
   providers: [MissionService],
   controllers: [MissionController],
-  exports: [MissionService]
+  exports: [MissionService],
 })
 export class MissionModule {}

@@ -16,6 +16,6 @@ import { Mission } from '../mission/entity/mission.entity';
     CompanyModule,
   ],
   controllers: [TicketController],
-  providers: [TicketService]
+  providers: [TicketService],
 })
 export class TicketModule {}

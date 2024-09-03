@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ChannelInfoDto {
- @ApiProperty()
+  @ApiProperty()
   id: number;
   @ApiProperty()
   name: string;
@@ -10,12 +10,12 @@ export class ChannelInfoDto {
 }
 
 export class StudentConversationResponseDto {
-  @ApiProperty({type: ChannelInfoDto})
+  @ApiProperty({ type: ChannelInfoDto })
   groupChannel: ChannelInfoDto;
-  @ApiProperty({type: ChannelInfoDto, isArray: true})
+  @ApiProperty({ type: ChannelInfoDto, isArray: true })
   missionChannels: ChannelInfoDto[];
-  @ApiProperty({type: ChannelInfoDto, isArray: true})
+  @ApiProperty({ type: ChannelInfoDto, isArray: true })
   premissionChannels: ChannelInfoDto[];
-  @ApiProperty({type: ChannelInfoDto, isArray: true})
+  @ApiProperty({ type: ChannelInfoDto, isArray: true })
   dmChannels: ChannelInfoDto[];
 }

@@ -5,9 +5,9 @@ import { StudentModule } from '../student/student.module';
 import { CompanyModule } from '../company/company.module';
 
 @Module({
-    imports: [StudentModule, CompanyModule],
-    providers: [LinkedinService],
-    controllers: [LinkedinController],
-    exports: [LinkedinService]
+  imports: [StudentModule, CompanyModule],
+  providers: [LinkedinService],
+  controllers: [LinkedinController],
+  exports: [LinkedinService],
 })
 export class LinkedinModule {}

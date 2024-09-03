@@ -13,7 +13,7 @@ import { StudentModule } from '../student/student.module';
     TypeOrmModule.forFeature([Payment, StudentPayment]),
     CompanyModule,
     forwardRef(() => MissionModule),
-    StudentModule
+    StudentModule,
   ],
   controllers: [PaymentController],
   providers: [PaymentService],

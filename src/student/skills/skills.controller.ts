@@ -9,14 +9,15 @@ import { VerifiedUserGuard } from '../../admin/auth/guard/user.guard';
 @ApiTags('Skills')
 @ApiBearerAuth()
 export class SkillsController {
-    constructor(private readonly skillsService: SkillsService) {}
+  constructor(private readonly skillsService: SkillsService) {
+  }
 
-    @Get('list')
-    @ApiOperation({
+  @Get('list')
+  @ApiOperation({
     description: 'Get skills list',
     summary: 'Get skills list',
-    })
-    async getSkillsList(@Req() req) {
-        return SkillList;
-    }
+  })
+  async getSkillsList(@Req() req) {
+    return SkillList;
+  }
 }

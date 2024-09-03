@@ -129,7 +129,8 @@ describe('InvoiceService', () => {
         {
           provide: getRepositoryToken(Jobs),
           useClass: Repository,
-        }, {
+        },
+        {
           provide: getRepositoryToken(MissionTask),
           useClass: Repository,
         },
@@ -157,35 +158,35 @@ describe('InvoiceService', () => {
         },
         {
           provide: getRepositoryToken(Document),
-          useClass: Repository
+          useClass: Repository,
         },
         {
           provide: getRepositoryToken(CompanyProfile),
-          useClass: Repository
+          useClass: Repository,
         },
         {
           provide: getRepositoryToken(CompanyUser),
-          useClass: Repository
+          useClass: Repository,
         },
         {
           provide: getRepositoryToken(StudentUser),
-          useClass: Repository
+          useClass: Repository,
         },
         {
           provide: getRepositoryToken(StudentProfile),
-          useClass: Repository
+          useClass: Repository,
         },
         {
           provide: getRepositoryToken(Skills),
-          useClass: Repository
+          useClass: Repository,
         },
         {
           provide: getRepositoryToken(Jobs),
-          useClass: Repository
+          useClass: Repository,
         },
         {
           provide: getRepositoryToken(Studies),
-          useClass: Repository
+          useClass: Repository,
         },
         {
           provide: InvoiceService,

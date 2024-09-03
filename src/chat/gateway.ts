@@ -130,7 +130,7 @@ export class Gateway implements OnModuleInit {
       (storedMessage.type = MessageType.GROUP),
       (storedMessage.content = message.content),
       (storedMessage.channelId = studentUser.groupId.toString()),
-      (storedMessage.isFile) = body.isFile,
+      (storedMessage.isFile = body.isFile),
       this.messageRepository.save(storedMessage);
 
     this.server
@@ -782,4 +782,3 @@ export class Gateway implements OnModuleInit {
     socket.emit('directMessageHistory', historyDto);
   }
 }
-

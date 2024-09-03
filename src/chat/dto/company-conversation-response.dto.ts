@@ -12,8 +12,8 @@ export class CompanyChannelInfoDto {
 }
 
 export class CompanyConversationResponseDto {
-  @ApiProperty({type: CompanyChannelInfoDto, isArray: true})
+  @ApiProperty({ type: CompanyChannelInfoDto, isArray: true })
   missionChannels: CompanyChannelInfoDto[];
-  @ApiProperty({type: CompanyChannelInfoDto, isArray: true})
+  @ApiProperty({ type: CompanyChannelInfoDto, isArray: true })
   premissionChannels: CompanyChannelInfoDto[];
 }
