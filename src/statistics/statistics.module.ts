@@ -8,13 +8,14 @@ import { StatisticsService } from './statistics.service';
 import { StudentPayment } from 'src/payment/entity/student-payment.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([StudentPayment]),
-        MissionModule,
-        StudentModule,
-    ],
-    controllers: [StatisticsController],
-    providers: [StatisticsService],
-    exports: [StatisticsService],
+  imports: [
+    TypeOrmModule.forFeature([StudentPayment]),
+    MissionModule,
+    StudentModule,
+  ],
+  controllers: [StatisticsController],
+  providers: [StatisticsService],
+  exports: [StatisticsService],
 })
-export class StatisticsModule { }
+export class StatisticsModule {
+}

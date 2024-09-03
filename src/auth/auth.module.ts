@@ -14,7 +14,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CompanyPreferences } from '../company/entity/CompanyPreferences.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([StudentPreferences, CompanyPreferences]),StudentModule, CompanyModule, MailModule, GroupModule, MissionModule],
+  imports: [
+    TypeOrmModule.forFeature([StudentPreferences, CompanyPreferences]),
+    StudentModule,
+    CompanyModule,
+    MailModule,
+    GroupModule,
+    MissionModule,
+  ],
   controllers: [AuthController],
   providers: [AuthService, JwtService, GoogleApiService, SiretService],
 })

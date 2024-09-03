@@ -1,13 +1,13 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class GroupInvite {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({type :'int', nullable: false})
-    groupId: number;
+  @Column({ type: 'int', nullable: false })
+  groupId: number;
 
-    @Column({type :'int', nullable: false})
-    userId: number;
+  @Column({ type: 'int', nullable: false })
+  userId: number;
 }

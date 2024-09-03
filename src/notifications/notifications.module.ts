@@ -11,13 +11,17 @@ import { CompanyPreferences } from '../company/entity/CompanyPreferences.entity'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Notification, StudentPreferences, CompanyPreferences]),
+    TypeOrmModule.forFeature([
+      Notification,
+      StudentPreferences,
+      CompanyPreferences,
+    ]),
     StudentModule,
     CompanyModule,
-    MailModule
+    MailModule,
   ],
-  providers: [NotificationsService,],
+  providers: [NotificationsService],
   exports: [NotificationsService],
-  controllers: [NotificationsController]
+  controllers: [NotificationsController],
 })
 export class NotificationsModule {}

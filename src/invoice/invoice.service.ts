@@ -61,7 +61,9 @@ export class InvoiceService {
     Data.missionName = mission.name ? mission.name : '';
     Data.invoiceNumber = mission.id;
     Data.studentName = studentProfile.firstName + ' ' + studentProfile.lastName;
-    Data.studentLocation = studentProfile.location ? studentProfile.location : '';
+    Data.studentLocation = studentProfile.location
+      ? studentProfile.location
+      : '';
 
     return this.generatePdf('invoice.pdf', Data, companyProfile);
   }
@@ -69,7 +71,7 @@ export class InvoiceService {
   async generatePdf(
     filePath: string,
     data: CompanyInvoiceDataDto,
-    companyProfile : CompanyProfile,
+    companyProfile: CompanyProfile,
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       const pdf = new PDFDocument();
@@ -82,7 +84,7 @@ export class InvoiceService {
       const hour: number = currentDate.getHours();
       const minute: number = currentDate.getMinutes();
 
-      const formattedDate: string = `${day}/${month}/${year} ${hour}:${minute}`;
+      const formattedDate = `${day}/${month}/${year} ${hour}:${minute}`;
 
       pdf.pipe(stream);
 
@@ -120,7 +122,10 @@ export class InvoiceService {
       pdf.font('Helvetica-Bold').fontSize(16).text('Facture', 50, 200);
       pdf.font('Helvetica-Bold').fontSize(14).text(data.missionName, 50, 230);
       pdf.font('Helvetica').fontSize(10).text('Numéro de facture :', 50, 260);
-      pdf.font('Helvetica').fontSize(10).text(Math.floor(Math.random() * 1000000), 150, 260);
+      pdf
+        .font('Helvetica')
+        .fontSize(10)
+        .text(Math.floor(Math.random() * 1000000), 150, 260);
 
       pdf.font('Helvetica-Bold').fontSize(16).text('Étudiant', 460, 230);
       pdf.font('Helvetica').fontSize(10).text(data.studentName, 460, 260);
@@ -205,16 +210,17 @@ export class InvoiceService {
 
       pdf.on('end', () => {
         const fileStream = createReadStream(filePath);
-        this.fileService.storeFileStream(fileStream, 'invoice.pdf').then(async (file: string) => {
-          const filepath: string = file;
-          const doc = new Document();
-          doc.documentPath = filepath;
-          doc.documentType = DocumentTypeEnum.INVOICE;
-          doc.documentUser = DocumentUserEnum.COMPANY;
-          doc.userId = companyProfile.companyId;
-          this.DocumentAdminRepository.save(doc);
-        }
-        );
+        this.fileService
+          .storeFileStream(fileStream, 'invoice.pdf')
+          .then(async (file: string) => {
+            const filepath: string = file;
+            const doc = new Document();
+            doc.documentPath = filepath;
+            doc.documentType = DocumentTypeEnum.INVOICE;
+            doc.documentUser = DocumentUserEnum.COMPANY;
+            doc.userId = companyProfile.companyId;
+            this.DocumentAdminRepository.save(doc);
+          });
 
         resolve();
       });
@@ -235,17 +241,17 @@ export class InvoiceService {
   async downloadInvoice(id: number, res: any): Promise<any> {
     try {
       const document = await this.findInvoiceById(id);
-  
+
       if (!document) {
         // If document is not found, send a 404 response
         return res.status(404).json({ message: 'Document not found' });
       }
-  
+
       const path = document.documentPath.replace(
         process.env.BASE_URL + '/public/',
         '',
       );
-  
+
       return this.fileService.getFile(path, res);
     } catch (error) {
       // Handle any other errors
@@ -253,15 +259,14 @@ export class InvoiceService {
       return res.status(500).json({ message: 'Internal server error' });
     }
   }
-  
+
   async getInvoices(email: string): Promise<any> {
     const companyProfile = await this.companyProfileRepository.findOne({
       where: { email: email },
     });
     if (!companyProfile) throw new Error(`Could not find company profile`);
-    const documentsQuery = this.DocumentAdminRepository.createQueryBuilder(
-      'document',
-    );
+    const documentsQuery =
+      this.DocumentAdminRepository.createQueryBuilder('document');
     documentsQuery.where('document.documentUser = :documentUser', {
       documentUser: DocumentUserEnum.COMPANY,
     });
@@ -284,9 +289,8 @@ export class InvoiceService {
   }
 
   async generateInvoiceForCompany(body: LinkerInvoiceCompanyDto) {
-
     const companyProfile = await this.companyProfileRepository.findOne({
-      where: { email: body.companyEmail},
+      where: { email: body.companyEmail },
     });
     if (!companyProfile) throw new Error(`Could not find company profile`);
     const companyName = companyProfile.name;
@@ -315,7 +319,7 @@ export class InvoiceService {
   async generatePdfForCompany(
     filePath: string,
     data: CompanyInvoiceDataDto,
-    companyProfile : CompanyProfile,
+    companyProfile: CompanyProfile,
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       const pdf = new PDFDocument();
@@ -328,7 +332,7 @@ export class InvoiceService {
       const hour: number = currentDate.getHours();
       const minute: number = currentDate.getMinutes();
 
-      const formattedDate: string = `${day}/${month}/${year} ${hour}:${minute}`;
+      const formattedDate = `${day}/${month}/${year} ${hour}:${minute}`;
 
       pdf.pipe(stream);
 
@@ -344,23 +348,28 @@ export class InvoiceService {
       const companyName = data.companyName;
       const companyNameWidth = pdf.widthOfString(companyName);
       const companyNameX = (pdf.page.width - companyNameWidth) / 2 + 175;
-      pdf.font('Helvetica').fontSize(10).text("Linker", companyNameX, 70);
+      pdf.font('Helvetica').fontSize(10).text('Linker', companyNameX, 70);
 
       // Add address
       const address = data.address;
       const addressWidth = pdf.widthOfString(address);
-      const addressX = (pdf.page.width) / 2 + 120;
-      pdf.font('Helvetica').fontSize(10).text("linkercontact@gmail.com", addressX, 90);
+      const addressX = pdf.page.width / 2 + 120;
+      pdf
+        .font('Helvetica')
+        .fontSize(10)
+        .text('linkercontact@gmail.com', addressX, 90);
 
       pdf.font('Helvetica-Bold').fontSize(16).text('Facture', 50, 200);
       pdf.font('Helvetica-Bold').fontSize(14).text(data.missionName, 50, 230);
       pdf.font('Helvetica').fontSize(10).text('Numéro de facture :', 50, 260);
-      pdf.font('Helvetica').fontSize(10).text(Math.floor(Math.random() * 1000000), 150, 260);
+      pdf
+        .font('Helvetica')
+        .fontSize(10)
+        .text(Math.floor(Math.random() * 1000000), 150, 260);
 
       pdf.font('Helvetica-Bold').fontSize(16).text('Company', 460, 230);
       pdf.font('Helvetica').fontSize(10).text(companyName, 460, 260);
       pdf.font('Helvetica').fontSize(10).text(data.address, 460, 290);
-
 
       pdf.font('Helvetica').fontSize(10).text('Date de facture:', 50, 280);
       pdf.font('Helvetica').fontSize(10).text(formattedDate, 130, 280);
@@ -441,16 +450,17 @@ export class InvoiceService {
 
       pdf.on('end', () => {
         const fileStream = createReadStream(filePath);
-        this.fileService.storeFileStream(fileStream, 'invoice.pdf').then(async (file: string) => {
-          const filepath: string = file;
-          const doc = new Document();
-          doc.documentPath = filepath;
-          doc.documentType = DocumentTypeEnum.INVOICE;
-          doc.documentUser = DocumentUserEnum.LINKER;
-          doc.userId = companyProfile.companyId;
-          this.DocumentAdminRepository.save(doc);
-        }
-        );
+        this.fileService
+          .storeFileStream(fileStream, 'invoice.pdf')
+          .then(async (file: string) => {
+            const filepath: string = file;
+            const doc = new Document();
+            doc.documentPath = filepath;
+            doc.documentType = DocumentTypeEnum.INVOICE;
+            doc.documentUser = DocumentUserEnum.LINKER;
+            doc.userId = companyProfile.companyId;
+            this.DocumentAdminRepository.save(doc);
+          });
 
         resolve();
       });

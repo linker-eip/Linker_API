@@ -13,14 +13,22 @@ import {
 import { UserAdminService } from './user-admin.service';
 import { StudentAdminResponseDto } from './dto/students-admin-response.dto';
 import { formatToStudentAdminResponseDto } from './dto/students-admin-response.dto';
-import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { StudentSearchOptionAdminDto } from './dto/student-search-option-admin.dto';
 import { RegisterStudentAdminDto } from './dto/register-student-admin.dto';
 import { StudentUserByIdPipe } from './pipes/student.user.pipe';
 import { StudentUser } from '../../student/entity/StudentUser.entity';
 import { AdminGuard } from '../guards/admin/admin.guard';
 import { UpdateStudentAdminDto } from './dto/update-student-admin.dto';
-import { CompanyAdminResponseDto, formatToCompanyAdminResponseDto } from './dto/company-admin-response.dto';
+import {
+  CompanyAdminResponseDto,
+  formatToCompanyAdminResponseDto,
+} from './dto/company-admin-response.dto';
 import { CompanySearchOptionAdminDto } from './dto/company-search-option-admin.dto';
 import { CompanyUser } from '../../company/entity/CompanyUser.entity';
 import { CompanyUserByIdPipe } from './pipes/company.user.pipe';
@@ -34,7 +42,6 @@ import { RegisterCompanyAdminDto } from './dto/register-company-admin.dto';
 //@ApiBearerAuth()
 export class UserAdminController {
   constructor(private readonly userAdminService: UserAdminService) {}
-
 
   //STUDENTS
   @Get('students')
@@ -126,7 +133,6 @@ export class UserAdminController {
     return this.userAdminService.deleteStudent(student);
   }
 
-
   //COMPANIES
 
   @Get('companies')
@@ -142,7 +148,9 @@ export class UserAdminController {
     @Query() searchOption: CompanySearchOptionAdminDto,
     @Req() req,
   ): Promise<CompanyAdminResponseDto[]> {
-    const companies = await this.userAdminService.findAllCompanies(searchOption);
+    const companies = await this.userAdminService.findAllCompanies(
+      searchOption,
+    );
     return companies.map(formatToCompanyAdminResponseDto);
   }
 
@@ -217,5 +225,4 @@ export class UserAdminController {
     );
     return formatToCompanyAdminResponseDto(updatedCompany);
   }
-
 }

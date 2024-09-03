@@ -13,7 +13,7 @@ import { AdminModule } from './admin/admin.module';
 import { FileModule } from './filesystem/file.module';
 import { FileController } from './filesystem/file.controller';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path'
+import { join } from 'path';
 import { MissionModule } from './mission/mission.module';
 import { SiretService } from './siret/siret.service';
 import { SiretController } from './siret/siret.controller';
@@ -36,6 +36,7 @@ import { LinkedinModule } from './linkedin/linkedin.module';
 import { StatisticsController } from './statistics/statistics.controller';
 import { StatisticsService } from './statistics/statistics.service';
 import { StatisticsModule } from './statistics/statistics.module';
+import { TicketModule } from './ticket/ticket.module';
 
 @Module({
   imports: [
@@ -79,9 +80,16 @@ import { StatisticsModule } from './statistics/statistics.module';
     SkillsModule,
     PaymentModule,
     LinkedinModule,
-    StatisticsModule
+    StatisticsModule,
+    TicketModule,
   ],
-  controllers: [FileController, SiretController, DocumentTransferController, StatisticsController],
+  controllers: [
+    FileController,
+    SiretController,
+    DocumentTransferController,
+    StatisticsController,
+  ],
   providers: [JwtStrategy, SiretService],
 })
-export class AppModule { }
+export class AppModule {
+}

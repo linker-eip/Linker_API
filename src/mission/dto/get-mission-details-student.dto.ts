@@ -53,39 +53,38 @@ export class GetMissionDetailsDto {
 }
 
 export class StudentProfileResponseMissionDto {
-    @ApiProperty()
-    id: number;
-    
-    @ApiProperty()
-    studentId: number;
-    
-    @ApiProperty()
-    firstName: string;
-    
-    @ApiProperty()
-    lastName: string;
-    
-    @ApiProperty()
-    description: string;
-    
-    @ApiProperty()
-    email: string;
-    
-    @ApiProperty()
-    phone: string;
-    
-    @ApiProperty()
-    location: string;
-    
-    @ApiProperty()
-    picture: string;
-    
-    @ApiProperty()
-    website: string;
-    
-    @ApiProperty()
-    note: number;
+  @ApiProperty()
+  id: number;
 
+  @ApiProperty()
+  studentId: number;
+
+  @ApiProperty()
+  firstName: string;
+
+  @ApiProperty()
+  lastName: string;
+
+  @ApiProperty()
+  description: string;
+
+  @ApiProperty()
+  email: string;
+
+  @ApiProperty()
+  phone: string;
+
+  @ApiProperty()
+  location: string;
+
+  @ApiProperty()
+  picture: string;
+
+  @ApiProperty()
+  website: string;
+
+  @ApiProperty()
+  note: number;
 }
 
 export class MissionTaskArrayDto {
@@ -93,13 +92,12 @@ export class MissionTaskArrayDto {
   @IsArray()
   missionTasks: MissionTaskDto[];
 
-  @ApiProperty({ isArray: true, type: StudentProfileResponseMissionDto})
+  @ApiProperty({ isArray: true, type: StudentProfileResponseMissionDto })
   @IsArray()
   studentProfile: StudentProfileResponseMissionDto[];
 }
 
 export class GetMissionDetailsStudentDto {
-
   @ApiProperty()
   companyProfile: CompanyProfileResponseDto;
 
@@ -113,6 +111,6 @@ export class GetMissionDetailsStudentDto {
   @ApiProperty()
   group: GetGroupeResponse;
 
-  @ApiProperty({ isArray: true, type: StudentProfileResponseMissionDto})
+  @ApiProperty({ isArray: true, type: StudentProfileResponseMissionDto })
   groupStudents: StudentProfileResponseMissionDto[];
 }

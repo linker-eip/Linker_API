@@ -1,4 +1,11 @@
-import { Column, Entity, JoinColumn, ManyToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Mission } from '../../mission/entity/mission.entity';
 import { StudentProfile } from './StudentProfile.entity';
 
@@ -31,14 +38,14 @@ export class StudentUser {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-    @Column({ type: 'varchar', nullable: true})
-    resetPasswordToken: string;
+  @Column({ type: 'varchar', nullable: true })
+  resetPasswordToken: string;
 
-    @Column({ type: 'boolean', default: false})
-    isVerified: boolean;
+  @Column({ type: 'boolean', default: false })
+  isVerified: boolean;
 
-    @Column({ type: 'varchar', nullable: true})
-    verificationKey: string;
+  @Column({ type: 'varchar', nullable: true })
+  verificationKey: string;
 
   @Column('simple-array', { nullable: true })
   missionsIds: number[];
@@ -46,7 +53,7 @@ export class StudentUser {
   @Column({ type: 'int', default: null, nullable: true })
   groupId: number;
 
-  @OneToOne(() => StudentProfile, studentProfile => studentProfile.student, {
+  @OneToOne(() => StudentProfile, (studentProfile) => studentProfile.student, {
     cascade: true,
     onDelete: 'CASCADE',
   })

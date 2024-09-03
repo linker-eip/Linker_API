@@ -10,10 +10,11 @@ import { VerifiedUserGuard } from '../admin/auth/guard/user.guard';
 @ApiTags('LinkedIn')
 @Controller('api/linkedin')
 export class LinkedinController {
-    constructor(private readonly linkedinService: LinkedinService) { }
+  constructor(private readonly linkedinService: LinkedinService) {
+  }
 
-    @Post()
-    async getProfile(@Req() req, @Body() body: LinkedinDto) {
-        return await this.linkedinService.findProfile(req, body.url)
-    }
+  @Post()
+  async getProfile(@Req() req, @Body() body: LinkedinDto) {
+    return await this.linkedinService.findProfile(req, body.url);
+  }
 }

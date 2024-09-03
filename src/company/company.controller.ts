@@ -26,16 +26,20 @@ import { CompanyProfileResponseDto } from './dto/company-profile-response.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadCompanyDocumentDto } from './dto/upload-company-document.dto';
 import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
-import { UnverifiedUserGuard, VerifiedUserGuard } from '../admin/auth/guard/user.guard';
 import {
   UpdateCompanyPreferencesDto,
 } from '../student/dto/update-student-preferences.dto';
+import {
+  UnverifiedUserGuard,
+  VerifiedUserGuard,
+} from '../admin/auth/guard/user.guard';
 
 @Controller('api/company')
 @ApiTags('Company')
 @ApiBearerAuth()
 export class CompanyController {
-  constructor(private readonly companyService: CompanyService) { }
+  constructor(private readonly companyService: CompanyService) {
+  }
 
   @Get('profile')
   @UseGuards(UnverifiedUserGuard)
@@ -124,7 +128,6 @@ export class CompanyController {
     status: 201,
     description: 'Document uploaded successfully',
   })
-
   @UseInterceptors(FileInterceptor('file'))
   async replaceCompanyDocument(
     @UploadedFile(
@@ -163,22 +166,20 @@ export class CompanyController {
     type: DocumentStatusResponseDto,
     isArray: true,
   })
-  async getDocumentStatus(
-    @Req() req,
-  ): Promise<DocumentStatusResponseDto[]> {
+  async getDocumentStatus(@Req() req): Promise<DocumentStatusResponseDto[]> {
     return await this.companyService.getDocumentStatus(req.user);
   }
 
   @Post('createPref')
   @UseGuards(VerifiedUserGuard)
   async createPref() {
-    return this.companyService.createPref()
+    return this.companyService.createPref();
   }
 
   @Put('preferences')
   @UseGuards(VerifiedUserGuard)
   async updatePreferences(@Req() req, @Body() updatePreferencesDto: UpdateCompanyPreferencesDto) {
-    return this.companyService.updatePreferences(req, updatePreferencesDto)
+    return this.companyService.updatePreferences(req, updatePreferencesDto);
   }
 
   @Get('preferences')
@@ -188,9 +189,9 @@ export class CompanyController {
     summary: 'Get company preferences',
   })
   @ApiOkResponse({
-    type: UpdateCompanyPreferencesDto
+    type: UpdateCompanyPreferencesDto,
   })
   async getPreferences(@Req() req): Promise<UpdateCompanyPreferencesDto> {
-    return this.companyService.getPreferences(req)
+    return this.companyService.getPreferences(req);
   }
 }

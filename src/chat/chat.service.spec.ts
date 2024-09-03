@@ -4,7 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ChatController } from './chat.controller';
 import { Message } from './entity/Message.entity';
-import { MessageType} from './enum/MessageType.enum';
+import { MessageType } from './enum/MessageType.enum';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { StudentService } from '../student/student.service';
@@ -191,15 +191,15 @@ describe('ChatService', () => {
         buffer: Buffer.from(''),
       };
 
-      const dto: SendFileInChatDto =
-        {
-          file,
-          type: MessageType.GROUP,
-        };
+      const dto: SendFileInChatDto = {
+        file,
+        type: MessageType.GROUP,
+      };
 
       const expectedResponse = null;
 
-      jest.spyOn(service, 'sendFileInChat')
+      jest
+        .spyOn(service, 'sendFileInChat')
         .mockResolvedValueOnce(expectedResponse);
 
       const response = await controller.sendFileInChat(file, req, dto);
@@ -207,7 +207,6 @@ describe('ChatService', () => {
       expect(service.sendFileInChat).toHaveBeenCalledWith(req, file, dto);
 
       expect(response).toEqual(expectedResponse);
-
     });
   });
 
@@ -247,7 +246,8 @@ describe('ChatService', () => {
         ],
       };
 
-      jest.spyOn(service, 'getStudentConversations')
+      jest
+        .spyOn(service, 'getStudentConversations')
         .mockResolvedValueOnce(expectedResponse);
 
       const response = await controller.getStudentConversations(req);
@@ -255,7 +255,6 @@ describe('ChatService', () => {
       expect(service.getStudentConversations).toHaveBeenCalledWith(req);
 
       expect(response).toEqual(expectedResponse);
-
     });
   });
 
@@ -285,20 +284,20 @@ describe('ChatService', () => {
         premissionChannels: [],
       };
 
-      jest.spyOn(service, 'getCompanyConversations')
+      jest
+        .spyOn(service, 'getCompanyConversations')
         .mockResolvedValueOnce(expectedResponse);
 
-      const response: CompanyConversationResponseDto = await controller.getCompanyConversations(req);
+      const response: CompanyConversationResponseDto =
+        await controller.getCompanyConversations(req);
 
       expect(service.getCompanyConversations).toHaveBeenCalledWith(req);
 
       expect(response).toEqual(expectedResponse);
-
     });
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
-})
-;
+});

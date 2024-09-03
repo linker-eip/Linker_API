@@ -18,13 +18,20 @@ import { DocumentTransferService } from './services/document-transfer.service';
 @Controller('api/document')
 @ApiTags('DOCUMENT')
 export class DocumentTransferController {
-  constructor(private readonly documentTransferService: DocumentTransferService) {}
+  constructor(
+    private readonly documentTransferService: DocumentTransferService,
+  ) {
+  }
 
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file', {
-    limits: { fileSize: 2 * 1024 * 1024 }, // 2MB
-  }))
-  async uploadDocument(@UploadedFile() file: Express.Multer.File): Promise<any> {
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: 2 * 1024 * 1024 }, // 2MB
+    }),
+  )
+  async uploadDocument(
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<any> {
     if (!file) {
       throw new HttpException('File is required', HttpStatus.BAD_REQUEST);
     }

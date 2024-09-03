@@ -58,5 +58,4 @@ export class SkillsService {
     const skill = await this.findSkillById(skillId);
     return this.skillsRepository.remove(skill);
   }
-
 }

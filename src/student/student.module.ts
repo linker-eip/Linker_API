@@ -18,9 +18,27 @@ import { Jobs } from './jobs/entity/jobs.entity';
 import { Studies } from './studies/entity/studies.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([StudentUser, StudentProfile, StudentPreferences, StudentDocument, Jobs, Studies]), JobsModule, StudiesModule, SkillsModule, CompanyModule],
+  imports: [
+    TypeOrmModule.forFeature([
+      StudentUser,
+      StudentProfile,
+      StudentPreferences,
+      StudentDocument,
+      Jobs,
+      Studies,
+    ]),
+    JobsModule,
+    StudiesModule,
+    SkillsModule,
+    CompanyModule,
+  ],
   controllers: [StudentController],
-  providers: [StudentService, FileService, DocumentTransferService, ConfigService],
+  providers: [
+    StudentService,
+    FileService,
+    DocumentTransferService,
+    ConfigService,
+  ],
   exports: [StudentService],
 })
 export class StudentModule {}

@@ -1,5 +1,5 @@
 export enum DocumentUserEnum {
-    COMPANY = 'COMPANY',
-    STUDENT = 'STUDENT',
-    LINKER = 'LINKER'
+  COMPANY = 'COMPANY',
+  STUDENT = 'STUDENT',
+  LINKER = 'LINKER',
 }

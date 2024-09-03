@@ -1,7 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CompanyUser } from '../../../company/entity/CompanyUser.entity';
 import { Mission } from '../../../mission/entity/mission.entity';
-import { CompanyAdminResponseDto, formatToCompanyAdminResponseDto } from '../../user-admin/dto/company-admin-response.dto';
+import {
+  CompanyAdminResponseDto,
+  formatToCompanyAdminResponseDto,
+} from '../../user-admin/dto/company-admin-response.dto';
 import { StudentUser } from '../../../student/entity/StudentUser.entity';
 
 export class missionAdminResponseDto {
@@ -59,7 +62,6 @@ export function formatToMissionAdminDto(
   };
 }
 
-
 export class missionAdminResponseBasicDto {
   @ApiProperty()
   id: number;
@@ -92,7 +94,7 @@ export class missionAdminResponseBasicDto {
 export function formatToMissionAdminBasicDto(
   mission: Mission,
   company: CompanyUser,
-) : missionAdminResponseBasicDto {
+): missionAdminResponseBasicDto {
   return {
     id: mission.id,
     name: mission.name,

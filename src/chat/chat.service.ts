@@ -3,11 +3,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Message } from './entity/Message.entity';
 import { Repository } from 'typeorm';
 import { StudentService } from '../student/student.service';
-import { ChannelInfoDto, StudentConversationResponseDto } from './dto/student-conversation-response.dto';
+import {
+  ChannelInfoDto,
+  StudentConversationResponseDto,
+} from './dto/student-conversation-response.dto';
 import { GroupService } from '../group/group.service';
 import { MissionService } from '../mission/mission.service';
 import { MissionStatus } from '../mission/enum/mission-status.enum';
-import { CompanyChannelInfoDto, CompanyConversationResponseDto } from './dto/company-conversation-response.dto';
+import {
+  CompanyChannelInfoDto,
+  CompanyConversationResponseDto,
+} from './dto/company-conversation-response.dto';
 import { CompanyService } from '../company/company.service';
 import { SendFileInChatDto } from './dto/chat-send-file.dto';
 import { DocumentTransferService } from '../document-transfer/src/services/document-transfer.service';
@@ -205,7 +211,11 @@ export class ChatService {
     return MessageType[value].toString();
   }
 
-  async sendFileInChat(req: any, file: any, body: SendFileInChatDto): Promise<any> {
+  async sendFileInChat(
+    req: any,
+    file: any,
+    body: SendFileInChatDto,
+  ): Promise<any> {
     if (req.user.userType == 'USER_COMPANY') {
       return this.companySendFileInChat(req, file, body);
     }
@@ -223,45 +233,61 @@ export class ChatService {
 
     console.log(student);
     switch (body.type.toString()) {
-      case (this.getMessageTypeKeyByValue(MessageType.MISSION)): {
-        await this.gateway.onNewMissionMessage({
-          student: student,
-          id: body.channelId,
-          message: fileUrl,
-          isFile: true,
-        }, null);
+      case this.getMessageTypeKeyByValue(MessageType.MISSION): {
+        await this.gateway.onNewMissionMessage(
+          {
+            student: student,
+            id: body.channelId,
+            message: fileUrl,
+            isFile: true,
+          },
+          null,
+        );
         break;
       }
-      case (this.getMessageTypeKeyByValue(MessageType.GROUP)): {
-        await this.gateway.onNewGroupMessage({
-          student: student,
-          message: fileUrl,
-          isFile: true,
-        }, null);
+      case this.getMessageTypeKeyByValue(MessageType.GROUP): {
+        await this.gateway.onNewGroupMessage(
+          {
+            student: student,
+            message: fileUrl,
+            isFile: true,
+          },
+          null,
+        );
         break;
       }
-      case (this.getMessageTypeKeyByValue(MessageType.PREMISSION)): {
-        await this.gateway.onNewPreMissionMessage({
-          student: student,
-          missionId: body.channelId,
-          message: fileUrl,
-          isFile: true,
-        }, null);
+      case this.getMessageTypeKeyByValue(MessageType.PREMISSION): {
+        await this.gateway.onNewPreMissionMessage(
+          {
+            student: student,
+            missionId: body.channelId,
+            message: fileUrl,
+            isFile: true,
+          },
+          null,
+        );
         break;
       }
-      case (this.getMessageTypeKeyByValue(MessageType.DM)): {
-        await this.gateway.onNewDirectMessage({
-          student: student,
-          userId: body.channelId,
-          message: fileUrl,
-          isFile: true,
-        }, null);
+      case this.getMessageTypeKeyByValue(MessageType.DM): {
+        await this.gateway.onNewDirectMessage(
+          {
+            student: student,
+            userId: body.channelId,
+            message: fileUrl,
+            isFile: true,
+          },
+          null,
+        );
         break;
       }
     }
   }
 
-  private async companySendFileInChat(req: any, file: any, body: SendFileInChatDto) {
+  private async companySendFileInChat(
+    req: any,
+    file: any,
+    body: SendFileInChatDto,
+  ) {
     const company = await this.companyService.findOne(req.user.email);
     if (!company) {
       throw new HttpException('Etudiant invalide', 404);
@@ -275,31 +301,40 @@ export class ChatService {
     }
 
     switch (body.type.toString()) {
-      case (this.getMessageTypeKeyByValue(MessageType.MISSION)): {
-        await this.gateway.onNewMissionMessage({
-          student: company,
-          id: body.channelId,
-          message: fileUrl,
-          isFile: true,
-        }, null);
+      case this.getMessageTypeKeyByValue(MessageType.MISSION): {
+        await this.gateway.onNewMissionMessage(
+          {
+            student: company,
+            id: body.channelId,
+            message: fileUrl,
+            isFile: true,
+          },
+          null,
+        );
         break;
       }
-      case (this.getMessageTypeKeyByValue(MessageType.GROUP)): {
-        await this.gateway.onNewGroupMessage({
-          student: company,
-          message: fileUrl,
-          isFile: true,
-        }, null);
+      case this.getMessageTypeKeyByValue(MessageType.GROUP): {
+        await this.gateway.onNewGroupMessage(
+          {
+            student: company,
+            message: fileUrl,
+            isFile: true,
+          },
+          null,
+        );
         break;
       }
-      case (this.getMessageTypeKeyByValue(MessageType.PREMISSION)): {
-        await this.gateway.onNewPreMissionMessage({
-          student: company,
-          missionId: body.channelId,
-          groupId: body.groupId,
-          message: fileUrl,
-          isFile: true,
-        }, null);
+      case this.getMessageTypeKeyByValue(MessageType.PREMISSION): {
+        await this.gateway.onNewPreMissionMessage(
+          {
+            student: company,
+            missionId: body.channelId,
+            groupId: body.groupId,
+            message: fileUrl,
+            isFile: true,
+          },
+          null,
+        );
         break;
       }
     }

@@ -45,7 +45,8 @@ import { VerifiedUserGuard } from '../admin/auth/guard/user.guard';
 @ApiTags('Mission')
 @Controller('api/mission')
 export class MissionController {
-  constructor(private readonly missionService: MissionService) { }
+  constructor(private readonly missionService: MissionService) {
+  }
 
   @Post()
   @ApiOperation({
@@ -67,8 +68,11 @@ export class MissionController {
           }),
         ],
       }),
-    ) file,
-    @Req() req, @Body() body: CreateMissionDto) {
+    )
+      file,
+    @Req() req,
+    @Body() body: CreateMissionDto,
+  ) {
     return await this.missionService.createMission(body, req, file);
   }
 
@@ -101,7 +105,8 @@ export class MissionController {
           }),
         ],
       }),
-    ) file,
+    )
+      file,
     @Param('id') missionId: number,
     @Body() body: UpdateMissionDto,
     @Req() req,
@@ -153,7 +158,11 @@ export class MissionController {
     @Body() body: CreateMissionTaskDto,
     @Req() req,
   ) {
-    return await this.missionService.createMissionTaskStudent(missionId, body, req);
+    return await this.missionService.createMissionTaskStudent(
+      missionId,
+      body,
+      req,
+    );
   }
 
   @Put('task/:taskId')
@@ -187,7 +196,11 @@ export class MissionController {
     @Body() body: UpdateMissionTaskDto,
     @Req() req,
   ) {
-    return await this.missionService.updateMissionTaskStudent(taskId, body, req);
+    return await this.missionService.updateMissionTaskStudent(
+      taskId,
+      body,
+      req,
+    );
   }
 
   @Delete('task/:taskId')
@@ -275,7 +288,6 @@ export class MissionController {
     return await this.missionService.acceptGroup(missionId, groupId, req);
   }
 
-
   @Post('refuse/:missionId/:groupId')
   @ApiOperation({
     description: 'Refuse a mission for a group',
@@ -308,7 +320,7 @@ export class MissionController {
     summary: 'Get the list of group that accepted missions AS A COMPANY',
   })
   async getGroupToAccept(@Param('missionId') missionId: number, @Req() req) {
-    return await this.missionService.getGroupToAccept(req, missionId)
+    return await this.missionService.getGroupToAccept(req, missionId);
   }
 
   @Post('finish/:missionId')
@@ -386,7 +398,10 @@ export class MissionController {
     description: 'Get all invitations for a student',
     type: GetMissionDto,
   })
-  async getStudentInvitations(@Req() req, @Query('status') status: MissionInviteStatus) {
+  async getStudentInvitations(
+    @Req() req,
+    @Query('status') status: MissionInviteStatus,
+  ) {
     return await this.missionService.getMissionInvites(req, status);
   }
 
@@ -398,7 +413,7 @@ export class MissionController {
   @ApiOkResponse({
     description: 'Get all invited groups for a mission',
     type: getInvitedGroups,
-    isArray: true
+    isArray: true,
   })
   async getInvitedStudents(@Req() req, @Param('missionId') missionId: number) {
     return await this.missionService.getInvitedGroups(req, missionId);

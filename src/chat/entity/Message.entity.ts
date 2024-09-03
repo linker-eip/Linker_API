@@ -2,7 +2,8 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { MessageType } from '../enum/MessageType.enum';
 
 export enum UserType {
-  STUDENT_USER = 'STUDENT_USER', COMPANY_USER = 'COMPANY_USER'
+  STUDENT_USER = 'STUDENT_USER',
+  COMPANY_USER = 'COMPANY_USER',
 }
 
 @Entity()
@@ -26,8 +27,8 @@ export class Message {
   timestamp: Date;
 
   @Column({ type: 'varchar', nullable: false })
-  content: String;
+  content: string;
 
   @Column({ type: 'boolean', nullable: false, default: false })
-  isFile: Boolean;
+  isFile: boolean;
 }

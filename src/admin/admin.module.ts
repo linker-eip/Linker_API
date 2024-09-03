@@ -23,9 +23,9 @@ import { PaymentAdminModule } from './payment/payment-admin.module';
     DocumentAdminModule,
     ContactAdminModule,
     DocumentVerificationModule,
-    PaymentAdminModule
+    PaymentAdminModule,
   ],
-  providers: [AdminService,],
+  providers: [AdminService],
   exports: [AdminService],
   controllers: [],
 })

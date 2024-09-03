@@ -14,13 +14,18 @@ import { CompanyDocument } from '../company/entity/CompanyDocument.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Mission, MissionTask, MissionInvite, CompanyDocument]),
+    TypeOrmModule.forFeature([
+      Mission,
+      MissionTask,
+      MissionInvite,
+      CompanyDocument,
+    ]),
     CompanyModule,
     GroupModule,
     StudentModule,
     PaymentModule,
     forwardRef(() => PaymentModule),
-    DocumentTransferModule
+    DocumentTransferModule,
   ],
   providers: [MissionService],
   controllers: [MissionController],

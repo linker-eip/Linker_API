@@ -8,8 +8,12 @@ import { UserAdminModule } from '../user-admin/user-admin.module';
 import { MissionModule } from '../mission/mission.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([StudentPayment]), UserAdminModule, MissionModule],
+  imports: [
+    TypeOrmModule.forFeature([StudentPayment]),
+    UserAdminModule,
+    MissionModule,
+  ],
   providers: [PaymentAdminService],
-  controllers: [PaymentAdminController]
+  controllers: [PaymentAdminController],
 })
 export class PaymentAdminModule {}

@@ -1,21 +1,20 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { PaymentAdminController } from "./payment-admin.controller";
-import { PaymentAdminService } from "./payment-admin.service";
-import { PassportModule } from "@nestjs/passport";
-import { JwtModule } from "@nestjs/jwt";
-import { getRepositoryToken } from "@nestjs/typeorm";
-import { StudentPayment } from "../../payment/entity/student-payment.entity";
-import { Repository } from "typeorm";
-import { StudentPaymentStatus } from "../../payment/enum/student-payment.status.enum";
-import { StudentPaymentResponseDto } from "./dto/student-payment-response.dto";
-import { UserAdminService } from "../user-admin/user-admin.service";
-import { MissionService } from "../mission/mission.service";
-import { StudentUser } from "../../student/entity/StudentUser.entity";
-import { StudentProfile } from "../../student/entity/StudentProfile.entity";
-import { CompanyUser } from "../../company/entity/CompanyUser.entity";
-import { CompanyProfile } from "../../company/entity/CompanyProfile.entity";
-import { Mission } from "../../mission/entity/mission.entity";
-
+import { Test, TestingModule } from '@nestjs/testing';
+import { PaymentAdminController } from './payment-admin.controller';
+import { PaymentAdminService } from './payment-admin.service';
+import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { StudentPayment } from '../../payment/entity/student-payment.entity';
+import { Repository } from 'typeorm';
+import { StudentPaymentStatus } from '../../payment/enum/student-payment.status.enum';
+import { StudentPaymentResponseDto } from './dto/student-payment-response.dto';
+import { UserAdminService } from '../user-admin/user-admin.service';
+import { MissionService } from '../mission/mission.service';
+import { StudentUser } from '../../student/entity/StudentUser.entity';
+import { StudentProfile } from '../../student/entity/StudentProfile.entity';
+import { CompanyUser } from '../../company/entity/CompanyUser.entity';
+import { CompanyProfile } from '../../company/entity/CompanyProfile.entity';
+import { Mission } from '../../mission/entity/mission.entity';
 
 describe('PaymentAdminService', () => {
   let service: PaymentAdminService;
@@ -38,14 +37,16 @@ describe('PaymentAdminService', () => {
         {
           provide: getRepositoryToken(StudentPayment),
           useClass: Repository,
-        }, {
+        },
+        {
           provide: getRepositoryToken(StudentUser),
           useClass: Repository,
         },
         {
           provide: getRepositoryToken(StudentProfile),
           useClass: Repository,
-        },        {
+        },
+        {
           provide: getRepositoryToken(CompanyUser),
           useClass: Repository,
         },
@@ -57,7 +58,6 @@ describe('PaymentAdminService', () => {
           provide: getRepositoryToken(Mission),
           useClass: Repository,
         },
-        
       ],
       exports: [PaymentAdminService],
     }).compile();
@@ -106,7 +106,9 @@ describe('PaymentAdminService', () => {
           amount: 100,
         },
       ];
-      jest.spyOn(service, 'getStudentPayments').mockResolvedValue(studentPayments);
+      jest
+        .spyOn(service, 'getStudentPayments')
+        .mockResolvedValue(studentPayments);
 
       const res = await controller.getStudentPayments();
 
@@ -115,7 +117,6 @@ describe('PaymentAdminService', () => {
       expect(studentPayments).toEqual(res);
     });
   });
-
 
   describe('update student payment', () => {
     it('should update a student payment', async () => {
@@ -161,17 +162,19 @@ describe('PaymentAdminService', () => {
         amount: 100,
       };
 
-      jest.spyOn(service, 'updateStudentPayment').mockResolvedValue(studentPayment);
+      jest
+        .spyOn(service, 'updateStudentPayment')
+        .mockResolvedValue(studentPayment);
 
-      const res = await controller.updateStudentPayment(updateStudentPaymentDto);
+      const res = await controller.updateStudentPayment(
+        updateStudentPaymentDto,
+      );
 
       expect(service.updateStudentPayment).toHaveBeenCalled();
 
       expect(studentPayment).toEqual(res);
-    }
-    );
-  }
-  );
+    });
+  });
 
   it('should be defined', () => {
     expect(service).toBeDefined();

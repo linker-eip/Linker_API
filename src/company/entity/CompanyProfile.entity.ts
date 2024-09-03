@@ -1,4 +1,10 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { CompanyUser } from './CompanyUser.entity';
 
 @Entity()
@@ -46,4 +52,3 @@ export class CompanyProfile {
   @JoinColumn({ name: 'companyId' })
   company: CompanyUser;
 }
-

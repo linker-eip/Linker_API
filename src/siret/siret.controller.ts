@@ -5,15 +5,15 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 @Controller('siret')
 @ApiTags('SIRET')
 export class SiretController {
-    constructor(private readonly siretService: SiretService) {}
+  constructor(private readonly siretService: SiretService) {
+  }
 
-    @Get('/siret/:siret')
-    @ApiOperation({
-        description: "Trouve une entreprise depuis son SIRET",
-        summary: "Trouve une entreprise depuis son SIRET"
-    })
-    async getCompanyFromSiret(@Param('siret') siret: String)
-    {
-        return await this.siretService.searchCompanyFromSiret(siret);
-    }
+  @Get('/siret/:siret')
+  @ApiOperation({
+    description: 'Trouve une entreprise depuis son SIRET',
+    summary: 'Trouve une entreprise depuis son SIRET',
+  })
+  async getCompanyFromSiret(@Param('siret') siret: string) {
+    return await this.siretService.searchCompanyFromSiret(siret);
+  }
 }

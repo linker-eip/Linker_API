@@ -30,7 +30,7 @@ class FileMimeTypeValidator extends FileValidator<FileMimeTypeValidatorOptions> 
 const SupportedImageMimeTypes: MimeType[] = [
   'image/jpeg',
   'image/png',
-  'image/webp'
+  'image/webp',
 ];
 
 export { FileMimeTypeValidator, SupportedImageMimeTypes };

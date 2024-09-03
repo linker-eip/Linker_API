@@ -38,7 +38,10 @@ import { CompanyProfileResponseDto } from '../company/dto/company-profile-respon
 import { UpdateStudentPreferencesDto } from './dto/update-student-preferences.dto';
 import { UploadStudentDocumentDto } from './dto/upload-student-document.dto';
 import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
-import { UnverifiedUserGuard, VerifiedUserGuard } from '../admin/auth/guard/user.guard';
+import {
+  UnverifiedUserGuard,
+  VerifiedUserGuard,
+} from '../admin/auth/guard/user.guard';
 import { StudentSearchNetworkOptionDto } from './dto/student-search-network-option.dto';
 import { StudentSearchNetworkResponseDto } from './dto/student-search-network-response.dto';
 
@@ -46,7 +49,8 @@ import { StudentSearchNetworkResponseDto } from './dto/student-search-network-re
 @ApiTags('Student')
 @ApiBearerAuth()
 export class StudentController {
-  constructor(private readonly studentService: StudentService) { }
+  constructor(private readonly studentService: StudentService) {
+  }
 
   @Get('profile')
   @UseGuards(UnverifiedUserGuard)
@@ -239,15 +243,14 @@ export class StudentController {
   @Post('createPref')
   @UseGuards(VerifiedUserGuard)
   async createPref() {
-    return this.studentService.createPref()
+    return this.studentService.createPref();
   }
 
   @Put('preferences')
   @UseGuards(VerifiedUserGuard)
   async updatePreferences(@Req() req, @Body() updatePreferencesDto: UpdateStudentPreferencesDto) {
-    return this.studentService.updatePreferences(req, updatePreferencesDto)
+    return this.studentService.updatePreferences(req, updatePreferencesDto);
   }
-
 
   @Get('preferences')
   @UseGuards(VerifiedUserGuard)
@@ -256,10 +259,10 @@ export class StudentController {
     summary: 'Get student preferences',
   })
   @ApiOkResponse({
-    type: UpdateStudentPreferencesDto
+    type: UpdateStudentPreferencesDto,
   })
   async getPreferences(@Req() req): Promise<UpdateStudentPreferencesDto> {
-    return this.studentService.getPreferences(req)
+    return this.studentService.getPreferences(req);
   }
 
   @Post('documentVerification')
@@ -351,9 +354,7 @@ export class StudentController {
     type: DocumentStatusResponseDto,
     isArray: true,
   })
-  async getDocumentStatus(
-    @Req() req,
-  ): Promise<DocumentStatusResponseDto[]> {
+  async getDocumentStatus(@Req() req): Promise<DocumentStatusResponseDto[]> {
     return await this.studentService.getDocumentStatus(req.user);
   }
 

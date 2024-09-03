@@ -8,7 +8,11 @@ import { UserAdminModule } from '../user-admin/user-admin.module';
 import { StudentDocument } from '../../student/entity/StudentDocuments.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Document, StudentDocument]), FileModule, UserAdminModule],
+  imports: [
+    TypeOrmModule.forFeature([Document, StudentDocument]),
+    FileModule,
+    UserAdminModule,
+  ],
   controllers: [DocumentAdminController],
   providers: [DocumentAdminService],
 })

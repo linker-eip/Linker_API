@@ -1,6 +1,6 @@
 interface DocumentResult {
-  url: string
-  key: string
+  url: string;
+  key: string;
 }
 
-export type { DocumentResult }
+export type { DocumentResult };

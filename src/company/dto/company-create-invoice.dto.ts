@@ -18,11 +18,11 @@ export class CompanyCreateInvoiceDto {
   @IsNumber()
   amount: number;
 
-  @ApiProperty({isArray: true })
+  @ApiProperty({ isArray: true })
   @IsArray()
   headerFields: string[];
 
-  @ApiProperty({isArray: true})
+  @ApiProperty({ isArray: true })
   @IsArray()
   rows: Row[];
 }
