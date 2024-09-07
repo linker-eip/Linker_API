@@ -194,4 +194,14 @@ export class CompanyController {
   async getPreferences(@Req() req): Promise<UpdateCompanyPreferencesDto> {
     return this.companyService.getPreferences(req);
   }
+
+  @Get('askAI')
+  @UseGuards(VerifiedUserGuard)
+  async askAI(
+    @Req() req,
+    @Body() companyForm,
+  ) {
+    return this.companyService.askAI(req, companyForm);
+  }
+
 }
