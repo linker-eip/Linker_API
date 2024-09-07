@@ -8,38 +8,44 @@ export class AiService {
     constructor() {}
 
     public async askAI(companyForm: CompanyFormDto): Promise<string> {
-        // Transforme les compétences en une chaîne de caractères
         const allSkills = Object.values(SkillList.skills)
             .flat()
             .join(', ');
 
-        let skills;
-        if (companyForm.requiredSkills) {
-            skills = companyForm.requiredSkills.join(', ');
-        }
+            let requiredSkills = companyForm.requiredSkills ? companyForm.requiredSkills.join(', ') : 'Aucune compétence spécifique mentionnée';
 
-        const response = await axios.post(
-            'https://api.openai.com/v1/chat/completions',
-            {
-                model: 'gpt-3.5-turbo',
-                messages: [
-                    {
-                        role: 'system',
-                        content: `Vous êtes un expert consultant dans le domaine des projets digitaux. Vous aidez les entreprises à définir leurs besoins de projet, à déterminer le budget adéquat, à allouer les ressources nécessaires (designers, développeurs, marketeurs, etc.), et à donner des conseils sur les délais, les exigences techniques et les stratégies (SEO, réseaux sociaux, marketing). Vous fournissez des recommandations détaillées et pratiques. Ne pas oublier que ceux qui vont faire le projet sont des étudiants. Il faut donc que les recommandations soient adaptées à leur niveau de compétence. Voici la liste des compétences disponibles sur la plateforme : ${allSkills}.`
-                    },
-                    {
-                        role: 'user',
-                        content: `Une entreprise nommée ${companyForm.companyName}, opérant dans le secteur ${companyForm.industry}, a un projet avec l'objectif suivant : "${companyForm.projectObjective}". Le projet est décrit comme suit : "${companyForm.projectDescription}". L'entreprise dispose d'un budget de ${companyForm.budget} euros et souhaite que le projet soit réalisé en ${companyForm.projectDurationWeeks} semaines. Les compétences nécessaires pour ce projet sont les suivantes : ${skills}. Les contraintes techniques du projet sont : ${companyForm.technicalRequirements}. Le public cible de ce projet est : ${companyForm.targetAudience}. L'entreprise ${companyForm.contentAvailability === 'ready' ? 'dispose déjà du contenu nécessaire' : 'doit encore créer le contenu nécessaire'}. Elle ${companyForm.requiresMarketingOrSEO ? 'nécessite' : 'ne nécessite pas'} une stratégie de marketing ou de SEO. De plus, le projet ${companyForm.hasSocialMediaStrategy ? 'inclut' : 'n\'inclut pas'} une gestion des réseaux sociaux ou une stratégie d\'influence. Sur la base de ces informations, pouvez-vous fournir un plan détaillé concernant les ressources nécessaires (nombre de personnes par compétence), le calendrier estimé, ainsi que d'autres considérations importantes (par exemple, les meilleures pratiques, outils, plateformes) ?`
-                    }
-                ]
-            },
-            {
-                headers: {
-                    Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+            const response = await axios.post(
+                'https://api.openai.com/v1/chat/completions',
+                {
+                    model: 'gpt-3.5-turbo',
+                    messages: [
+                        {
+                            role: 'system',
+                            content: `
+                            Vous êtes un consultant en projets digitaux. Votre rôle est de donner des conseils pratiques et adaptés aux projets des entreprises, en prenant en compte les compétences disponibles chez les étudiants. Vous devez aider à déterminer le nombre d'étudiants nécessaires, vérifier si le budget est approprié, fournir des recommandations sur la gestion du projet et le calendrier, en vous basant sur les compétences disponibles dans la liste suivante : ${allSkills}.
+                            `
+                        },
+                        {
+                            role: 'user',
+                            content: `
+                            Une entreprise nommée ${companyForm.companyName}, opérant dans le secteur ${companyForm.industry}, souhaite réaliser un projet dont la description est : "${companyForm.projectDescription}". L'entreprise a un budget de ${companyForm.budget} euros et souhaite que le projet soit terminé en ${companyForm.projectDurationWeeks ?? 'non précisé'} semaines. Les compétences requises pour le projet sont les suivantes : ${requiredSkills}. Les contraintes techniques du projet sont : ${companyForm.technicalRequirements ?? 'aucune spécifiée'}. Le public cible est : ${companyForm.targetAudience ?? 'non précisé'}. Le contenu nécessaire est ${companyForm.contentAvailability ?? 'non précisé'}. Le projet ${companyForm.requiresMarketingOrSEO ? 'nécessite' : 'ne nécessite pas'} une stratégie de marketing ou SEO et ${companyForm.hasSocialMediaStrategy ? 'inclut' : 'n\'inclut pas'} une gestion des réseaux sociaux ou une stratégie d'influence.
+    
+                            Pouvez-vous donner des recommandations sur :
+                            - Le nombre d'étudiants nécessaires pour le projet
+                            - La pertinence du budget par rapport aux besoins du projet
+                            - La gestion du projet et l'organisation des tâches
+                            - Le calendrier suggéré pour la réalisation du projet
+                            `
+                        }
+                    ]
                 },
-            }
-        );
-
-        return response.data.choices[0].message.content;
+                {
+                    headers: {
+                        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+                    },
+                }
+            );
+    
+            return response.data.choices[0].message.content;
+        }
     }
-}

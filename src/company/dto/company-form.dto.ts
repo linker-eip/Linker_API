@@ -15,62 +15,63 @@ export class CompanyFormDto {
   industry: string;
 
   @ApiProperty({
-    description: 'Objectif principal du projet digital (site web, application, stratégie marketing, etc.)',
-    example: 'Lancement d\'une campagne de marketing digital',
-  })
-  projectObjective: string;
-
-  @ApiProperty({
-    description: 'Description détaillée du projet',
-    example: 'Créer et gérer une campagne de publicité en ligne, améliorer la présence sur les réseaux sociaux, etc.',
+    description: 'Description générale du besoin ou du projet',
+    example: 'Amélioration de la présence en ligne de l\'entreprise',
   })
   projectDescription: string;
 
   @ApiProperty({
-    description: 'Budget estimé pour le projet en euros',
+    description: 'Budget approximatif pour le projet en euros',
     example: 5000,
   })
   budget: number;
 
   @ApiProperty({
-    description: 'Durée souhaitée pour la réalisation du projet en semaines',
+    description: 'Durée souhaitée pour le projet en semaines (si connu)',
     example: 8,
+    required: false,
   })
-  projectDurationWeeks: number;
+  projectDurationWeeks?: number;
 
   @ApiProperty({
-    description: 'Types de compétences ou métiers nécessaires pour le projet (ex: développeurs, designers, marketeurs)',
-    example: ['Designer', 'Community Manager', 'Expert SEO'],
+    description: 'Compétences ou types de services qui pourraient être nécessaires (ex: développement, design, marketing)',
+    example: ['Développement Web', 'Design Graphique'],
+    required: false,
   })
-  requiredSkills: string[];
+  requiredSkills?: string[];
 
   @ApiProperty({
-    description: 'Contraintes ou exigences techniques spécifiques (ex: CMS, outils marketing, etc.)',
-    example: 'Utilisation de WordPress, gestion de campagne Google Ads, etc.',
+    description: 'Contraintes ou exigences particulières (si connues)',
+    example: 'Utilisation de certains outils ou plateformes spécifiques',
+    required: false,
   })
-  technicalRequirements: string;
+  technicalRequirements?: string;
 
   @ApiProperty({
-    description: 'Public cible ou utilisateurs finaux visés par le projet',
-    example: 'Jeunes adultes entre 18 et 25 ans, entreprises B2B, etc.',
+    description: 'Public cible ou utilisateurs finaux visés par le projet (si connu)',
+    example: 'Jeunes adultes entre 18 et 25 ans',
+    required: false,
   })
-  targetAudience: string;
+  targetAudience?: string;
 
   @ApiProperty({
-    description: 'Le contenu nécessaire est-il déjà disponible ou doit-il être créé ?',
-    example: 'Le contenu texte et les images doivent être créés.',
+    description: 'Le contenu nécessaire est-il déjà disponible ou doit-il être créé ? (si connu)',
+    example: 'Le contenu est partiellement disponible.',
+    required: false,
   })
-  contentAvailability: string;
+  contentAvailability?: string;
 
   @ApiProperty({
-    description: 'Une stratégie SEO ou de marketing est-elle nécessaire ?',
-    example: true,
+    description: 'Une stratégie SEO ou de marketing est-elle envisagée ?',
+    example: false,
+    required: false,
   })
-  requiresMarketingOrSEO: boolean;
+  requiresMarketingOrSEO?: boolean;
 
   @ApiProperty({
     description: 'Le projet inclut-il une gestion des réseaux sociaux ou une stratégie d\'influence ?',
-    example: true,
+    example: false,
+    required: false,
   })
-  hasSocialMediaStrategy: boolean;
+  hasSocialMediaStrategy?: boolean;
 }
