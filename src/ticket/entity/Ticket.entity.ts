@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { UserType } from '../../chat/entity/Message.entity';
 
 export enum TicketTypeEnum {
@@ -42,3 +42,24 @@ export class Ticket {
   state: TicketStateEnum;
 }
 
+@Entity()
+export class TicketAnswer {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  ticketId: number;
+
+  @Column()
+  author: 'USER' | 'ADMIN';
+
+  @Column()
+  content: string;
+
+  @Column({ nullable: true })
+  attachment?: string;
+
+  @Column()
+  @CreateDateColumn()
+  date: Date;
+}

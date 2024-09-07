@@ -1,6 +1,11 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Ticket, TicketStateEnum, TicketTypeEnum } from './entity/Ticket.entity';
+import {
+  Ticket,
+  TicketAnswer,
+  TicketStateEnum,
+  TicketTypeEnum,
+} from './entity/Ticket.entity';
 import { Repository } from 'typeorm';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UserType } from '../chat/entity/Message.entity';
@@ -10,6 +15,7 @@ import { HttpStatusCode } from 'axios';
 import { Mission } from '../mission/entity/mission.entity';
 import { GetTicketsDto } from './dto/get-ticket.dto';
 import { DocumentTransferService } from '../document-transfer/src/services/document-transfer.service';
+import { AnswerTicketDto } from './dto/answer-ticket.dto';
 
 @Injectable()
 export class TicketService {
@@ -22,6 +28,8 @@ export class TicketService {
     private readonly companyRepository: Repository<CompanyUser>,
     @InjectRepository(Mission)
     private readonly missionRepository: Repository<Mission>,
+    @InjectRepository(TicketAnswer)
+    private readonly ticketAnswerRepository: Repository<TicketAnswer>,
     private readonly documentTransferService: DocumentTransferService,
   ) {
   }
@@ -62,7 +70,11 @@ export class TicketService {
     return false;
   }
 
-  async createTicket(req: any, createTicket: CreateTicketDto, file?: Express.Multer.File): Promise<Ticket> {
+  async createTicket(
+    req: any,
+    createTicket: CreateTicketDto,
+    file?: Express.Multer.File,
+  ): Promise<Ticket> {
     const ticket = new Ticket();
     let user;
     if (req.user.userType == 'USER_STUDENT') {
@@ -149,5 +161,31 @@ export class TicketService {
       options['state'] = body.state;
     }
     return this.ticketRepository.find({ where: options });
+  }
+
+  async answerTicket(
+    req,
+    body: AnswerTicketDto,
+    file: Express.Multer.File,
+    ticketId: number,
+  ) {
+    const ticket = await this.ticketRepository.findOne({
+      where: {
+        id: ticketId,
+        authorId: req.user.id,
+        state: TicketStateEnum.OPEN,
+      },
+    });
+    if (!ticket) {
+      throw new HttpException('Ticket not found', HttpStatusCode.NotFound);
+    }
+    const answer = new TicketAnswer();
+    answer.ticketId = ticketId;
+    answer.content = body.content;
+    if (file) {
+      answer.attachment = await this.documentTransferService.uploadFile(file);
+    }
+    answer.author = 'USER';
+    return this.ticketAnswerRepository.save(answer);
   }
 }

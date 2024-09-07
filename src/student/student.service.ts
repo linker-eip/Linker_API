@@ -578,8 +578,13 @@ export class StudentService {
     }
   }
 
-  async updatePreferences(req: any, updatePreferencesDto: UpdateStudentPreferencesDto) {
-    const student = await this.studentRepository.findOne({ where: { email: req.user.email } });
+  async updatePreferences(
+    req: any,
+    updatePreferencesDto: UpdateStudentPreferencesDto,
+  ) {
+    const student = await this.studentRepository.findOne({
+      where: { email: req.user.email },
+    });
 
     const existingPreferences =
       await this.studentPreferencesRepository.findOneBy({
@@ -598,7 +603,9 @@ export class StudentService {
   }
 
   async getPreferences(req: any): Promise<UpdateStudentPreferencesDto> {
-    const student = await this.studentRepository.findOne({ where: { email: req.user.email } });
+    const student = await this.studentRepository.findOne({
+      where: { email: req.user.email },
+    });
 
     const existingPreferences =
       await this.studentPreferencesRepository.findOneBy({
@@ -609,7 +616,7 @@ export class StudentService {
       throw new HttpException('Preferences not found', HttpStatus.CONFLICT);
     }
 
-    let preferences = new UpdateStudentPreferencesDto;
+    let preferences = new UpdateStudentPreferencesDto();
 
     preferences.mailNotifDocument = existingPreferences.mailNotifDocument;
     preferences.mailNotifGroup = existingPreferences.mailNotifGroup;

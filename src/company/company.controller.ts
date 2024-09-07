@@ -26,9 +26,7 @@ import { CompanyProfileResponseDto } from './dto/company-profile-response.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadCompanyDocumentDto } from './dto/upload-company-document.dto';
 import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
-import {
-  UpdateCompanyPreferencesDto,
-} from '../student/dto/update-student-preferences.dto';
+import { UpdateCompanyPreferencesDto } from '../student/dto/update-student-preferences.dto';
 import {
   UnverifiedUserGuard,
   VerifiedUserGuard,
@@ -178,7 +176,10 @@ export class CompanyController {
 
   @Put('preferences')
   @UseGuards(VerifiedUserGuard)
-  async updatePreferences(@Req() req, @Body() updatePreferencesDto: UpdateCompanyPreferencesDto) {
+  async updatePreferences(
+    @Req() req,
+    @Body() updatePreferencesDto: UpdateCompanyPreferencesDto,
+  ) {
     return this.companyService.updatePreferences(req, updatePreferencesDto);
   }
 
