@@ -89,4 +89,30 @@ export class TicketAdminService {
     });
     return response;
   }
+
+  async closeTicket(req, ticketId: number) {
+    const ticket = await this.ticketRepository.findOne({
+      where: {
+        id: ticketId,
+      },
+    });
+    if (!ticket) {
+      throw new HttpException('Ticket not found', HttpStatusCode.NotFound);
+    }
+    ticket.state = TicketStateEnum.CLOSED;
+    return this.ticketRepository.save(ticket);
+  }
+
+  async reopenTicket(req, ticketId: number) {
+    const ticket = await this.ticketRepository.findOne({
+      where: {
+        id: ticketId,
+      },
+    });
+    if (!ticket) {
+      throw new HttpException('Ticket not found', HttpStatusCode.NotFound);
+    }
+    ticket.state = TicketStateEnum.OPEN;
+    return this.ticketRepository.save(ticket);
+  }
 }

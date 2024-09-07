@@ -78,4 +78,24 @@ export class TicketAdminController {
   async getTicketById(@Req() req, @Param('ticketId') ticketId: number): Promise<GetTicketReponseDto> {
     return this.ticketService.getTicketById(req, ticketId);
   }
+
+  @Post(':ticketId/close')
+  @ApiParam({ name: 'ticketId', required: true })
+  @ApiOperation({
+    description: 'Close ticket',
+    summary: 'Close ticket',
+  })
+  async closeTicket(@Req() req, @Param('ticketId') ticketId: number) {
+    return this.ticketService.closeTicket(req, ticketId);
+  }
+
+  @Post(':ticketId/open')
+  @ApiParam({ name: 'ticketId', required: true })
+  @ApiOperation({
+    description: 'open ticket',
+    summary: 'open ticket',
+  })
+  async reopenTicket(@Req() req, @Param('ticketId') ticketId: number) {
+    return this.ticketService.reopenTicket(req, ticketId);
+  }
 }
