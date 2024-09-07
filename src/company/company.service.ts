@@ -11,6 +11,8 @@ import { DocumentTransferService } from '../document-transfer/src/services/docum
 import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
 import { CompanyPreferences } from './entity/CompanyPreferences.entity';
 import { UpdateCompanyPreferencesDto } from '../student/dto/update-student-preferences.dto';
+import { AiService } from '../ai/ai.service';
+import { CompanyFormDto } from './dto/company-form.dto';
 
 @Injectable()
 export class CompanyService {
@@ -24,6 +26,7 @@ export class CompanyService {
     @InjectRepository(CompanyPreferences)
     private companyPreferencesRepository: Repository<CompanyPreferences>,
     private readonly documentTransferService: DocumentTransferService,
+    private aiService: AiService,
   ) {
   }
 
@@ -306,5 +309,19 @@ export class CompanyService {
     preferences.mailNotifMission = existingPreferences.mailNotifMission;
 
     return preferences;
+  }
+
+  async askAI(req: any, companyForm: CompanyFormDto): Promise<string> {
+
+    const company = await this.companyRepository.findOne({ where: { email: req.user.email } });
+
+    if (!company) {
+      throw new HttpException(
+        'Company not found',
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    return this.aiService.askAI(companyForm);
   }
 }
