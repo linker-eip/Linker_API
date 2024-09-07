@@ -15,7 +15,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import {
-  ApiBearerAuth,
+  ApiBearerAuth, ApiOkResponse,
   ApiOperation,
   ApiParam,
   ApiTags,
@@ -26,6 +26,7 @@ import { TicketService } from './ticket.service';
 import { GetTicketsDto } from './dto/get-ticket.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AnswerTicketDto } from './dto/answer-ticket.dto';
+import { GetTicketReponseDto } from './dto/get-ticket-reponse.dto';
 
 @Controller('api/ticket')
 @ApiTags('Ticket')
@@ -102,5 +103,19 @@ export class TicketController {
     @Param('ticketId') ticketId: number,
   ) {
     return this.ticketService.answerTicket(req, body, file, ticketId);
+  }
+
+  @Get(':ticketId')
+  @UseGuards(VerifiedUserGuard)
+  @ApiParam({ name: 'ticketId', required: true })
+  @ApiOperation({
+    description: 'Get ticket by id',
+    summary: 'Get ticket by id',
+  })
+  @ApiOkResponse({
+    type: GetTicketReponseDto,
+  })
+  async getTicketById(@Req() req, @Param('ticketId') ticketId: number): Promise<GetTicketReponseDto> {
+    return this.ticketService.getTicketById(req, ticketId);
   }
 }

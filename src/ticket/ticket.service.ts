@@ -16,6 +16,7 @@ import { Mission } from '../mission/entity/mission.entity';
 import { GetTicketsDto } from './dto/get-ticket.dto';
 import { DocumentTransferService } from '../document-transfer/src/services/document-transfer.service';
 import { AnswerTicketDto } from './dto/answer-ticket.dto';
+import { GetAnswerDto, GetTicketReponseDto } from './dto/get-ticket-reponse.dto';
 
 @Injectable()
 export class TicketService {
@@ -176,5 +177,36 @@ export class TicketService {
     }
     answer.author = 'USER';
     return this.ticketAnswerRepository.save(answer);
+  }
+
+  async getTicketById(req: any, ticketId: number): Promise<GetTicketReponseDto> {
+    const ticket = await this.ticketRepository.findOne({ where: { id: ticketId, authorId: req.user.id } });
+    if (!ticket) {
+      throw new HttpException('Ticket not found', HttpStatusCode.NotFound);
+    }
+
+    const answers = await this.ticketAnswerRepository.find({ where: { ticketId } });
+
+    const response = new GetTicketReponseDto();
+    response.id = ticket.id;
+    response.authorId = ticket.authorId;
+    response.authorType = ticket.authorType;
+    response.title = ticket.title;
+    response.content = ticket.content;
+    response.attachment = ticket.attachment;
+    response.ticketType = ticket.ticketType;
+    response.entityId = ticket.entityId;
+    response.state = ticket.state;
+    response.date = ticket.date;
+    response.answer = answers.map(answer => {
+      const getAnswer = new GetAnswerDto();
+      getAnswer.id = answer.id;
+      getAnswer.author = answer.author;
+      getAnswer.content = answer.content;
+      getAnswer.attachment = answer.attachment;
+      getAnswer.date = answer.date;
+      return getAnswer;
+    });
+    return response;
   }
 }

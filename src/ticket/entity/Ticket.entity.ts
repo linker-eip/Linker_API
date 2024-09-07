@@ -45,6 +45,10 @@ export class Ticket {
 
   @Column()
   state: TicketStateEnum;
+
+  @Column()
+  @CreateDateColumn()
+  date: Date;
 }
 
 @Entity()
