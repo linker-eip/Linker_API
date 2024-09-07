@@ -15,7 +15,8 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import {
-  ApiBearerAuth, ApiOkResponse,
+  ApiBearerAuth,
+  ApiOkResponse,
   ApiOperation,
   ApiParam,
   ApiTags,
@@ -115,7 +116,10 @@ export class TicketController {
   @ApiOkResponse({
     type: GetTicketReponseDto,
   })
-  async getTicketById(@Req() req, @Param('ticketId') ticketId: number): Promise<GetTicketReponseDto> {
+  async getTicketById(
+    @Req() req,
+    @Param('ticketId') ticketId: number,
+  ): Promise<GetTicketReponseDto> {
     return this.ticketService.getTicketById(req, ticketId);
   }
 }

@@ -319,14 +319,12 @@ export class CompanyService {
   }
 
   async askAI(req: any, companyForm: CompanyFormDto): Promise<string> {
-
-    const company = await this.companyRepository.findOne({ where: { email: req.user.email } });
+    const company = await this.companyRepository.findOne({
+      where: { email: req.user.email },
+    });
 
     if (!company) {
-      throw new HttpException(
-        'Company not found',
-        HttpStatus.CONFLICT,
-      );
+      throw new HttpException('Company not found', HttpStatus.CONFLICT);
     }
 
     return this.aiService.askAI(companyForm);

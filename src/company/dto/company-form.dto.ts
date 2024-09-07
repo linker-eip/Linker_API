@@ -2,7 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CompanyFormDto {
-
   @ApiProperty({
     description: 'Nom de l\'entreprise',
     example: 'Acme Corp',
@@ -41,7 +40,8 @@ export class CompanyFormDto {
   projectDurationWeeks?: number;
 
   @ApiProperty({
-    description: 'Compétences ou types de services qui pourraient être nécessaires (ex: développement, design, marketing)',
+    description:
+      'Compétences ou types de services qui pourraient être nécessaires (ex: développement, design, marketing)',
     example: ['Développement Web', 'Design Graphique'],
     required: false,
   })
@@ -58,7 +58,8 @@ export class CompanyFormDto {
   technicalRequirements?: string;
 
   @ApiProperty({
-    description: 'Public cible ou utilisateurs finaux visés par le projet (si connu)',
+    description:
+      'Public cible ou utilisateurs finaux visés par le projet (si connu)',
     example: 'Jeunes adultes entre 18 et 25 ans',
     required: false,
   })
@@ -67,7 +68,8 @@ export class CompanyFormDto {
   targetAudience?: string;
 
   @ApiProperty({
-    description: 'Le contenu nécessaire est-il déjà disponible ou doit-il être créé ? (si connu)',
+    description:
+      'Le contenu nécessaire est-il déjà disponible ou doit-il être créé ? (si connu)',
     example: 'Le contenu est partiellement disponible.',
     required: false,
   })
@@ -85,7 +87,8 @@ export class CompanyFormDto {
   requiresMarketingOrSEO?: boolean;
 
   @ApiProperty({
-    description: 'Le projet inclut-il une gestion des réseaux sociaux ou une stratégie d\'influence ?',
+    description:
+      'Le projet inclut-il une gestion des réseaux sociaux ou une stratégie d\'influence ?',
     example: false,
     required: false,
   })
