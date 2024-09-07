@@ -3,7 +3,8 @@ import { AuthAdminService } from './auth.admin.service';
 import {
   ApiBearerAuth,
   ApiOkResponse,
-  ApiOperation, ApiParam,
+  ApiOperation,
+  ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
 import { LoginAdminResponseDto } from './dto/login-admin-response.dto';
@@ -42,7 +43,11 @@ export class AuthAdminController {
   })
   @ApiParam({ name: 'userId', type: Number })
   @ApiParam({ name: 'userType', enum: UserType })
-  async blockUser(@Param('userType') userType: UserType, @Param('userId') userId: number) {
-    return this.authAdminService.blockUser(userType, userId);
+  async blockUser(
+    @Param('userType') userType: UserType,
+    @Param('userId') userId: number,
+    @Body() body: { reason?: string },
+  ) {
+    return this.authAdminService.blockUser(userType, userId, body);
   }
 }

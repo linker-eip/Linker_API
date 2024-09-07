@@ -6,6 +6,7 @@ export enum NotificationType {
   MISSION,
   DOCUMENT,
   TICKET,
+  ACCOUNT,
 }
 
 @Entity()

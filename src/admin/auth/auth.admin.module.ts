@@ -7,10 +7,14 @@ import { CompanyModule } from '../../company/company.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CompanyUser } from '../../company/entity/CompanyUser.entity';
 import { StudentUser } from '../../student/entity/StudentUser.entity';
+import { NotificationsModule } from '../../notifications/notifications.module';
 
 @Module({
-  imports: [forwardRef(() => AdminModule),
-    TypeOrmModule.forFeature([StudentUser, CompanyUser])],
+  imports: [
+    forwardRef(() => AdminModule),
+    TypeOrmModule.forFeature([StudentUser, CompanyUser]),
+    NotificationsModule,
+  ],
   providers: [AuthAdminService],
   controllers: [AuthAdminController],
 })

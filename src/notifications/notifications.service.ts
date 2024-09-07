@@ -47,7 +47,8 @@ export class NotificationsService {
         (type == NotificationType.GROUP && studentPref.mailNotifGroup) ||
         (type == NotificationType.MESSAGE && studentPref.mailNotifMessage) ||
         (type == NotificationType.MISSION && studentPref.mailNotifMission) ||
-        (type == NotificationType.TICKET && studentPref.mailNotifTicket)
+        (type == NotificationType.TICKET && studentPref.mailNotifTicket) ||
+        type == NotificationType.ACCOUNT
       ) {
         const mailDto = new SendMailDto();
         mailDto.subject = 'Nouvelle notification Linker : ' + title;
