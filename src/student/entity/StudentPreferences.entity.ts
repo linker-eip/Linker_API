@@ -16,4 +16,7 @@ export class StudentPreferences {
 
   @Column({ default: false })
   mailNotifDocument: boolean;
+
+  @Column({ default: false })
+  mailNotifTicket: boolean;
 }
