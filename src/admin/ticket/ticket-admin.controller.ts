@@ -11,17 +11,16 @@ import {
   Query,
   Req,
   UploadedFile,
-  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { TicketAdminService } from './ticket-admin.service';
-import { ApiOperation, ApiParam } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { GetTicketsDto } from '../../ticket/dto/get-ticket.dto';
-import { VerifiedUserGuard } from '../auth/guard/user.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AnswerTicketDto } from '../../ticket/dto/answer-ticket.dto';
 
 @Controller('api/admin/ticket')
+@ApiTags('Admin/Ticket')
 export class TicketAdminController {
   constructor(private readonly ticketService: TicketAdminService) {
   }
@@ -37,7 +36,6 @@ export class TicketAdminController {
   }
 
   @Post(':ticketId')
-  @UseGuards(VerifiedUserGuard)
   @ApiParam({ name: 'ticketId', required: true })
   @ApiOperation({
     description: 'Answer to a ticket',

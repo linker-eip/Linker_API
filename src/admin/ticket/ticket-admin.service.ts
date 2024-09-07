@@ -42,7 +42,6 @@ export class TicketAdminService {
     const ticket = await this.ticketRepository.findOne({
       where: {
         id: ticketId,
-        authorId: req.user.id,
         state: TicketStateEnum.OPEN,
       },
     });
