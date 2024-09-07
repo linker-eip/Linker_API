@@ -59,4 +59,7 @@ export class StudentUser {
   })
   @JoinColumn({ name: 'profileId' })
   profile: StudentProfile;
+
+  @Column({ type: 'boolean', default: false })
+  isBlocked: boolean;
 }

@@ -207,11 +207,7 @@ export class CompanyController {
     description: 'Ask AI',
     type: String,
   })
-  async askAI(
-    @Req() req,
-    @Body() companyForm : CompanyFormDto
-  ) {
+  async askAI(@Req() req, @Body() companyForm: CompanyFormDto) {
     return this.companyService.askAI(req, companyForm);
   }
-
 }
