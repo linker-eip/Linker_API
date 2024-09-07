@@ -313,6 +313,8 @@ export class CompanyService {
 
   async askAI(req: any, companyForm: CompanyFormDto): Promise<string> {
 
+    console.log('companyForm', companyForm);
+
     const company = await this.companyRepository.findOne({ where: { email: req.user.email } });
 
     if (!company) {

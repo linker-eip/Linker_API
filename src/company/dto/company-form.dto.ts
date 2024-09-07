@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CompanyFormDto {
 
@@ -6,24 +7,28 @@ export class CompanyFormDto {
     description: 'Nom de l\'entreprise',
     example: 'Acme Corp',
   })
+  @IsString()
   companyName: string;
 
   @ApiProperty({
     description: 'Secteur d\'activité de l\'entreprise',
     example: 'E-commerce, SaaS, Marketing Digital, etc.',
   })
+  @IsString()
   industry: string;
 
   @ApiProperty({
     description: 'Description générale du besoin ou du projet',
     example: 'Amélioration de la présence en ligne de l\'entreprise',
   })
+  @IsString()
   projectDescription: string;
 
   @ApiProperty({
     description: 'Budget approximatif pour le projet en euros',
     example: 5000,
   })
+  @IsNumber()
   budget: number;
 
   @ApiProperty({
@@ -31,6 +36,8 @@ export class CompanyFormDto {
     example: 8,
     required: false,
   })
+  @IsNumber()
+  @IsOptional()
   projectDurationWeeks?: number;
 
   @ApiProperty({
@@ -38,6 +45,7 @@ export class CompanyFormDto {
     example: ['Développement Web', 'Design Graphique'],
     required: false,
   })
+  @IsOptional()
   requiredSkills?: string[];
 
   @ApiProperty({
@@ -45,6 +53,8 @@ export class CompanyFormDto {
     example: 'Utilisation de certains outils ou plateformes spécifiques',
     required: false,
   })
+  @IsString()
+  @IsOptional()
   technicalRequirements?: string;
 
   @ApiProperty({
@@ -52,6 +62,8 @@ export class CompanyFormDto {
     example: 'Jeunes adultes entre 18 et 25 ans',
     required: false,
   })
+  @IsString()
+  @IsOptional()
   targetAudience?: string;
 
   @ApiProperty({
@@ -59,6 +71,8 @@ export class CompanyFormDto {
     example: 'Le contenu est partiellement disponible.',
     required: false,
   })
+  @IsString()
+  @IsOptional()
   contentAvailability?: string;
 
   @ApiProperty({
@@ -66,6 +80,8 @@ export class CompanyFormDto {
     example: false,
     required: false,
   })
+  @IsBoolean()
+  @IsOptional()
   requiresMarketingOrSEO?: boolean;
 
   @ApiProperty({
@@ -73,5 +89,7 @@ export class CompanyFormDto {
     example: false,
     required: false,
   })
+  @IsBoolean()
+  @IsOptional()
   hasSocialMediaStrategy?: boolean;
 }
