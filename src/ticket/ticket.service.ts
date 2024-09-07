@@ -2,6 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   Ticket,
+  TicketAnswer,
   TicketStateEnum,
   TicketTypeEnum,
 } from './entity/Ticket.entity';
@@ -13,6 +14,9 @@ import { CompanyUser } from '../company/entity/CompanyUser.entity';
 import { HttpStatusCode } from 'axios';
 import { Mission } from '../mission/entity/mission.entity';
 import { GetTicketsDto } from './dto/get-ticket.dto';
+import { DocumentTransferService } from '../document-transfer/src/services/document-transfer.service';
+import { AnswerTicketDto } from './dto/answer-ticket.dto';
+import { GetAnswerDto, GetTicketReponseDto } from './dto/get-ticket-reponse.dto';
 
 @Injectable()
 export class TicketService {
@@ -25,6 +29,9 @@ export class TicketService {
     private readonly companyRepository: Repository<CompanyUser>,
     @InjectRepository(Mission)
     private readonly missionRepository: Repository<Mission>,
+    @InjectRepository(TicketAnswer)
+    private readonly ticketAnswerRepository: Repository<TicketAnswer>,
+    private readonly documentTransferService: DocumentTransferService,
   ) {
   }
 
@@ -64,7 +71,11 @@ export class TicketService {
     return false;
   }
 
-  async createTicket(req: any, createTicket: CreateTicketDto): Promise<Ticket> {
+  async createTicket(
+    req: any,
+    createTicket: CreateTicketDto,
+    file?: Express.Multer.File,
+  ): Promise<Ticket> {
     const ticket = new Ticket();
     let user;
     if (req.user.userType == 'USER_STUDENT') {
@@ -118,17 +129,84 @@ export class TicketService {
         ? UserType.STUDENT_USER
         : UserType.COMPANY_USER;
     ticket.state = TicketStateEnum.OPEN;
+    if (file) {
+      ticket.attachment = await this.documentTransferService.uploadFile(file);
+    }
     return this.ticketRepository.save(ticket);
   }
 
-  async getTickets(getTicketDto: GetTicketsDto) {
+  getUserTickets(req, body: GetTicketsDto) {
     const options = {};
-    if (getTicketDto.ticketType) {
-      options['ticketType'] = getTicketDto.ticketType;
+    if (req.user.userType == 'USER_STUDENT') {
+      options['authorType'] = UserType.STUDENT_USER;
+    } else {
+      options['authorType'] = UserType.COMPANY_USER;
     }
-    if (getTicketDto.state) {
-      options['state'] = getTicketDto.state;
+
+    options['authorId'] = req.user.id;
+    if (body.ticketType) {
+      options['ticketType'] = body.ticketType;
+    }
+    if (body.state) {
+      options['state'] = body.state;
     }
     return this.ticketRepository.find({ where: options });
+  }
+
+  async answerTicket(
+    req,
+    body: AnswerTicketDto,
+    file: Express.Multer.File,
+    ticketId: number,
+  ) {
+    const ticket = await this.ticketRepository.findOne({
+      where: {
+        id: ticketId,
+        authorId: req.user.id,
+        state: TicketStateEnum.OPEN,
+      },
+    });
+    if (!ticket) {
+      throw new HttpException('Ticket not found', HttpStatusCode.NotFound);
+    }
+    const answer = new TicketAnswer();
+    answer.ticketId = ticketId;
+    answer.content = body.content;
+    if (file) {
+      answer.attachment = await this.documentTransferService.uploadFile(file);
+    }
+    answer.author = 'USER';
+    return this.ticketAnswerRepository.save(answer);
+  }
+
+  async getTicketById(req: any, ticketId: number): Promise<GetTicketReponseDto> {
+    const ticket = await this.ticketRepository.findOne({ where: { id: ticketId, authorId: req.user.id } });
+    if (!ticket) {
+      throw new HttpException('Ticket not found', HttpStatusCode.NotFound);
+    }
+
+    const answers = await this.ticketAnswerRepository.find({ where: { ticketId } });
+
+    const response = new GetTicketReponseDto();
+    response.id = ticket.id;
+    response.authorId = ticket.authorId;
+    response.authorType = ticket.authorType;
+    response.title = ticket.title;
+    response.content = ticket.content;
+    response.attachment = ticket.attachment;
+    response.ticketType = ticket.ticketType;
+    response.entityId = ticket.entityId;
+    response.state = ticket.state;
+    response.date = ticket.date;
+    response.answer = answers.map(answer => {
+      const getAnswer = new GetAnswerDto();
+      getAnswer.id = answer.id;
+      getAnswer.author = answer.author;
+      getAnswer.content = answer.content;
+      getAnswer.attachment = answer.attachment;
+      getAnswer.date = answer.date;
+      return getAnswer;
+    });
+    return response;
   }
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { NotificationType, Notification } from './entity/Notification.entity';
+import { Notification, NotificationType } from './entity/Notification.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { StudentService } from '../student/student.service';
@@ -46,7 +46,8 @@ export class NotificationsService {
         (type == NotificationType.DOCUMENT && studentPref.mailNotifDocument) ||
         (type == NotificationType.GROUP && studentPref.mailNotifGroup) ||
         (type == NotificationType.MESSAGE && studentPref.mailNotifMessage) ||
-        (type == NotificationType.MISSION && studentPref.mailNotifMission)
+        (type == NotificationType.MISSION && studentPref.mailNotifMission) ||
+        (type == NotificationType.TICKET && studentPref.mailNotifTicket)
       ) {
         const mailDto = new SendMailDto();
         mailDto.subject = 'Nouvelle notification Linker : ' + title;

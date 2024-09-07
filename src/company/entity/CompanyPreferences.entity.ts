@@ -13,4 +13,7 @@ export class CompanyPreferences {
 
   @Column({ default: false })
   mailNotifDocument: boolean;
+
+  @Column({ default: false })
+  mailNotifTicket: boolean;
 }

@@ -184,7 +184,8 @@ export class CompanyService {
       companyDocument = new CompanyDocument();
     }
 
-    companyDocument.file = await this.documentTransferService.uploadFileNotImage(file);
+    companyDocument.file =
+      await this.documentTransferService.uploadFileNotImage(file);
     const url = await this.documentTransferService.uploadFileNotImage(file);
 
     companyDocument.file = url;
@@ -270,16 +271,21 @@ export class CompanyService {
     }
   }
 
-  async updatePreferences(req: any, updatePreferencesDto: UpdateCompanyPreferencesDto) {
-    const company = await this.companyRepository.findOne({ where: { email: req.user.email } });
+  async updatePreferences(
+    req: any,
+    updatePreferencesDto: UpdateCompanyPreferencesDto,
+  ) {
+    const company = await this.companyRepository.findOne({
+      where: { email: req.user.email },
+    });
 
-    const existingPreferences = await this.companyPreferencesRepository.findOneBy({ companyId: company.id });
+    const existingPreferences =
+      await this.companyPreferencesRepository.findOneBy({
+        companyId: company.id,
+      });
 
     if (!existingPreferences) {
-      throw new HttpException(
-        'Preferences not found',
-        HttpStatus.CONFLICT,
-      );
+      throw new HttpException('Preferences not found', HttpStatus.CONFLICT);
     }
 
     Object.assign(existingPreferences, updatePreferencesDto);
@@ -290,16 +296,17 @@ export class CompanyService {
   }
 
   async getPreferences(req: any): Promise<UpdateCompanyPreferencesDto> {
-    const company = await this.companyRepository.findOne({ where: { email: req.user.email } });
+    const company = await this.companyRepository.findOne({
+      where: { email: req.user.email },
+    });
 
-    const existingPreferences = await this.companyPreferencesRepository.findOneBy({ companyId: company.id });
-
+    const existingPreferences =
+      await this.companyPreferencesRepository.findOneBy({
+        companyId: company.id,
+      });
 
     if (!existingPreferences) {
-      throw new HttpException(
-        'Preferences not found',
-        HttpStatus.CONFLICT,
-      );
+      throw new HttpException('Preferences not found', HttpStatus.CONFLICT);
     }
 
     let preferences = new UpdateCompanyPreferencesDto();

@@ -21,6 +21,11 @@ export class UpdateStudentPreferencesDto {
   @IsOptional()
   @IsBoolean()
   mailNotifDocument: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  mailNotifTicket: boolean;
 }
 
 export class UpdateCompanyPreferencesDto {
@@ -38,4 +43,9 @@ export class UpdateCompanyPreferencesDto {
   @IsOptional()
   @IsBoolean()
   mailNotifDocument: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  mailNotifTicket: boolean;
 }

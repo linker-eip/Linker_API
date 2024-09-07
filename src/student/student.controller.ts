@@ -30,9 +30,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateSkillDto } from './skills/dto/update-skill.dto';
 import { UpdateJobsDto } from './jobs/dto/update-jobs.dto';
 import { UpdateStudiesDto } from './studies/dto/update-studies.dto';
-import {
-  StudentSearchResponseDto,
-} from './dto/student-search-response.dto';
+import { StudentSearchResponseDto } from './dto/student-search-response.dto';
 import { StudentSearchOptionDto } from './dto/student-search-option.dto';
 import { CompanyProfileResponseDto } from '../company/dto/company-profile-response.dto';
 import { UpdateStudentPreferencesDto } from './dto/update-student-preferences.dto';
@@ -248,7 +246,10 @@ export class StudentController {
 
   @Put('preferences')
   @UseGuards(VerifiedUserGuard)
-  async updatePreferences(@Req() req, @Body() updatePreferencesDto: UpdateStudentPreferencesDto) {
+  async updatePreferences(
+    @Req() req,
+    @Body() updatePreferencesDto: UpdateStudentPreferencesDto,
+  ) {
     return this.studentService.updatePreferences(req, updatePreferencesDto);
   }
 
