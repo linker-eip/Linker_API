@@ -1,10 +1,6 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  Ticket,
-  TicketStateEnum,
-  TicketTypeEnum,
-} from './entity/Ticket.entity';
+import { Ticket, TicketStateEnum, TicketTypeEnum } from './entity/Ticket.entity';
 import { Repository } from 'typeorm';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UserType } from '../chat/entity/Message.entity';
@@ -13,6 +9,7 @@ import { CompanyUser } from '../company/entity/CompanyUser.entity';
 import { HttpStatusCode } from 'axios';
 import { Mission } from '../mission/entity/mission.entity';
 import { GetTicketsDto } from './dto/get-ticket.dto';
+import { DocumentTransferService } from '../document-transfer/src/services/document-transfer.service';
 
 @Injectable()
 export class TicketService {
@@ -25,6 +22,7 @@ export class TicketService {
     private readonly companyRepository: Repository<CompanyUser>,
     @InjectRepository(Mission)
     private readonly missionRepository: Repository<Mission>,
+    private readonly documentTransferService: DocumentTransferService,
   ) {
   }
 
@@ -64,7 +62,7 @@ export class TicketService {
     return false;
   }
 
-  async createTicket(req: any, createTicket: CreateTicketDto): Promise<Ticket> {
+  async createTicket(req: any, createTicket: CreateTicketDto, file?: Express.Multer.File): Promise<Ticket> {
     const ticket = new Ticket();
     let user;
     if (req.user.userType == 'USER_STUDENT') {
@@ -118,6 +116,9 @@ export class TicketService {
         ? UserType.STUDENT_USER
         : UserType.COMPANY_USER;
     ticket.state = TicketStateEnum.OPEN;
+    if (file) {
+      ticket.attachment = await this.documentTransferService.uploadFile(file);
+    }
     return this.ticketRepository.save(ticket);
   }
 
@@ -128,6 +129,24 @@ export class TicketService {
     }
     if (getTicketDto.state) {
       options['state'] = getTicketDto.state;
+    }
+    return this.ticketRepository.find({ where: options });
+  }
+
+  getUserTickets(req, body: GetTicketsDto) {
+    const options = {};
+    if (req.user.userType == 'USER_STUDENT') {
+      options['authorType'] = UserType.STUDENT_USER;
+    } else {
+      options['authorType'] = UserType.COMPANY_USER;
+    }
+
+    options['authorId'] = req.user.id;
+    if (body.ticketType) {
+      options['ticketType'] = body.ticketType;
+    }
+    if (body.state) {
+      options['state'] = body.state;
     }
     return this.ticketRepository.find({ where: options });
   }

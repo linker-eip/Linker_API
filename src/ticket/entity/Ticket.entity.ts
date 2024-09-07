@@ -41,3 +41,4 @@ export class Ticket {
   @Column()
   state: TicketStateEnum;
 }
+

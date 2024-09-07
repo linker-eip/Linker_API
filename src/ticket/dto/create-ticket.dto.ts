@@ -21,4 +21,7 @@ export class CreateTicketDto {
   @ApiProperty({ description: 'Type de ticket' })
   @IsEnum(TicketTypeEnum)
   ticketType: TicketTypeEnum;
+
+  @ApiProperty({ description: 'Fichier' })
+  file: Express.Multer.File;
 }
