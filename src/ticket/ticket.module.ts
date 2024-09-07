@@ -12,7 +12,13 @@ import { DocumentTransferModule } from '../document-transfer/src/document-transf
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Ticket, StudentUser, CompanyUser, Mission, TicketAnswer]),
+    TypeOrmModule.forFeature([
+      Ticket,
+      StudentUser,
+      CompanyUser,
+      Mission,
+      TicketAnswer,
+    ]),
     StudentModule,
     CompanyModule,
     DocumentTransferModule,

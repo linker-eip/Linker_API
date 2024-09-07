@@ -63,16 +63,6 @@ export class TicketController {
     return this.ticketService.createTicket(req, createTicket, file);
   }
 
-  @Get()
-  // @UseGuards(AdminGuard)
-  @ApiOperation({
-    description: 'Get all tickets',
-    summary: 'Get all tickets',
-  })
-  async getTickets(@Query() body: GetTicketsDto) {
-    return this.ticketService.getTickets(body);
-  }
-
   @Get('/me')
   @UseGuards(VerifiedUserGuard)
   @ApiOperation({

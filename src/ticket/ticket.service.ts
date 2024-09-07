@@ -134,17 +134,6 @@ export class TicketService {
     return this.ticketRepository.save(ticket);
   }
 
-  async getTickets(getTicketDto: GetTicketsDto) {
-    const options = {};
-    if (getTicketDto.ticketType) {
-      options['ticketType'] = getTicketDto.ticketType;
-    }
-    if (getTicketDto.state) {
-      options['state'] = getTicketDto.state;
-    }
-    return this.ticketRepository.find({ where: options });
-  }
-
   getUserTickets(req, body: GetTicketsDto) {
     const options = {};
     if (req.user.userType == 'USER_STUDENT') {
