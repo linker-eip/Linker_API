@@ -120,8 +120,9 @@ export class ChatService {
           .find((id) => id !== student.id.toString());
       }),
     );
-
-    const dmChannels: ChannelInfoDto[] = await Promise.all(
+    dmChannelsIds.delete(undefined);
+    let dmChannels: ChannelInfoDto[] = [];
+    dmChannels = await Promise.all(
       Array.from(dmChannelsIds).map(async (id) => {
         const student = await this.studentService.findOneById(parseInt(id));
         return {
