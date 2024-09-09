@@ -899,4 +899,14 @@ export class StudentService {
       }),
     );
   }
+
+  async findStudentPicture(studentId: number) {
+    const studentProfile = await this.studentProfileRepository.findOne({
+      where: { studentId: studentId },
+    });
+    if (!studentProfile) {
+      throw new HttpException('Invalid student profile', HttpStatus.NOT_FOUND);
+    }
+    return studentProfile.picture;
+  }
 }
