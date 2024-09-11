@@ -16,12 +16,12 @@ export class CreateTicketDto {
 
   @ApiProperty({ description: 'Identifiant de l\'entité' })
   @IsNumber()
-  entityId: number;
+  entityId?: number;
 
   @ApiProperty({ description: 'Type de ticket' })
   @IsEnum(TicketTypeEnum)
   ticketType: TicketTypeEnum;
 
   @ApiProperty({ description: 'Fichier' })
-  file: Express.Multer.File;
+  file?: Express.Multer.File;
 }
