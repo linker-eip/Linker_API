@@ -23,7 +23,7 @@ export class AiService {
           {
             role: 'system',
             content: `
-                            Vous êtes un consultant en projets digitaux. Votre rôle est de donner des conseils pratiques et adaptés aux projets des entreprises, en prenant en compte les compétences disponibles chez les étudiants. Vous devez aider à déterminer le nombre d'étudiants nécessaires, vérifier si le budget est approprié, fournir des recommandations sur la gestion du projet et le calendrier, en vous basant sur les compétences disponibles dans la liste suivante : ${allSkills}.
+                            Vous êtes un consultant en projets digitaux. Votre rôle est de donner des conseils pratiques et adaptés aux projets des entreprises, en prenant en compte les compétences disponibles chez les étudiants. Vous devez aider à déterminer le nombre d'étudiants nécessaires, vérifier si le budget est approprié, fournir des recommandations sur la gestion du projet et le calendrier, et d'autres points en vous basant sur les compétences disponibles dans la liste suivante : ${allSkills}.
                             `,
           },
           {
