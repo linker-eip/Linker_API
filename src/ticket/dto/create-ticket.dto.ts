@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNumber, IsString, MaxLength } from 'class-validator';
+import { IsEnum, IsNumber, IsString, IsOptional, MaxLength } from 'class-validator';
 import { TicketTypeEnum } from '../entity/Ticket.entity';
 
 export class CreateTicketDto {
@@ -15,6 +15,7 @@ export class CreateTicketDto {
   content: string;
 
   @ApiProperty({ description: 'Identifiant de l\'entité' })
+  @IsOptional()
   @IsNumber()
   entityId?: number;
 
@@ -23,5 +24,6 @@ export class CreateTicketDto {
   ticketType: TicketTypeEnum;
 
   @ApiProperty({ description: 'Fichier' })
+  @IsOptional()
   file?: Express.Multer.File;
 }
