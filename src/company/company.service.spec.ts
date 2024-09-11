@@ -29,6 +29,8 @@ import {
   DocumentStatus,
 } from './enum/CompanyDocument.enum';
 import { AiService } from '../ai/ai.service';
+import { CompanyFormDto } from './dto/company-form.dto';
+
 
 describe('CompanyService', () => {
   let service: CompanyService;
@@ -317,6 +319,39 @@ describe('CompanyService', () => {
       expect(response).toEqual(expectedResponse);
     });
   });
+
+  describe('askAI', () => {
+    it('should return an AI response', async () => {
+      const req = {
+        user: {
+          email: 'test@gmail.com',
+        },
+      };
+
+      const companyFormDto: CompanyFormDto = {
+        companyName: 'Acme Corp',
+        industry: 'E-commerce, SaaS, Marketing Digital, etc.',
+        projectDescription: 'Amélioration de la présence en ligne de l\'entreprise',
+        budget: 5000,
+        projectDurationWeeks: 8,
+        requiredSkills: ['Développement Web', 'Design Graphique'],
+        technicalRequirements: 'Utilisation de certains outils ou plateformes spécifiques',
+        targetAudience: 'Jeunes adultes entre 18 et 25 ans',
+        contentAvailability: 'Le contenu est partiellement disponible.',
+        requiresMarketingOrSEO: false,
+        hasSocialMediaStrategy: false,
+      };
+
+      const expectedResponse = 'AI response';
+
+      jest.spyOn(service, 'askAI').mockResolvedValueOnce(expectedResponse);
+
+      const response = await controller.askAI(req, companyFormDto);
+
+      expect(service.askAI).toHaveBeenCalledWith(req, companyFormDto);
+      expect(response).toEqual(expectedResponse);
+    })
+  })
 
   it('should be defined', () => {
     expect(service).toBeDefined();
