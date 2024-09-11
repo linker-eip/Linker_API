@@ -5,7 +5,7 @@ import { MissionModule } from '../mission/mission.module';
 import { StudentModule } from '../student/student.module';
 import { StatisticsController } from './statistics.controller';
 import { StatisticsService } from './statistics.service';
-import { StudentPayment } from 'src/payment/entity/student-payment.entity';
+import { StudentPayment } from '../payment/entity/student-payment.entity';
 
 @Module({
   imports: [

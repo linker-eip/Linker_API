@@ -371,6 +371,7 @@ describe('StudentService', () => {
         mailNotifGroup: true,
         mailNotifMission: false,
         mailNotifDocument: true,
+        mailNotifTicket: false,
       };
 
       const expectedResponse = null;
@@ -520,7 +521,7 @@ describe('StudentService', () => {
           description: 'I am John Doe',
           picture: '',
           location: 'Paris',
-          skills: 'JS, TS',
+          skills: null,
           note: 0,
           tjm: 0,
           isActive: true,
@@ -556,7 +557,7 @@ describe('StudentService', () => {
         description: 'I am John Doe',
         picture: '',
         location: 'Paris',
-        skills: 'JS, TS',
+        skills: null,
         note: 0,
         tjm: 0,
         isActive: true,
