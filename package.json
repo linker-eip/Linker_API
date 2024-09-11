@@ -16,6 +16,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage --coverageReporters=\"json-summary\"",
+    "test:covdev": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "typeorm": "yarn run build && npx typeorm -d dist/db/data-source.js",
@@ -36,7 +37,7 @@
     "@nestjs/swagger": "^6.3.0",
     "@nestjs/typeorm": "^9.0.1",
     "@nestjs/websockets": "^10.3.0",
-    "axios": "^1.4.0",
+    "axios": "^1.7.7",
     "bcrypt": "^5.1.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
@@ -48,6 +49,7 @@
     "linkedin-client": "^0.1.1",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.3",
+    "openai": "^4.58.1",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
     "pdfkit": "^0.13.0",
@@ -99,6 +101,7 @@
       "**/*dto*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "maxWorkers": 4
   }
 }

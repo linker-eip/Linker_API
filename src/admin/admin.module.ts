@@ -13,6 +13,7 @@ import { DocumentVerificationController } from './document-verification/document
 import { DocumentVerificationService } from './document-verification/document-verification.service';
 import { DocumentVerificationModule } from './document-verification/document-verification.module';
 import { PaymentAdminModule } from './payment/payment-admin.module';
+import { TicketAdminModule } from './ticket/ticket-admin.module';
 
 @Module({
   imports: [
@@ -23,9 +24,10 @@ import { PaymentAdminModule } from './payment/payment-admin.module';
     DocumentAdminModule,
     ContactAdminModule,
     DocumentVerificationModule,
-    PaymentAdminModule
+    PaymentAdminModule,
+    TicketAdminModule,
   ],
-  providers: [AdminService,],
+  providers: [AdminService],
   exports: [AdminService],
   controllers: [],
 })

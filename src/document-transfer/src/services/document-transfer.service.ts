@@ -18,9 +18,11 @@ export class DocumentTransferService {
       region: this.s3Region,
       credentials: {
         accessKeyId: this.configService.get<string>('AWS_ACCESS_KEY_ID'),
-        secretAccessKey: this.configService.get<string>('AWS_SECRET_ACCESS_KEY'),
+        secretAccessKey: this.configService.get<string>(
+          'AWS_SECRET_ACCESS_KEY',
+        ),
       },
-    })
+    });
   }
 
   async uploadFile(file: Express.Multer.File): Promise<string> {
@@ -42,12 +44,14 @@ export class DocumentTransferService {
           .jpeg({ quality: 90 })
           .toBuffer();
 
-        await this.s3Client.send(new PutObjectCommand({
-          Bucket: this.s3Bucket,
-          Key: key,
-          Body: outputBuffer,
-          ContentType: file.mimetype,
-        }));
+        await this.s3Client.send(
+          new PutObjectCommand({
+            Bucket: this.s3Bucket,
+            Key: key,
+            Body: outputBuffer,
+            ContentType: file.mimetype,
+          }),
+        );
 
         resolve(url);
       } catch (error) {
@@ -61,14 +65,16 @@ export class DocumentTransferService {
       try {
         const key = getRandomString(48);
         const url = `https://${this.s3Bucket}.s3.${this.s3Region}.amazonaws.com/${key}`;
-  
-        await this.s3Client.send(new PutObjectCommand({
-          Bucket: this.s3Bucket,
-          Key: key,
-          Body: file.buffer,
-          ContentType: file.mimetype,
-        }));
-  
+
+        await this.s3Client.send(
+          new PutObjectCommand({
+            Bucket: this.s3Bucket,
+            Key: key,
+            Body: file.buffer,
+            ContentType: file.mimetype,
+          }),
+        );
+
         resolve(url);
       } catch (error) {
         reject(error);

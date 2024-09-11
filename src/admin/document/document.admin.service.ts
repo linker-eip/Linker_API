@@ -7,6 +7,11 @@ import { Document } from '../../documents/entity/document.entity';
 import { UserAdminService } from '../user-admin/user-admin.service';
 import { DocumentUserEnum } from '../../documents/enum/document-user.enum';
 import { DocumentSearchOptionAdminDto } from './dto/document-search-option-admin.dto';
+import { StudentDocument } from '../../student/entity/StudentDocuments.entity';
+import {
+  DocumentStatus,
+  StudentDocumentType,
+} from '../../student/enum/StudentDocument.enum';
 
 @Injectable()
 export class DocumentAdminService {
@@ -15,6 +20,8 @@ export class DocumentAdminService {
     @InjectRepository(Document)
     private readonly DocumentAdminRepository: Repository<Document>,
     private readonly userAdminService: UserAdminService,
+    @InjectRepository(StudentDocument)
+    private studentDocumentRepository: Repository<StudentDocument>,
   ) {}
 
   async findDocumentById(documentId: number): Promise<Document> {
@@ -123,5 +130,19 @@ export class DocumentAdminService {
       '',
     );
     return this.fileService.getFile(path, res);
+  }
+
+  async getStudentRib(studentId: number): Promise<any> {
+    const document = await this.studentDocumentRepository.findOne({
+      where: {
+        studentId: studentId,
+        documentType: StudentDocumentType.RIB,
+        status: DocumentStatus.VERIFIED,
+      },
+    });
+    if (!document) throw new NotFoundException(`DOCUMENT_NOT_FOUND`);
+    return {
+      File: document.file,
+    };
   }
 }

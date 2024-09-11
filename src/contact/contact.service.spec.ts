@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 import { Contact } from './entity/contact.entity';
 import { ContactService } from './contact.service';
 import { ContactController } from './contact.controller';
-import { CreateContactDto} from './dto/create-contact.dto';
+import { CreateContactDto } from './dto/create-contact.dto';
 import { MailService } from '../mail/mail.service';
 
 describe('ContactService', () => {
@@ -45,7 +45,7 @@ describe('ContactService', () => {
 
   describe('post contact', () => {
     it('should post contact', async () => {
-      const contact : Contact = {
+      const contact: Contact = {
         id: 1,
         email: 'test@gmail.com',
         object: 'test',
@@ -54,12 +54,11 @@ describe('ContactService', () => {
         isTreated: false,
       };
 
-      const contactDto : CreateContactDto = {
+      const contactDto: CreateContactDto = {
         email: 'test@gmail.com',
         object: 'test',
         content: 'test',
       };
-
 
       jest.spyOn(service, 'createContact').mockResolvedValue(contact);
 

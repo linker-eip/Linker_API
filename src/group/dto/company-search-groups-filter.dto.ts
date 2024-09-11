@@ -9,6 +9,10 @@ export class CompanySearchGroupsFilterDto {
 
   @ApiPropertyOptional()
   @IsOptional()
+  missionId?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsEmail()
   email?: string;
 

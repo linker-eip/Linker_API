@@ -30,25 +30,28 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdateSkillDto } from './skills/dto/update-skill.dto';
 import { UpdateJobsDto } from './jobs/dto/update-jobs.dto';
 import { UpdateStudiesDto } from './studies/dto/update-studies.dto';
-import {
-  StudentSearchResponseDto,
-  formatToStudentSearchResponseDto,
-} from './dto/student-search-response.dto';
+import { StudentSearchResponseDto } from './dto/student-search-response.dto';
 import { StudentSearchOptionDto } from './dto/student-search-option.dto';
 import { CompanyProfileResponseDto } from '../company/dto/company-profile-response.dto';
-import { UpdatePreferencesDto } from './dto/update-preferences.dto';
+import { UpdateStudentPreferencesDto } from './dto/update-student-preferences.dto';
 import { UploadStudentDocumentDto } from './dto/upload-student-document.dto';
 import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
-import { VerifiedUserGuard } from '../admin/auth/guard/user.guard';
+import {
+  UnverifiedUserGuard,
+  VerifiedUserGuard,
+} from '../admin/auth/guard/user.guard';
+import { StudentSearchNetworkOptionDto } from './dto/student-search-network-option.dto';
+import { StudentSearchNetworkResponseDto } from './dto/student-search-network-response.dto';
 
 @Controller('api/student')
-@UseGuards(VerifiedUserGuard)
 @ApiTags('Student')
 @ApiBearerAuth()
 export class StudentController {
-  constructor(private readonly studentService: StudentService) { }
+  constructor(private readonly studentService: StudentService) {
+  }
 
   @Get('profile')
+  @UseGuards(UnverifiedUserGuard)
   @ApiOperation({
     description: 'Get student profile',
     summary: 'Get student profile',
@@ -63,6 +66,7 @@ export class StudentController {
   }
 
   @Put('profile')
+  @UseGuards(VerifiedUserGuard)
   @ApiOperation({
     description: 'Update student profile',
     summary: 'Update student profile',
@@ -100,6 +104,7 @@ export class StudentController {
   }
 
   @Put('skill/:id')
+  @UseGuards(VerifiedUserGuard)
   @ApiOperation({
     description: 'Update student skill',
     summary: 'Update student skill',
@@ -118,6 +123,7 @@ export class StudentController {
   }
 
   @Put('job/:id')
+  @UseGuards(VerifiedUserGuard)
   @ApiOperation({
     description: 'Update student job',
     summary: 'Update student job',
@@ -136,6 +142,7 @@ export class StudentController {
   }
 
   @Put('studies/:id')
+  @UseGuards(VerifiedUserGuard)
   @ApiOperation({
     description: 'Update student studies',
     summary: 'Update student studies',
@@ -154,6 +161,7 @@ export class StudentController {
   }
 
   @Delete('skill/:id')
+  @UseGuards(VerifiedUserGuard)
   @ApiOperation({
     description: 'Delete student skill',
     summary: 'Delete student skill',
@@ -168,6 +176,7 @@ export class StudentController {
   }
 
   @Delete('job/:id')
+  @UseGuards(VerifiedUserGuard)
   @ApiOperation({
     description: 'Delete student job',
     summary: 'Delete student job',
@@ -182,6 +191,7 @@ export class StudentController {
   }
 
   @Delete('studies/:id')
+  @UseGuards(VerifiedUserGuard)
   @ApiOperation({
     description: 'Delete student studies',
     summary: 'Delete student studies',
@@ -196,6 +206,7 @@ export class StudentController {
   }
 
   @Get('search')
+  @UseGuards(VerifiedUserGuard)
   @ApiOperation({
     description: 'Get all students',
     summary: 'Get all students',
@@ -213,6 +224,7 @@ export class StudentController {
   }
 
   @Get('companyInfo/:companyId')
+  @UseGuards(VerifiedUserGuard)
   @ApiOperation({
     description: 'Get company info',
     summary: 'Get company info',
@@ -227,16 +239,35 @@ export class StudentController {
   }
 
   @Post('createPref')
+  @UseGuards(VerifiedUserGuard)
   async createPref() {
-    return this.studentService.createPref()
+    return this.studentService.createPref();
   }
 
   @Put('preferences')
-  async updatePreferences(@Req() req, @Body() updatePreferencesDto: UpdatePreferencesDto) {
-    return this.studentService.updatePreferences(req, updatePreferencesDto)
+  @UseGuards(VerifiedUserGuard)
+  async updatePreferences(
+    @Req() req,
+    @Body() updatePreferencesDto: UpdateStudentPreferencesDto,
+  ) {
+    return this.studentService.updatePreferences(req, updatePreferencesDto);
+  }
+
+  @Get('preferences')
+  @UseGuards(VerifiedUserGuard)
+  @ApiOperation({
+    description: 'Get student preferences',
+    summary: 'Get student preferences',
+  })
+  @ApiOkResponse({
+    type: UpdateStudentPreferencesDto,
+  })
+  async getPreferences(@Req() req): Promise<UpdateStudentPreferencesDto> {
+    return this.studentService.getPreferences(req);
   }
 
   @Post('documentVerification')
+  @UseGuards(VerifiedUserGuard)
   @ApiOperation({
     description: 'Upload student document',
     summary: 'Upload student document',
@@ -276,7 +307,45 @@ export class StudentController {
     );
   }
 
+  @Post('replaceDocument')
+  @UseGuards(VerifiedUserGuard)
+  @ApiOperation({
+    description: 'Replace verified student document',
+    summary: 'Replace verified student document',
+  })
+  @ApiOkResponse({
+    status: 201,
+    description: 'Document uploaded successfully',
+  })
+  @UseInterceptors(FileInterceptor('file'))
+  async replaceStudentDocument(
+    @UploadedFile(
+      new ParseFilePipe({
+        fileIsRequired: true,
+        errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+        validators: [
+          new MaxFileSizeValidator({
+            maxSize: 3_500_000,
+          }),
+          new FileTypeValidator({
+            fileType: 'application/pdf',
+          }),
+        ],
+      }),
+    )
+    file,
+    @Req() req,
+    @Body() uploadStudentDocument: UploadStudentDocumentDto,
+  ) {
+    return this.studentService.replaceStudentDocument(
+      file,
+      uploadStudentDocument,
+      req.user,
+    );
+  }
+
   @Get('documentStatus')
+  @UseGuards(VerifiedUserGuard)
   @ApiOperation({
     description: 'Get all documents statuses',
     summary: 'Get all documents statuses',
@@ -286,10 +355,39 @@ export class StudentController {
     type: DocumentStatusResponseDto,
     isArray: true,
   })
-  async getDocumentStatus(
-    @Req() req,
-  ): Promise<DocumentStatusResponseDto[]> {
+  async getDocumentStatus(@Req() req): Promise<DocumentStatusResponseDto[]> {
     return await this.studentService.getDocumentStatus(req.user);
   }
-}
 
+  @Get('searchNetwork')
+  @UseGuards(VerifiedUserGuard)
+  @ApiOperation({
+    description: 'Search students',
+    summary: 'Search students',
+  })
+  @ApiOkResponse({
+    description: 'Search students',
+    type: StudentSearchNetworkResponseDto,
+    isArray: true,
+  })
+  async searchStudents(
+    @Query() searchOption: StudentSearchNetworkOptionDto,
+    @Req() req,
+  ): Promise<StudentSearchNetworkResponseDto[]> {
+    return await this.studentService.searchStudents(searchOption, req);
+  }
+
+  @Get('searchNetwork/:id')
+  @UseGuards(VerifiedUserGuard)
+  @ApiOperation({
+    description: 'Get student by id',
+    summary: 'Get student by id',
+  })
+  @ApiOkResponse({
+    description: 'Get student by id',
+    type: StudentSearchNetworkResponseDto,
+  })
+  async getStudentById(@Param('id') id: number, @Req() req) {
+    return await this.studentService.getStudentById(id, req);
+  }
+}

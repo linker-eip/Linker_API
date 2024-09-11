@@ -48,4 +48,7 @@ export class CompanyUser {
 
   @Column({ type: 'varchar', nullable: true })
   resetPasswordToken: string;
+
+  @Column({ type: 'boolean', default: false })
+  isBlocked: boolean;
 }

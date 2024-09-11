@@ -1,20 +1,26 @@
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
-import { DocumentStatus, StudentDocumentType } from "../enum/StudentDocument.enum";
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  DocumentStatus,
+  StudentDocumentType,
+} from '../enum/StudentDocument.enum';
 
 @Entity()
 export class StudentDocument {
-    @PrimaryColumn()
-    studentId: number;
+  @PrimaryColumn()
+  studentId: number;
 
-    @PrimaryColumn()
-    documentType: StudentDocumentType
+  @PrimaryColumn()
+  documentType: StudentDocumentType;
 
-    @Column()
-    file: string;
+  @PrimaryColumn({ default: false })
+  bis: boolean;
 
-    @Column()
-    status: DocumentStatus
+  @Column()
+  file: string;
 
-    @Column()
-    comment: string
+  @Column()
+  status: DocumentStatus;
+
+  @Column()
+  comment: string;
 }

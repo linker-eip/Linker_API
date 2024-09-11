@@ -29,7 +29,13 @@ import { StudentPreferences } from './entity/StudentPreferences.entity';
 import { StudentDocument } from './entity/StudentDocuments.entity';
 import { CompanyDocument } from '../company/entity/CompanyDocument.entity';
 import { CompanyPreferences } from '../company/entity/CompanyPreferences.entity';
-import { DocumentStatus, StudentDocumentType } from './enum/StudentDocument.enum';
+import {
+  DocumentStatus,
+  StudentDocumentType,
+} from './enum/StudentDocument.enum';
+import { StudentSearchNetworkOptionDto } from './dto/student-search-network-option.dto';
+import { StudentSearchNetworkResponseDto } from './dto/student-search-network-response.dto';
+import { AiService } from '../ai/ai.service';
 
 describe('StudentService', () => {
   let service: StudentService;
@@ -51,6 +57,7 @@ describe('StudentService', () => {
         SkillsService,
         JobsService,
         StudiesService,
+        AiService,
         DocumentTransferService,
         CompanyService,
         ConfigService,
@@ -161,6 +168,7 @@ describe('StudentService', () => {
         email: 'test@example.com',
         website: 'http://example.com',
         description: 'New Description',
+        tjm: 0,
       };
 
       const expectedProfile = {
@@ -231,7 +239,6 @@ describe('StudentService', () => {
       jest.spyOn(service, 'updateJob').mockResolvedValueOnce(expectedResponse);
 
       const response = await controller.updateJob(1, dto, req);
-
     });
   });
 
@@ -252,7 +259,6 @@ describe('StudentService', () => {
         .mockResolvedValueOnce(expectedResponse);
 
       const response = await controller.updateStudies(1, dto, req);
-
     });
   });
 
@@ -271,7 +277,6 @@ describe('StudentService', () => {
         .mockResolvedValueOnce(expectedResponse);
 
       const response = await controller.deleteSkill(req, 1);
-
     });
   });
 
@@ -288,7 +293,6 @@ describe('StudentService', () => {
       jest.spyOn(service, 'deleteJob').mockResolvedValueOnce(expectedResponse);
 
       const response = await controller.deleteJob(req, 1);
-
     });
   });
 
@@ -307,7 +311,6 @@ describe('StudentService', () => {
         .mockResolvedValueOnce(expectedResponse);
 
       const response = await controller.deleteStudies(req, 1);
-
     });
   });
 
@@ -328,7 +331,6 @@ describe('StudentService', () => {
         .mockResolvedValueOnce(expectedResponse);
 
       const response = await controller.findAllStudents(dto, req);
-
     });
   });
 
@@ -371,7 +373,8 @@ describe('StudentService', () => {
         mailNotifGroup: true,
         mailNotifMission: false,
         mailNotifDocument: true,
-      }
+        mailNotifTicket: false,
+      };
 
       const expectedResponse = null;
 
@@ -410,7 +413,7 @@ describe('StudentService', () => {
       const dto = {
         file: file,
         documentType: StudentDocumentType.CNI,
-      }
+      };
 
       const expectedResponse = null;
 
@@ -420,7 +423,11 @@ describe('StudentService', () => {
 
       const response = await controller.uploadStudentDocument(file, req, dto);
 
-      expect(service.uploadStudentDocument).toHaveBeenCalledWith(file, dto, req.user);
+      expect(service.uploadStudentDocument).toHaveBeenCalledWith(
+        file,
+        dto,
+        req.user,
+      );
 
       expect(response).toEqual(expectedResponse);
     });
@@ -439,8 +446,9 @@ describe('StudentService', () => {
           documentType: StudentDocumentType.CNI,
           status: DocumentStatus.PENDING,
           comment: null,
-        }
-      ]
+          bis: false,
+        },
+      ];
 
       jest
         .spyOn(service, 'getDocumentStatus')
@@ -454,8 +462,123 @@ describe('StudentService', () => {
     });
   });
 
+  describe('replaceDocument', () => {
+    it('should replace a student document', async () => {
+      const req = {
+        user: {
+          email: 'test@exemple.com',
+        },
+      };
+      const file: Express.Multer.File = {
+        fieldname: 'file',
+        originalname: 'test-file.txt',
+        encoding: '7bit',
+        mimetype: 'text/plain',
+        destination: './uploads',
+        filename: 'test-file.txt',
+        path: './uploads/test-file.txt',
+        size: 1234,
+        stream: null,
+        buffer: Buffer.from(''),
+      };
+
+      const dto = {
+        file: file,
+        documentType: StudentDocumentType.CNI,
+      };
+
+      const expectedResponse = null;
+
+      jest
+        .spyOn(service, 'replaceStudentDocument')
+        .mockResolvedValueOnce(expectedResponse);
+
+      const response = await controller.replaceStudentDocument(file, req, dto);
+
+      expect(service.replaceStudentDocument).toHaveBeenCalledWith(
+        file,
+        dto,
+        req.user,
+      );
+
+      expect(response).toEqual(expectedResponse);
+    });
+  });
+
+  describe('searchStudent', () => {
+    it('should search for students', async () => {
+      const req = {
+        user: {
+          email: 'test@gmail.com',
+        },
+      };
+
+      const dto = new StudentSearchNetworkOptionDto();
+
+      const expectedResponse = [
+        {
+          id: 1,
+          firstName: 'John',
+          lastName: 'Doe',
+          description: 'I am John Doe',
+          picture: '',
+          location: 'Paris',
+          skills: null,
+          note: 0,
+          tjm: 0,
+          isActive: true,
+          hasGroup: false,
+        },
+      ];
+
+      jest
+        .spyOn(service, 'searchStudents')
+        .mockResolvedValueOnce(expectedResponse);
+
+      const response = await controller.searchStudents(dto, req);
+
+      expect(service.searchStudents).toHaveBeenCalledWith(dto, req);
+
+      expect(response).toEqual(expectedResponse);
+    });
+  });
+
+  //get student by id
+  describe('getStudentById', () => {
+    it('should return a studentProfile', async () => {
+      const req = {
+        user: {
+          email: 'test@gmail.com',
+        },
+      };
+
+      const expectedResponse = {
+        id: 1,
+        firstName: 'John',
+        lastName: 'Doe',
+        description: 'I am John Doe',
+        picture: '',
+        location: 'Paris',
+        skills: null,
+        note: 0,
+        tjm: 0,
+        isActive: true,
+        hasGroup: false,
+      };
+
+      jest
+        .spyOn(service, 'getStudentById')
+        .mockResolvedValueOnce(expectedResponse);
+
+      const response = await controller.getStudentById(1, req);
+
+      expect(service.getStudentById).toHaveBeenCalledWith(1, req);
+
+      expect(response).toEqual(expectedResponse);
+    });
+  });
+
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
-
 });

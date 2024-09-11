@@ -6,9 +6,12 @@ import { DocumentVerificationService } from './document-verification.service';
 import { DocumentVerificationController } from './document-verification.controller';
 import { NotificationsModule } from '../../notifications/notifications.module';
 @Module({
-    imports: [TypeOrmModule.forFeature([StudentDocument, CompanyDocument]), NotificationsModule],
-    exports: [DocumentVerificationService],
-    providers: [DocumentVerificationService],
-    controllers: [DocumentVerificationController]
+  imports: [
+    TypeOrmModule.forFeature([StudentDocument, CompanyDocument]),
+    NotificationsModule,
+  ],
+  exports: [DocumentVerificationService],
+  providers: [DocumentVerificationService],
+  controllers: [DocumentVerificationController],
 })
 export class DocumentVerificationModule {}

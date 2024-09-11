@@ -7,6 +7,6 @@ import { Studies } from './entity/studies.entity';
   imports: [TypeOrmModule.forFeature([Studies])],
   providers: [StudiesService],
   controllers: [],
-  exports: [StudiesService]
+  exports: [StudiesService],
 })
 export class StudiesModule {}

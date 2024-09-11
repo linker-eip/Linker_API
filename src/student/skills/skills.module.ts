@@ -13,14 +13,34 @@ import { Jobs } from '../jobs/entity/jobs.entity';
 import { Studies } from '../studies/entity/studies.entity';
 import { JobsService } from '../jobs/jobs.service';
 import { StudiesService } from '../studies/studies.service';
-import { FileService } from 'src/filesystem/file.service';
-import { DocumentTransferService } from 'src/document-transfer/src/services/document-transfer.service';
+import { FileService } from '../../filesystem/file.service';
+import { DocumentTransferService } from '../../document-transfer/src/services/document-transfer.service';
 import { ConfigService } from '@nestjs/config';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Skills, StudentUser, StudentProfile, StudentPreferences, StudentDocument, Jobs, Studies, Skills]), CompanyModule],
+  imports: [
+    TypeOrmModule.forFeature([
+      Skills,
+      StudentUser,
+      StudentProfile,
+      StudentPreferences,
+      StudentDocument,
+      Jobs,
+      Studies,
+      Skills,
+    ]),
+    CompanyModule,
+  ],
   controllers: [SkillsController],
-  providers: [SkillsService, StudentService, JobsService, StudiesService, FileService, DocumentTransferService, ConfigService],
+  providers: [
+    SkillsService,
+    StudentService,
+    JobsService,
+    StudiesService,
+    FileService,
+    DocumentTransferService,
+    ConfigService,
+  ],
   exports: [SkillsService],
 })
 export class SkillsModule {}

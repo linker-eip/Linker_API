@@ -9,8 +9,7 @@ export class ContactController {
   constructor(private readonly contactService: ContactService) {}
 
   @Post()
-    async createContact(@Body() body: CreateContactDto) {
-        return this.contactService.createContact(body);
-    }
-
+  async createContact(@Body() body: CreateContactDto) {
+    return this.contactService.createContact(body);
+  }
 }

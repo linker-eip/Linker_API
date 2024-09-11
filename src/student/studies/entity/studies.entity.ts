@@ -1,4 +1,11 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { StudentProfile } from '../../entity/StudentProfile.entity';
 
 @Entity()
@@ -9,8 +16,8 @@ export class Studies {
   @Column()
   name: string;
 
-  @Column({nullable: true})
-  position : string;
+  @Column({ nullable: true })
+  position: string;
 
   @Column()
   logo: string;

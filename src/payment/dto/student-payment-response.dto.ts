@@ -1,20 +1,17 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { PaymentStatus } from "../enum/payment.status.enum";
-import { StudentPaymentStatus } from "../enum/student-payment.status.enum";
-
-
-
+import { ApiProperty } from '@nestjs/swagger';
+import { PaymentStatus } from '../enum/payment.status.enum';
+import { StudentPaymentStatus } from '../enum/student-payment.status.enum';
 
 export class StudentPaymentResponseDto {
-    @ApiProperty()
-    id: number;
-  
-    @ApiProperty()
-    missionName: string;
+  @ApiProperty()
+  id: number;
 
-    @ApiProperty()
-    status: StudentPaymentStatus;
+  @ApiProperty()
+  missionName: string;
 
-    @ApiProperty()
-    amount: number;
+  @ApiProperty()
+  status: StudentPaymentStatus;
+
+  @ApiProperty()
+  amount: number;
 }

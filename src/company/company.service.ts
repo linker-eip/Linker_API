@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CompanyProfile } from './entity/CompanyProfile.entity';
 import { CompanyUser } from './entity/CompanyUser.entity';
@@ -10,10 +10,12 @@ import { DocumentStatus } from './enum/CompanyDocument.enum';
 import { DocumentTransferService } from '../document-transfer/src/services/document-transfer.service';
 import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
 import { CompanyPreferences } from './entity/CompanyPreferences.entity';
+import { UpdateCompanyPreferencesDto } from '../student/dto/update-student-preferences.dto';
+import { AiService } from '../ai/ai.service';
+import { CompanyFormDto } from './dto/company-form.dto';
 
 @Injectable()
 export class CompanyService {
-
   constructor(
     @InjectRepository(CompanyUser)
     private companyRepository: Repository<CompanyUser>,
@@ -24,8 +26,9 @@ export class CompanyService {
     @InjectRepository(CompanyPreferences)
     private companyPreferencesRepository: Repository<CompanyPreferences>,
     private readonly documentTransferService: DocumentTransferService,
-
-  ) { }
+    private aiService: AiService,
+  ) {
+  }
 
   async findAll(): Promise<CompanyUser[]> {
     return this.companyRepository.find();
@@ -73,7 +76,7 @@ export class CompanyService {
   }
 
   async findCompanyById(companyId: number): Promise<CompanyUser> {
-    return this.companyRepository.findOne({ where: { id: companyId } })
+    return this.companyRepository.findOne({ where: { id: companyId } });
   }
 
   async findCompanyProfile(email: string): Promise<CompanyProfile> {
@@ -150,60 +153,180 @@ export class CompanyService {
     return this.companyRepository.remove(company);
   }
 
-  async uploadCompanyDocument(file: any, uploadCompanyDocument: UploadCompanyDocumentDto, user: any) {
+  async uploadCompanyDocument(
+    file: any,
+    uploadCompanyDocument: UploadCompanyDocumentDto,
+    user: any,
+  ) {
     let company;
-    company = await this.companyRepository.findOne({ where: { email: user.email } })
+    company = await this.companyRepository.findOne({
+      where: { email: user.email },
+    });
     if (!company) {
-      throw new HttpException("Invalid company", HttpStatus.UNAUTHORIZED)
+      throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
     }
 
-    let companyDocument = await this.companyDocumentRepository.findOne({ where: { companyId: company.id, documentType: uploadCompanyDocument.documentType } })
+    let companyDocument = await this.companyDocumentRepository.findOne({
+      where: {
+        companyId: company.id,
+        documentType: uploadCompanyDocument.documentType,
+      },
+    });
 
     if (companyDocument != null) {
       if (companyDocument.status == DocumentStatus.VERIFIED) {
-        throw new HttpException("Ce fichier a déjà été validé", HttpStatus.CONFLICT)
+        throw new HttpException(
+          'Ce fichier a déjà été validé',
+          HttpStatus.CONFLICT,
+        );
       }
     } else {
-      companyDocument = new CompanyDocument()
+      companyDocument = new CompanyDocument();
     }
 
+    companyDocument.file =
+      await this.documentTransferService.uploadFileNotImage(file);
     const url = await this.documentTransferService.uploadFileNotImage(file);
 
-    companyDocument.file = url
+    companyDocument.file = url;
     companyDocument.companyId = company.id;
-    companyDocument.comment = "";
+    companyDocument.comment = '';
     companyDocument.documentType = uploadCompanyDocument.documentType;
     companyDocument.status = DocumentStatus.PENDING;
 
     this.companyDocumentRepository.save(companyDocument);
   }
 
-  async getDocumentStatus(user: any): Promise<DocumentStatusResponseDto[]> {
-    const company = await this.companyRepository.findOne({ where: { email: user.email } });
+  async replaceCompanyDocument(
+    file: any,
+    uploadCompanyDocument: UploadCompanyDocumentDto,
+    user: any,
+  ) {
+    let company;
+    company = await this.companyRepository.findOne({
+      where: { email: user.email },
+    });
     if (!company) {
-      throw new HttpException("Invalid company", HttpStatus.UNAUTHORIZED)
+      throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
     }
 
-    const documentStatuses = await this.companyDocumentRepository.findBy({ companyId: company.id })
+    let companyDocument = await this.companyDocumentRepository.findOne({
+      where: {
+        companyId: company.id,
+        documentType: uploadCompanyDocument.documentType,
+      },
+    });
+    if (companyDocument == null) {
+      return this.uploadCompanyDocument(file, uploadCompanyDocument, user);
+    }
 
-    const documentStatusesResponse = documentStatuses.map(doc => {
-      const it = new DocumentStatusResponseDto()
-      it.documentType = doc.documentType
-      it.status = doc.status
-      it.comment = doc.comment
-      return it
-    })
+    if (companyDocument.status != DocumentStatus.VERIFIED) {
+      return this.uploadCompanyDocument(file, uploadCompanyDocument, user);
+    }
+    companyDocument = new CompanyDocument();
 
-    return documentStatusesResponse
+    const url = await this.documentTransferService.uploadFileNotImage(file);
+
+    companyDocument.file = url;
+    companyDocument.companyId = company.id;
+    companyDocument.comment = '';
+    companyDocument.documentType = uploadCompanyDocument.documentType;
+    companyDocument.status = DocumentStatus.PENDING;
+    companyDocument.bis = true;
+
+    this.companyDocumentRepository.save(companyDocument);
+  }
+
+  async getDocumentStatus(user: any): Promise<DocumentStatusResponseDto[]> {
+    const company = await this.companyRepository.findOne({
+      where: { email: user.email },
+    });
+    if (!company) {
+      throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
+    }
+
+    const documentStatuses = await this.companyDocumentRepository.findBy({
+      companyId: company.id,
+    });
+
+    const documentStatusesResponse = documentStatuses.map((doc) => {
+      const it = new DocumentStatusResponseDto();
+      it.documentType = doc.documentType;
+      it.status = doc.status;
+      it.comment = doc.comment;
+      it.bis = doc.bis;
+      return it;
+    });
+
+    return documentStatusesResponse;
   }
 
   async createPref() {
     const companies = await this.companyRepository.find();
 
     for (const company of companies) {
-      const prefs = new CompanyPreferences()
+      const prefs = new CompanyPreferences();
       prefs.companyId = company.id;
-      this.companyPreferencesRepository.save(prefs)
+      this.companyPreferencesRepository.save(prefs);
     }
+  }
+
+  async updatePreferences(
+    req: any,
+    updatePreferencesDto: UpdateCompanyPreferencesDto,
+  ) {
+    const company = await this.companyRepository.findOne({
+      where: { email: req.user.email },
+    });
+
+    const existingPreferences =
+      await this.companyPreferencesRepository.findOneBy({
+        companyId: company.id,
+      });
+
+    if (!existingPreferences) {
+      throw new HttpException('Preferences not found', HttpStatus.CONFLICT);
+    }
+
+    Object.assign(existingPreferences, updatePreferencesDto);
+
+    await this.companyPreferencesRepository.save(existingPreferences);
+
+    return existingPreferences;
+  }
+
+  async getPreferences(req: any): Promise<UpdateCompanyPreferencesDto> {
+    const company = await this.companyRepository.findOne({
+      where: { email: req.user.email },
+    });
+
+    const existingPreferences =
+      await this.companyPreferencesRepository.findOneBy({
+        companyId: company.id,
+      });
+
+    if (!existingPreferences) {
+      throw new HttpException('Preferences not found', HttpStatus.CONFLICT);
+    }
+
+    let preferences = new UpdateCompanyPreferencesDto();
+
+    preferences.mailNotifDocument = existingPreferences.mailNotifDocument;
+    preferences.mailNotifMessage = existingPreferences.mailNotifMessage;
+    preferences.mailNotifMission = existingPreferences.mailNotifMission;
+
+    return preferences;
+  }
+
+  async askAI(req: any, companyForm: CompanyFormDto): Promise<string> {
+    const company = await this.companyRepository.findOne({
+      where: { email: req.user.email },
+    });
+
+    if (!company) {
+      throw new HttpException('Company not found', HttpStatus.CONFLICT);
+    }
+
+    return this.aiService.askAI(companyForm);
   }
 }

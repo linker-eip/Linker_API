@@ -1,11 +1,18 @@
-import { HttpCode, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpCode,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, In, Repository, SelectQueryBuilder } from 'typeorm';
 import { StudentUser } from './entity/StudentUser.entity';
 import { StudentProfile } from './entity/StudentProfile.entity';
-import { CreateStudentProfileDto, UpdateSkillsDto } from './dto/create-student-profile.dto';
+import {
+  CreateStudentProfileDto,
+  UpdateSkillsDto,
+} from './dto/create-student-profile.dto';
 import { SkillsService } from './skills/skills.service';
-import { StudentProfileResponseDto } from './dto/student-profile-response.dto';
 import { JobsService } from './jobs/jobs.service';
 import { StudiesService } from './studies/studies.service';
 import { FileService } from '../filesystem/file.service';
@@ -21,17 +28,22 @@ import {
 import { CompanyService } from '../company/company.service';
 import { SkillList } from './skills/consts/skills-list';
 import { StudentPreferences } from './entity/StudentPreferences.entity';
-import { UpdatePreferencesDto } from './dto/update-preferences.dto';
+import { UpdateStudentPreferencesDto } from './dto/update-student-preferences.dto';
 import { UploadStudentDocumentDto } from './dto/upload-student-document.dto';
 import { StudentDocument } from './entity/StudentDocuments.entity';
 import { DocumentStatus } from './enum/StudentDocument.enum';
 import { DocumentStatusResponseDto } from './dto/document-status-response.dto';
 import { Jobs } from './jobs/entity/jobs.entity';
 import { Studies } from './studies/entity/studies.entity';
+import { StudentSearchNetworkOptionDto } from './dto/student-search-network-option.dto';
+import {
+  StudentSearchNetworkResponseDto,
+  formatToStudentSearchNetworkResponseDto,
+} from './dto/student-search-network-response.dto';
+import { getNearbyLocations } from '../utils/getNearbyLocation';
 
 @Injectable()
 export class StudentService {
-
   constructor(
     @InjectRepository(StudentUser)
     private studentRepository: Repository<StudentUser>,
@@ -51,7 +63,8 @@ export class StudentService {
     private readonly fileService: FileService,
     private readonly documentTransferService: DocumentTransferService,
     private readonly companyService: CompanyService,
-  ) { }
+  ) {
+  }
 
   async findAll(): Promise<StudentUser[]> {
     return this.studentRepository.find();
@@ -105,13 +118,13 @@ export class StudentService {
   }
 
   mapSkillToDto(json: any): UpdateSkillsDto {
-    let dto: UpdateSkillsDto = new UpdateSkillsDto();
+    const dto: UpdateSkillsDto = new UpdateSkillsDto();
     json = JSON.parse(json);
     dto.Data = json.skills['Data'];
     dto['Design & Produit'] = json.skills['Design & Produit'];
     dto.Development = json.skills['Development'];
     dto['Marketing & Sales'] = json.skills['Marketing & Sales'];
-    dto['No-code'] = json.skills['No-Code'];
+    dto['No-code'] = json.skills['No-code'];
     return dto;
   }
 
@@ -123,6 +136,7 @@ export class StudentService {
     const jobs = await this.jobsservice.findJobs(profile.id);
     const studies = await this.studiesService.findStudies(profile.id);
     return {
+      id: profile.studentId,
       lastName: profile.lastName,
       firstName: profile.firstName,
       description: profile.description,
@@ -135,7 +149,7 @@ export class StudentService {
       jobs: jobs,
       website: profile.website,
       note: profile.note,
-      noteNumber: profile.nbNotes
+      noteNumber: profile.nbNotes,
     };
   }
 
@@ -199,19 +213,22 @@ export class StudentService {
       }
     }
 
-    if (CreateStudentProfile.skills !== undefined && CreateStudentProfile.skills !== null) {
-      var skillResult = {
-        "skills": {
-          "Development": [],
-          "No-Code": [],
-          "Design & Produit": [],
-          "Data": [],
-          "Marketing & Sales": [],
-        }
-      }
+    if (
+      CreateStudentProfile.skills !== undefined &&
+      CreateStudentProfile.skills !== null
+    ) {
+      const skillResult = {
+        skills: {
+          Development: [],
+          'No-code': [],
+          'Design & Produit': [],
+          Data: [],
+          'Marketing & Sales': [],
+        },
+      };
       if (CreateStudentProfile.skills.Data) {
         for (let i = 0; i < CreateStudentProfile.skills.Data.length; i++) {
-          var skill = CreateStudentProfile.skills.Data[i]
+          var skill = CreateStudentProfile.skills.Data[i];
           if (!SkillList.skills.Data.includes(skill)) {
             throw new HttpException(
               'Invalid skill : ' + skill,
@@ -222,9 +239,12 @@ export class StudentService {
         }
       }
       if (CreateStudentProfile.skills.Development) {
-
-        for (let i = 0; i < CreateStudentProfile.skills.Development.length; i++) {
-          var skill = CreateStudentProfile.skills.Development[i]
+        for (
+          let i = 0;
+          i < CreateStudentProfile.skills.Development.length;
+          i++
+        ) {
+          var skill = CreateStudentProfile.skills.Development[i];
           if (!SkillList.skills.Development.includes(skill)) {
             throw new HttpException(
               'Invalid skill : ' + skill,
@@ -235,22 +255,28 @@ export class StudentService {
         }
       }
       if (CreateStudentProfile.skills['No-code']) {
-
-        for (let i = 0; i < CreateStudentProfile.skills['No-code'].length; i++) {
-          var skill = CreateStudentProfile.skills['No-code'][i]
+        for (
+          let i = 0;
+          i < CreateStudentProfile.skills['No-code'].length;
+          i++
+        ) {
+          var skill = CreateStudentProfile.skills['No-code'][i];
           if (!SkillList.skills['No-code'].includes(skill)) {
             throw new HttpException(
               'Invalid skill : ' + skill,
               HttpStatus.BAD_REQUEST,
             );
           }
-          skillResult.skills['No-Code'].push(skill);
+          skillResult.skills['No-code'].push(skill);
         }
       }
       if (CreateStudentProfile.skills['Design & Produit']) {
-
-        for (let i = 0; i < CreateStudentProfile.skills['Design & Produit'].length; i++) {
-          var skill = CreateStudentProfile.skills['Design & Produit'][i]
+        for (
+          let i = 0;
+          i < CreateStudentProfile.skills['Design & Produit'].length;
+          i++
+        ) {
+          var skill = CreateStudentProfile.skills['Design & Produit'][i];
           if (!SkillList.skills['Design & Produit'].includes(skill)) {
             throw new HttpException(
               'Invalid skill : ' + skill,
@@ -261,9 +287,12 @@ export class StudentService {
         }
       }
       if (CreateStudentProfile.skills['Marketing & Sales']) {
-
-        for (let i = 0; i < CreateStudentProfile.skills['Marketing & Sales'].length; i++) {
-          var skill = CreateStudentProfile.skills['Marketing & Sales'][i]
+        for (
+          let i = 0;
+          i < CreateStudentProfile.skills['Marketing & Sales'].length;
+          i++
+        ) {
+          var skill = CreateStudentProfile.skills['Marketing & Sales'][i];
           if (!SkillList.skills['Marketing & Sales'].includes(skill)) {
             throw new HttpException(
               'Invalid skill : ' + skill,
@@ -273,10 +302,8 @@ export class StudentService {
           skillResult.skills['Marketing & Sales'].push(skill);
         }
       }
-      studentProfile.skills = JSON.stringify(skillResult)
+      studentProfile.skills = JSON.stringify(skillResult);
     }
-
-
 
     if (CreateStudentProfile.jobs !== null) {
       for (let i = 0; i < CreateStudentProfile?.jobs?.length; i++) {
@@ -489,7 +516,7 @@ export class StudentService {
     return await Promise.all(
       students.map(async (student) => {
         try {
-          let studentProfile = await this.studentProfileRepository.findOneBy({
+          const studentProfile = await this.studentProfileRepository.findOneBy({
             studentId: student.id,
           });
           return formatToStudentSearchResponseDto(
@@ -519,45 +546,53 @@ export class StudentService {
   async deleteStudent(student: any) {
     const studentProfile = await this.studentProfileRepository.findOne({
       where: { studentId: student.id },
-      relations: ['jobs', 'studies']
+      relations: ['jobs', 'studies'],
     });
-  
+
     if (studentProfile) {
-      await Promise.all(studentProfile.jobs.map(async (job) => {
-        await this.jobsRepository.delete(job.id);
-      }));
-  
-      await Promise.all(studentProfile.studies.map(async (study) => {
-        await this.studiesRepository.delete(study.id);
-      }));
-  
+      await Promise.all(
+        studentProfile.jobs.map(async (job) => {
+          await this.jobsRepository.delete(job.id);
+        }),
+      );
+
+      await Promise.all(
+        studentProfile.studies.map(async (study) => {
+          await this.studiesRepository.delete(study.id);
+        }),
+      );
+
       await this.studentProfileRepository.remove(studentProfile);
     }
-  
+
     return this.studentRepository.remove(student);
   }
-  
 
   async createPref() {
     const students = await this.studentRepository.find();
 
     for (const student of students) {
-      const prefs = new StudentPreferences()
+      const prefs = new StudentPreferences();
       prefs.studentId = student.id;
-      this.studentPreferencesRepository.save(prefs)
+      this.studentPreferencesRepository.save(prefs);
     }
   }
 
-  async updatePreferences(req: any, updatePreferencesDto: UpdatePreferencesDto) {
-    const student = await this.studentRepository.findOne({ where: { email: req.user.email } })
+  async updatePreferences(
+    req: any,
+    updatePreferencesDto: UpdateStudentPreferencesDto,
+  ) {
+    const student = await this.studentRepository.findOne({
+      where: { email: req.user.email },
+    });
 
-    const existingPreferences = await this.studentPreferencesRepository.findOneBy({ studentId: student.id })
+    const existingPreferences =
+      await this.studentPreferencesRepository.findOneBy({
+        studentId: student.id,
+      });
 
     if (!existingPreferences) {
-      throw new HttpException(
-        'Preferences not found',
-        HttpStatus.CONFLICT,
-      );
+      throw new HttpException('Preferences not found', HttpStatus.CONFLICT);
     }
 
     Object.assign(existingPreferences, updatePreferencesDto);
@@ -567,30 +602,102 @@ export class StudentService {
     return existingPreferences;
   }
 
-  async uploadStudentDocument(file: any, UploadStudentDocument: UploadStudentDocumentDto, user: any) {
-    let student;
-    student = await this.findOneByEmail(user.email)
-    if (!student) {
-      throw new HttpException("Invalid student", HttpStatus.UNAUTHORIZED)
+  async getPreferences(req: any): Promise<UpdateStudentPreferencesDto> {
+    const student = await this.studentRepository.findOne({
+      where: { email: req.user.email },
+    });
+
+    const existingPreferences =
+      await this.studentPreferencesRepository.findOneBy({
+        studentId: student.id,
+      });
+
+    if (!existingPreferences) {
+      throw new HttpException('Preferences not found', HttpStatus.CONFLICT);
     }
 
-    let studentDocument = await this.studentDocumentRepository.findOne({ where: { studentId: student.id, documentType: UploadStudentDocument.documentType } })
+    let preferences = new UpdateStudentPreferencesDto();
+
+    preferences.mailNotifDocument = existingPreferences.mailNotifDocument;
+    preferences.mailNotifGroup = existingPreferences.mailNotifGroup;
+    preferences.mailNotifMessage = existingPreferences.mailNotifMessage;
+    preferences.mailNotifMission = existingPreferences.mailNotifMission;
+
+    return preferences;
+  }
+
+  async uploadStudentDocument(
+    file: any,
+    UploadStudentDocument: UploadStudentDocumentDto,
+    user: any,
+  ) {
+    let student;
+    student = await this.findOneByEmail(user.email);
+    if (!student) {
+      throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED);
+    }
+    let studentDocument = await this.studentDocumentRepository.findOne({
+      where: {
+        studentId: student.id,
+        documentType: UploadStudentDocument.documentType,
+      },
+    });
 
     if (studentDocument != null) {
       if (studentDocument.status == DocumentStatus.VERIFIED) {
-        throw new HttpException("Ce fichier a déjà été validé", HttpStatus.CONFLICT)
+        throw new HttpException(
+          'Ce fichier a déjà été validé',
+          HttpStatus.CONFLICT,
+        );
       }
     } else {
-      studentDocument = new StudentDocument()
+      studentDocument = new StudentDocument();
     }
 
     const url = await this.documentTransferService.uploadFileNotImage(file);
 
-    studentDocument.file = url
+    studentDocument.file = url;
     studentDocument.studentId = student.id;
-    studentDocument.comment = "";
+    studentDocument.comment = '';
     studentDocument.documentType = UploadStudentDocument.documentType;
     studentDocument.status = DocumentStatus.PENDING;
+
+    this.studentDocumentRepository.save(studentDocument);
+  }
+
+  async replaceStudentDocument(
+    file: any,
+    UploadStudentDocument: UploadStudentDocumentDto,
+    user: any,
+  ) {
+    let student;
+    student = await this.findOneByEmail(user.email);
+    if (!student) {
+      throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED);
+    }
+    let studentDocument = await this.studentDocumentRepository.findOne({
+      where: {
+        studentId: student.id,
+        documentType: UploadStudentDocument.documentType,
+      },
+    });
+    if (studentDocument == null) {
+      return this.uploadStudentDocument(file, UploadStudentDocument, user);
+    }
+
+    if (studentDocument.status != DocumentStatus.VERIFIED) {
+      return this.uploadStudentDocument(file, UploadStudentDocument, user);
+    }
+    studentDocument = new StudentDocument();
+
+    const url = await this.documentTransferService.uploadFileNotImage(file);
+
+    studentDocument.file = url;
+    studentDocument.studentId = student.id;
+    studentDocument.comment = '';
+    studentDocument.documentType = UploadStudentDocument.documentType;
+    studentDocument.status = DocumentStatus.PENDING;
+    studentDocument.bis = true;
 
     this.studentDocumentRepository.save(studentDocument);
   }
@@ -598,19 +705,208 @@ export class StudentService {
   async getDocumentStatus(user: any): Promise<DocumentStatusResponseDto[]> {
     const student = await this.findOneByEmail(user.email);
     if (!student) {
-      throw new HttpException("Invalid student", HttpStatus.UNAUTHORIZED)
+      throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED);
     }
 
-    const documentStatuses = await this.studentDocumentRepository.findBy({ studentId: student.id })
+    const documentStatuses = await this.studentDocumentRepository.findBy({
+      studentId: student.id,
+    });
 
-    const documentStatusesResponse = documentStatuses.map(doc => {
-      const it = new DocumentStatusResponseDto()
-      it.documentType = doc.documentType
-      it.status = doc.status
-      it.comment = doc.comment
-      return it
-    })
+    const documentStatusesResponse = documentStatuses.map((doc) => {
+      const it = new DocumentStatusResponseDto();
+      it.documentType = doc.documentType;
+      it.status = doc.status;
+      it.comment = doc.comment;
+      it.bis = doc.bis;
+      return it;
+    });
 
-    return documentStatusesResponse
+    return documentStatusesResponse;
+  }
+
+  async searchStudents(
+    searchOption: StudentSearchNetworkOptionDto,
+    req: any,
+  ): Promise<StudentSearchNetworkResponseDto[]> {
+    const student = await this.findOneByEmail(req.user.email);
+    if (!student) {
+      throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED);
+    }
+
+    const { searchString } = searchOption;
+
+    let nearbyLocations = await getNearbyLocations(searchOption.location);
+    if (nearbyLocations.length === 0) {
+      nearbyLocations = [searchOption.location];
+    }
+
+    let students = await this.getAllStudentsWithTheirProfile();
+
+    if (searchOption.searchString) {
+      students = students.filter((student) => {
+        return (
+          student.firstName
+            .toLowerCase()
+            .includes(searchOption.searchString.toLowerCase()) ||
+          student.lastName
+            .toLowerCase()
+            .includes(searchOption.searchString.toLowerCase())
+        );
+      });
+    }
+
+    if (searchOption.firstName) {
+      students = students.filter((student) =>
+        student.firstName
+          .toLowerCase()
+          .includes(searchOption.firstName.toLowerCase()),
+      );
+    }
+
+    if (searchOption.lastName) {
+      students = students.filter((student) =>
+        student.lastName
+          .toLowerCase()
+          .includes(searchOption.lastName.toLowerCase()),
+      );
+    }
+
+    if (searchOption.skills) {
+      students = students.filter((student) => {
+        for (let i = 0; i < student.skills.skills.Development.length; i++) {
+          if (
+            searchOption.skills.includes(student.skills.skills.Development[i])
+          ) {
+            return true;
+          }
+        }
+        for (let i = 0; i < student.skills.skills['No-code'].length; i++) {
+          if (
+            searchOption.skills.includes(student.skills.skills['No-code'][i])
+          ) {
+            return true;
+          }
+        }
+        for (
+          let i = 0;
+          i < student.skills.skills['Design & Produit'].length;
+          i++
+        ) {
+          if (
+            searchOption.skills.includes(
+              student.skills.skills['Design & Produit'][i],
+            )
+          ) {
+            return true;
+          }
+        }
+        for (let i = 0; i < student.skills.skills.Data.length; i++) {
+          if (searchOption.skills.includes(student.skills.skills.Data[i])) {
+            return true;
+          }
+        }
+
+        for (
+          let i = 0;
+          i < student.skills.skills['Marketing & Sales'].length;
+          i++
+        ) {
+          if (
+            searchOption.skills.includes(
+              student.skills.skills['Marketing & Sales'][i],
+            )
+          ) {
+            return true;
+          }
+        }
+
+        return false;
+      });
+    }
+
+    if (searchOption.tjmMin) {
+      students = students.filter(
+        (student) => student.tjm >= searchOption.tjmMin,
+      );
+    }
+
+    if (searchOption.tjmMax) {
+      students = students.filter(
+        (student) => student.tjm <= searchOption.tjmMax,
+      );
+    }
+
+    if (searchOption.noteMin) {
+      students = students.filter(
+        (student) => student.note >= searchOption.noteMin,
+      );
+    }
+
+    if (searchOption.noteMax) {
+      students = students.filter(
+        (student) => student.note <= searchOption.noteMax,
+      );
+    }
+
+    if (searchOption.isActive !== undefined) {
+      students = students.filter(
+        (student) => student.isActive === searchOption.isActive,
+      );
+    }
+
+    if (searchOption.location) {
+      students = students.filter((student) =>
+        nearbyLocations.includes(student.location),
+      );
+    }
+
+    return students;
+  }
+
+  async getStudentById(id: number, req: any) {
+    const checkUserIfStudent = await this.findOneByEmail(req.user.email);
+    if (!checkUserIfStudent) {
+      throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED);
+    }
+
+    const student = await this.studentRepository.findOne({ where: { id: id } });
+    if (!student) {
+      throw new HttpException('Invalid student', HttpStatus.UNAUTHORIZED);
+    }
+
+    const studentProfile = await this.studentProfileRepository.findOneBy({
+      studentId: student.id,
+    });
+
+    return formatToStudentSearchNetworkResponseDto(student, studentProfile);
+  }
+
+  async getAllStudentsWithTheirProfile() {
+    const students = await this.studentRepository.find();
+    return await Promise.all(
+      students.map(async (student) => {
+        try {
+          const studentProfile = await this.studentProfileRepository.findOneBy({
+            studentId: student.id,
+          });
+          return formatToStudentSearchNetworkResponseDto(
+            student,
+            studentProfile,
+          );
+        } catch (e) {
+          throw new Error(e);
+        }
+      }),
+    );
+  }
+
+  async findStudentPicture(studentId: number) {
+    const studentProfile = await this.studentProfileRepository.findOne({
+      where: { studentId: studentId },
+    });
+    if (!studentProfile) {
+      throw new HttpException('Invalid student profile', HttpStatus.NOT_FOUND);
+    }
+    return studentProfile.picture;
   }
 }

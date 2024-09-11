@@ -11,14 +11,14 @@ import { Mission } from '../mission/entity/mission.entity';
 import { StudentDocument } from '../student/entity/StudentDocuments.entity';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([Group, GroupInvite, Mission, StudentDocument]),
-        StudentModule,
-        NotificationsModule,
-        CompanyModule,
-    ],
-    providers: [GroupService,],
-    controllers: [GroupController],
-    exports: [GroupService]
+  imports: [
+    TypeOrmModule.forFeature([Group, GroupInvite, Mission, StudentDocument]),
+    StudentModule,
+    NotificationsModule,
+    CompanyModule,
+  ],
+  providers: [GroupService],
+  controllers: [GroupController],
+  exports: [GroupService],
 })
 export class GroupModule {}

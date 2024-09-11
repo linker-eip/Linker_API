@@ -65,7 +65,7 @@ export class MissionController {
         const company = await this.userAdminService.findOneCompanyById(
           mission.companyId,
         );
-        let students: any[] = [];
+        const students: any[] = [];
 
         return formatToMissionAdminDto(mission, company, students);
       }),
@@ -100,7 +100,7 @@ export class MissionController {
     const company = await this.userAdminService.findOneCompanyById(
       mission.companyId,
     );
-    let students: any[] = [];
+    const students: any[] = [];
     return formatToMissionAdminDto(mission, company, students);
   }
 
