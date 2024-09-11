@@ -14,7 +14,12 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { TicketAdminService } from './ticket-admin.service';
-import { ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 import { GetTicketsDto } from '../../ticket/dto/get-ticket.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AnswerTicketDto } from '../../ticket/dto/answer-ticket.dto';
@@ -75,7 +80,10 @@ export class TicketAdminController {
   @ApiOkResponse({
     type: GetTicketReponseDto,
   })
-  async getTicketById(@Req() req, @Param('ticketId') ticketId: number): Promise<GetTicketReponseDto> {
+  async getTicketById(
+    @Req() req,
+    @Param('ticketId') ticketId: number,
+  ): Promise<GetTicketReponseDto> {
     return this.ticketService.getTicketById(req, ticketId);
   }
 

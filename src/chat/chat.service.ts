@@ -120,14 +120,15 @@ export class ChatService {
           .find((id) => id !== student.id.toString());
       }),
     );
-
-    const dmChannels: ChannelInfoDto[] = await Promise.all(
+    dmChannelsIds.delete(undefined);
+    let dmChannels: ChannelInfoDto[] = [];
+    dmChannels = await Promise.all(
       Array.from(dmChannelsIds).map(async (id) => {
         const student = await this.studentService.findOneById(parseInt(id));
         return {
           id: student.id,
           name: student.firstName + ' ' + student.lastName,
-          logo: student.picture,
+          logo: await this.studentService.findStudentPicture(student.id),
         };
       }),
     );
@@ -231,7 +232,6 @@ export class ChatService {
       throw new HttpException('Impossible de télécharger le fichier', 400);
     }
 
-    console.log(student);
     switch (body.type.toString()) {
       case this.getMessageTypeKeyByValue(MessageType.MISSION): {
         await this.gateway.onNewMissionMessage(

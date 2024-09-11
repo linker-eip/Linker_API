@@ -30,6 +30,12 @@ export class VerifiedUserGuard extends AuthGuard('jwt') {
           request.user.email,
         );
         if (student == null) return false;
+        if (student.isBlocked) {
+          throw new HttpException(
+            'Cet utilisateur est bloqué',
+            HttpStatusCode.Forbidden,
+          );
+        }
         if (student.isVerified) return true;
         else
           throw new HttpException(
@@ -40,6 +46,12 @@ export class VerifiedUserGuard extends AuthGuard('jwt') {
       if (request.user.userType == 'USER_COMPANY') {
         const company = await this.companyService.findOne(request.user.email);
         if (company == null) return false;
+        if (company.isBlocked) {
+          throw new HttpException(
+            'Cet utilisateur est bloqué',
+            HttpStatusCode.Forbidden,
+          );
+        }
         if (company.isActive == true) return true;
         else
           throw new HttpException(

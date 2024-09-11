@@ -1,12 +1,19 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { GetTicketsDto } from '../../ticket/dto/get-ticket.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Ticket, TicketAnswer, TicketStateEnum } from '../../ticket/entity/Ticket.entity';
+import {
+  Ticket,
+  TicketAnswer,
+  TicketStateEnum,
+} from '../../ticket/entity/Ticket.entity';
 import { Repository } from 'typeorm';
 import { AnswerTicketDto } from '../../ticket/dto/answer-ticket.dto';
 import { HttpStatusCode } from 'axios';
 import { DocumentTransferService } from '../../document-transfer/src/services/document-transfer.service';
-import { GetAnswerDto, GetTicketReponseDto } from '../../ticket/dto/get-ticket-reponse.dto';
+import {
+  GetAnswerDto,
+  GetTicketReponseDto,
+} from '../../ticket/dto/get-ticket-reponse.dto';
 import { NotificationsService } from '../../notifications/notifications.service';
 import { NotificationType } from '../../notifications/entity/Notification.entity';
 import { UserType } from '../../chat/entity/Message.entity';
@@ -58,20 +65,38 @@ export class TicketAdminService {
     answer.author = 'ADMIN';
 
     if (ticket.authorType == UserType.STUDENT_USER) {
-      await this.notificationService.createNotification('Réponse à votre ticket', `Votre ticket ${ticket.title} a reçu une réponse`, NotificationType.TICKET, ticket.authorId);
+      await this.notificationService.createNotification(
+        'Réponse à votre ticket',
+        `Votre ticket ${ticket.title} a reçu une réponse`,
+        NotificationType.TICKET,
+        ticket.authorId,
+      );
     } else {
-      await this.notificationService.createNotification('Réponse à votre ticket', `Votre ticket ${ticket.title} a reçu une réponse`, NotificationType.TICKET, null, ticket.authorId);
+      await this.notificationService.createNotification(
+        'Réponse à votre ticket',
+        `Votre ticket ${ticket.title} a reçu une réponse`,
+        NotificationType.TICKET,
+        null,
+        ticket.authorId,
+      );
     }
     return this.ticketAnswerRepository.save(answer);
   }
 
-  async getTicketById(req: any, ticketId: number): Promise<GetTicketReponseDto> {
-    const ticket = await this.ticketRepository.findOne({ where: { id: ticketId } });
+  async getTicketById(
+    req: any,
+    ticketId: number,
+  ): Promise<GetTicketReponseDto> {
+    const ticket = await this.ticketRepository.findOne({
+      where: { id: ticketId },
+    });
     if (!ticket) {
       throw new HttpException('Ticket not found', HttpStatusCode.NotFound);
     }
 
-    const answers = await this.ticketAnswerRepository.find({ where: { ticketId } });
+    const answers = await this.ticketAnswerRepository.find({
+      where: { ticketId },
+    });
 
     const response = new GetTicketReponseDto();
     response.id = ticket.id;
@@ -84,7 +109,7 @@ export class TicketAdminService {
     response.entityId = ticket.entityId;
     response.state = ticket.state;
     response.date = ticket.date;
-    response.answer = answers.map(answer => {
+    response.answer = answers.map((answer) => {
       const getAnswer = new GetAnswerDto();
       getAnswer.id = answer.id;
       getAnswer.author = answer.author;

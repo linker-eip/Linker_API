@@ -31,6 +31,7 @@ import {
   UnverifiedUserGuard,
   VerifiedUserGuard,
 } from '../admin/auth/guard/user.guard';
+import { CompanyFormDto } from './dto/company-form.dto';
 
 @Controller('api/company')
 @ApiTags('Company')
@@ -194,5 +195,19 @@ export class CompanyController {
   })
   async getPreferences(@Req() req): Promise<UpdateCompanyPreferencesDto> {
     return this.companyService.getPreferences(req);
+  }
+
+  @Get('askAI')
+  @UseGuards(VerifiedUserGuard)
+  @ApiOperation({
+    description: 'Ask AI',
+    summary: 'Ask AI',
+  })
+  @ApiOkResponse({
+    description: 'Ask AI',
+    type: String,
+  })
+  async askAI(@Req() req, @Body() companyForm: CompanyFormDto) {
+    return this.companyService.askAI(req, companyForm);
   }
 }

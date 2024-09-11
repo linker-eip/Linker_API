@@ -20,6 +20,8 @@ import { SkillsService } from '../student/skills/skills.service';
 import { JobsService } from '../student/jobs/jobs.service';
 import { StudiesService } from '../student/studies/studies.service';
 import { FileService } from '../filesystem/file.service';
+import { AiService } from '../ai/ai.service';
+
 
 @Module({
   imports: [
@@ -46,6 +48,7 @@ import { FileService } from '../filesystem/file.service';
     JobsService,
     StudiesService,
     FileService,
+    AiService,
   ],
   controllers: [CompanyController],
   exports: [CompanyService],

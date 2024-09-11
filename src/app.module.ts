@@ -37,6 +37,7 @@ import { StatisticsController } from './statistics/statistics.controller';
 import { StatisticsService } from './statistics/statistics.service';
 import { StatisticsModule } from './statistics/statistics.module';
 import { TicketModule } from './ticket/ticket.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -82,6 +83,7 @@ import { TicketModule } from './ticket/ticket.module';
     LinkedinModule,
     StatisticsModule,
     TicketModule,
+    AiModule,
   ],
   controllers: [
     FileController,
