@@ -42,6 +42,7 @@ import { CompanyDocumentType } from '../../company/enum/CompanyDocument.enum';
 import { Payment } from '../../payment/entity/payment.entity';
 import { StudentPayment } from '../../payment/entity/student-payment.entity';
 import { PaymentService } from '../../payment/payment.service';
+import { AiService } from '../../ai/ai.service';
 
 describe('DocumentVerificationService', () => {
   let service: DocumentVerificationService;
@@ -72,6 +73,7 @@ describe('DocumentVerificationService', () => {
         StudiesService,
         FileService,
         SkillsService,
+        AiService,
         {
           provide: getRepositoryToken(Mission),
           useClass: Repository,

@@ -31,6 +31,7 @@ import { TicketAdminController } from './ticket-admin.controller';
 import { Ticket, TicketAnswer, TicketStateEnum, TicketTypeEnum } from '../../ticket/entity/Ticket.entity';
 import { TicketService } from '../../ticket/ticket.service';
 import { UserType } from '../../chat/entity/Message.entity';
+import { AiService } from '../../ai/ai.service';
 
 describe('AdminTicketService', () => {
   let service: TicketAdminService;
@@ -60,6 +61,7 @@ describe('AdminTicketService', () => {
         DocumentTransferService,
         CompanyProfile,
         ConfigService,
+        AiService,
         {
           provide: getRepositoryToken(Notification),
           useClass: Repository,

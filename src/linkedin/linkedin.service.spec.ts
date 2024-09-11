@@ -37,6 +37,7 @@ import { LinkedinController } from './linkedin.controller';
 import { PaymentService } from '../payment/payment.service';
 import { Payment } from '../payment/entity/payment.entity';
 import { StudentPayment } from '../payment/entity/student-payment.entity';
+import { AiService } from '../ai/ai.service';
 
 describe('LinkedinService', () => {
   let service: LinkedinService;
@@ -58,6 +59,7 @@ describe('LinkedinService', () => {
         ConfigService,
         NotificationsService,
         CompanyService,
+        AiService,
         MissionService,
         StudentService,
         GroupService,

@@ -15,6 +15,7 @@ import { MissionStatus } from '../../mission/enum/mission-status.enum';
 import { UpdateMission } from './dto/update-mission.dto';
 import { missionAdminResponseDto } from './dto/mission-admin-response.dto';
 import { CreateMissionAdminDto } from './dto/create-mission.dto';
+import { AiService } from '../../ai/ai.service';
 
 describe('MissionService', () => {
   let service: MissionService;
@@ -206,6 +207,7 @@ describe('MissionService', () => {
           password: null,
           resetPasswordToken: null,
           profile: null,
+          isBlocked: false,
         },
       };
 
@@ -226,6 +228,7 @@ describe('MissionService', () => {
         phoneNumber: '0612345678',
         companyPicture: null,
         profile: null,
+        isBlocked: false,
       };
 
       jest

@@ -46,6 +46,7 @@ import { MailService } from '../mail/mail.service';
 import { PaymentService } from '../payment/payment.service';
 import { Payment } from '../payment/entity/payment.entity';
 import { StudentPayment } from '../payment/entity/student-payment.entity';
+import { AiService } from '../ai/ai.service';
 
 describe('MissionService', () => {
   let service: MissionService;
@@ -70,6 +71,7 @@ describe('MissionService', () => {
         NotificationsService,
         StudentService,
         SkillsService,
+        AiService,
         JobsService,
         StudiesService,
         DocumentTransferService,

@@ -30,6 +30,7 @@ import { StudiesService } from '../student/studies/studies.service';
 import { FileService } from '../filesystem/file.service';
 import { StudentPaymentResponseDto } from './dto/student-payment-response.dto';
 import { StudentPaymentStatus } from './enum/student-payment.status.enum';
+import { AiService } from '../ai/ai.service';
 
 describe('PaymentService', () => {
   let service: PaymentService;
@@ -55,6 +56,7 @@ describe('PaymentService', () => {
         DocumentTransferService,
         ConfigService,
         SkillsService,
+        AiService,
         {
           provide: getRepositoryToken(Payment),
           useClass: Repository,

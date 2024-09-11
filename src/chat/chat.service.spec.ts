@@ -42,6 +42,7 @@ import { Notification } from '../notifications/entity/Notification.entity';
 import { MailService } from '../mail/mail.service';
 import { SendFileInChatDto } from './dto/chat-send-file.dto';
 import { CompanyConversationResponseDto } from './dto/company-conversation-response.dto';
+import { AiService } from '../ai/ai.service';
 
 describe('ChatService', () => {
   let service: ChatService;
@@ -69,6 +70,7 @@ describe('ChatService', () => {
         SkillsService,
         JobsService,
         StudiesService,
+        AiService,
         NotificationsService,
         FileService,
         Gateway,

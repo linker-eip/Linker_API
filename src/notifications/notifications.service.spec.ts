@@ -28,6 +28,7 @@ import { CompanyPreferences } from '../company/entity/CompanyPreferences.entity'
 import { MailService } from '../mail/mail.service';
 import { StudentDocument } from '../student/entity/StudentDocuments.entity';
 import { CompanyDocument } from '../company/entity/CompanyDocument.entity';
+import { AiService } from '../ai/ai.service';
 
 describe('NotificationsService', () => {
   let service: NotificationsService;
@@ -53,6 +54,7 @@ describe('NotificationsService', () => {
         StudiesService,
         FileService,
         DocumentTransferService,
+        AiService,
         CompanyProfile,
         ConfigService,
         {

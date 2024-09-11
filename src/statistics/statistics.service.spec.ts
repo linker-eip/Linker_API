@@ -37,6 +37,7 @@ import { MailService } from '../mail/mail.service';
 import { PaymentService } from '../payment/payment.service';
 import { Payment } from '../payment/entity/payment.entity';
 import { StudentPayment } from '../payment/entity/student-payment.entity';
+import { AiService } from '../ai/ai.service';
 
 describe('StatisticsService', () => {
   let service: StatisticsService;
@@ -55,6 +56,7 @@ describe('StatisticsService', () => {
       providers: [
         StatisticsService,
         DocumentTransferService,
+        AiService,
         ConfigService,
         NotificationsService,
         CompanyService,
@@ -63,6 +65,7 @@ describe('StatisticsService', () => {
         GroupService,
         MailService,
         JobsService,
+        AiService,
         StudiesService,
         FileService,
         PaymentService,

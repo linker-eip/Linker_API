@@ -28,6 +28,7 @@ import {
   CompanyDocumentType,
   DocumentStatus,
 } from './enum/CompanyDocument.enum';
+import { AiService } from '../ai/ai.service';
 
 describe('CompanyService', () => {
   let service: CompanyService;
@@ -48,6 +49,7 @@ describe('CompanyService', () => {
         DocumentTransferService,
         ConfigService,
         StudentService,
+        AiService,
         SkillsService,
         JobsService,
         StudiesService,

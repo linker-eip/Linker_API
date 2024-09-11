@@ -87,6 +87,7 @@ describe('UserAdminService', () => {
           missionsIds: [],
           groupId: null,
           profile: null,
+          isBlocked: false,
         },
         {
           id: 2,
@@ -104,6 +105,7 @@ describe('UserAdminService', () => {
           missionsIds: [],
           groupId: 1,
           profile: null,
+          isBlocked: false,
         },
       ];
 
@@ -268,6 +270,7 @@ describe('UserAdminService', () => {
         missionsIds: [],
         groupId: null,
         profile: null,
+        isBlocked: false,
       };
 
       jest.spyOn(service, 'findOneStudentById').mockResolvedValueOnce(student);
@@ -312,6 +315,7 @@ describe('UserAdminService', () => {
         missionsIds: [],
         groupId: null,
         profile: null,
+        isBlocked: false,
       };
 
       jest.spyOn(service, 'findOneStudentById').mockResolvedValueOnce(student);
@@ -350,6 +354,7 @@ describe('UserAdminService', () => {
           companyPicture: null,
           createdAt: new Date('2023-10-13T03:43:23.946Z'),
           profile: null,
+          isBlocked: false,
         },
       ];
 
@@ -440,6 +445,7 @@ describe('UserAdminService', () => {
         profile: null,
         password: 'Azerty1234!',
         resetPasswordToken: null,
+        isBlocked: false,
       };
 
       const expectedResponse: CompanyAdminResponseDto = {
@@ -488,6 +494,7 @@ describe('UserAdminService', () => {
         profile: null,
         password: 'Azerty1234!',
         resetPasswordToken: null,
+        isBlocked: false,
       };
 
       const expectedResponse: CompanyAdminResponseDto = {
@@ -519,6 +526,7 @@ describe('UserAdminService', () => {
         phoneNumber: '0612345678',
         companyPicture: null,
         profile: null,
+        isBlocked: false,
       };
 
       jest.spyOn(service, 'findOneCompanyById').mockResolvedValueOnce(company);
@@ -563,6 +571,7 @@ describe('UserAdminService', () => {
         phoneNumber: '0612345678',
         companyPicture: null,
         profile: null,
+        isBlocked: false,
       };
 
       jest.spyOn(service, 'findOneCompanyById').mockResolvedValueOnce(company);

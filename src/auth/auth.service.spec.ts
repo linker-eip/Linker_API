@@ -51,6 +51,7 @@ import { Notification } from '../notifications/entity/Notification.entity';
 import { PaymentService } from '../payment/payment.service';
 import { Payment } from '../payment/entity/payment.entity';
 import { StudentPayment } from '../payment/entity/student-payment.entity';
+import { AiService } from '../ai/ai.service';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -71,6 +72,7 @@ describe('AuthService', () => {
         StudentService,
         JwtService,
         CompanyService,
+        AiService,
         MailService,
         GoogleApiService,
         SkillsService,

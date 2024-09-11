@@ -35,6 +35,7 @@ import {
 } from './enum/StudentDocument.enum';
 import { StudentSearchNetworkOptionDto } from './dto/student-search-network-option.dto';
 import { StudentSearchNetworkResponseDto } from './dto/student-search-network-response.dto';
+import { AiService } from '../ai/ai.service';
 
 describe('StudentService', () => {
   let service: StudentService;
@@ -56,6 +57,7 @@ describe('StudentService', () => {
         SkillsService,
         JobsService,
         StudiesService,
+        AiService,
         DocumentTransferService,
         CompanyService,
         ConfigService,

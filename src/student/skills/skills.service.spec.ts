@@ -37,6 +37,7 @@ import { SkillList } from './consts/skills-list';
 import { PaymentService } from '../../payment/payment.service';
 import { Payment } from '../../payment/entity/payment.entity';
 import { StudentPayment } from '../../payment/entity/student-payment.entity';
+import { AiService } from '../../ai/ai.service';
 
 describe('SkillsService', () => {
   let service: SkillsService;
@@ -67,6 +68,7 @@ describe('SkillsService', () => {
         FileService,
         SkillsService,
         PaymentService,
+        AiService,
         {
           provide: getRepositoryToken(Mission),
           useClass: Repository,

@@ -33,6 +33,7 @@ import { CompanyPreferences } from '../company/entity/CompanyPreferences.entity'
 import { StudentDocument } from '../student/entity/StudentDocuments.entity';
 import { CompanyDocument } from '../company/entity/CompanyDocument.entity';
 import { Mission } from '../mission/entity/mission.entity';
+import { AiService } from '../ai/ai.service';
 
 describe('TicketService', () => {
   let service: TicketService;
@@ -61,6 +62,7 @@ describe('TicketService', () => {
         DocumentTransferService,
         CompanyProfile,
         ConfigService,
+        AiService,
         {
           provide: getRepositoryToken(Notification),
           useClass: Repository,
