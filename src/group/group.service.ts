@@ -606,11 +606,15 @@ export class GroupService {
 
     let filteredGroups = await dtos;
 
+    console.log('filteredGroups', filteredGroups);
+
     if (mission.skills) {
+      console.log('mission.skills', mission.skills);
       filteredGroups = filterGroupsBySkills(filteredGroups, mission.skills);
     }
 
     if (searchOption.skills) {
+      console.log('searchOption.skills', searchOption.skills);
       filteredGroups = filterGroupsBySkills(
         filteredGroups,
         searchOption.skills,
@@ -716,15 +720,13 @@ function filterGroupsBySkills(
   dto: GetCompanySearchGroupsDto[],
   skillsString: string,
 ): GetCompanySearchGroupsDto[] {
-  console.log('skillsString', skillsString);
   const skillsArray = skillsString
     .split(',')
     .map((skill) => skill.trim().toLowerCase());
 
-  console.log('test');
-
   const filteredGroups = dto.filter((group) => {
     return group.studentsProfiles.some((studentProfile) => {
+      console.log('object', Object.values(studentProfile.skills));
       const studentSkills = Object.values(studentProfile.skills)
         .flat()
         .map((skill) => skill.toLowerCase());
