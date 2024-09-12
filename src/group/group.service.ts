@@ -726,6 +726,7 @@ function filterGroupsBySkills(
 
   const filteredGroups = dto.filter((group) => {
     return group.studentsProfiles.some((studentProfile) => {
+      console.log('object', Object.values(studentProfile.skills));
       const studentSkills = Object.values(studentProfile.skills)
         .flat()
         .map((skill) => skill.toLowerCase());
