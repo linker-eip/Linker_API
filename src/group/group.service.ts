@@ -716,9 +716,12 @@ function filterGroupsBySkills(
   dto: GetCompanySearchGroupsDto[],
   skillsString: string,
 ): GetCompanySearchGroupsDto[] {
+  console.log('skillsString', skillsString);
   const skillsArray = skillsString
     .split(',')
     .map((skill) => skill.trim().toLowerCase());
+
+  console.log('test');
 
   const filteredGroups = dto.filter((group) => {
     return group.studentsProfiles.some((studentProfile) => {
