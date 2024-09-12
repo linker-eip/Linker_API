@@ -606,6 +606,8 @@ export class GroupService {
 
     let filteredGroups = await dtos;
 
+    console.log('filteredGroups', filteredGroups);
+
     if (mission.skills) {
       console.log('mission.skills', mission.skills);
       filteredGroups = filterGroupsBySkills(filteredGroups, mission.skills);
