@@ -4,17 +4,7 @@ import { IsEmail, IsNumber, IsOptional, IsString } from 'class-validator';
 export class CompanySearchGroupsFilterDto {
   @ApiPropertyOptional()
   @IsOptional()
-  @IsString()
-  searchString?: string;
-
-  @ApiPropertyOptional()
-  @IsOptional()
   missionId?: number;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsEmail()
-  email?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -23,8 +13,8 @@ export class CompanySearchGroupsFilterDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsString()
-  skills?: string;
+  @IsNumber()
+  page?: number;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -34,4 +24,14 @@ export class CompanySearchGroupsFilterDto {
   @ApiPropertyOptional()
   @IsOptional()
   size?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  firstName?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  lastName?: string;
 }
