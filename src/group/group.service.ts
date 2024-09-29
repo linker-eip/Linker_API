@@ -536,10 +536,13 @@ export class GroupService {
       where: { id: searchOption.missionId },
     });
 
+    if (!mission)
+      throw new HttpException('Mission non trouvée', HttpStatus.NOT_FOUND);
+
     if (mission) {
       if (mission.companyId != company.id) {
         throw new HttpException(
-          'Mission non trouvée',
+          'Vous n\'avez pas accès à cette mission',
           HttpStatus.NOT_FOUND,
         );
       }
@@ -683,6 +686,11 @@ function groupMatchingAlgorithm(groups: GetCompanySearchGroupsDto[], missionSkil
 }
 
 function assignSkillsScore(groups: GetCompanySearchGroupsDto[], missionSkills: string): GetCompanySearchGroupsDto[] {
+
+  if (!missionSkills) {
+    return groups;
+  }
+
   return groups.map(group => {
     const groupSkills = group.studentsProfiles.map(studentProfile => {
       return Object.values(studentProfile.skills).flat();
