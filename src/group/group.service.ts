@@ -1,27 +1,33 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateGroupDto } from './dto/create-group-dto';
-import { StudentService } from '../student/student.service';
-import { Group } from './entity/Group.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
-import { UpdateGroupDto } from './dto/update-group-dto';
-import { GetGroupeResponse } from './dto/get-group-response-dto';
-import { NotificationsService } from '../notifications/notifications.service';
+import { HttpStatusCode } from 'axios';
+import {
+  Brackets,
+  Repository,
+  SelectQueryBuilder
+} from 'typeorm';
+import { CompanyService } from '../company/company.service';
+import { Mission } from '../mission/entity/mission.entity';
+import { MissionStatus } from '../mission/enum/mission-status.enum';
 import { NotificationType } from '../notifications/entity/Notification.entity';
-import { GroupInvite } from './entity/GroupInvite.entity';
+import { NotificationsService } from '../notifications/notifications.service';
+import { StudentDocument } from '../student/entity/StudentDocuments.entity';
+import { StudentUser } from '../student/entity/StudentUser.entity';
+import { DocumentStatus } from '../student/enum/StudentDocument.enum';
+import { StudentService } from '../student/student.service';
+import { CompanySearchGroupsFilterDto } from './dto/company-search-groups-filter.dto';
+import { CreateGroupDto } from './dto/create-group-dto';
+import { GetCompanySearchGroupsDto } from './dto/get-company-search-groups.dto';
+import {
+  GetGroupeResponse
+} from './dto/get-group-response-dto';
 import {
   GetInvitesResponse,
   GetPersonnalInvitesResponse,
 } from './dto/get-invites-response-dto';
-import { CompanyService } from '../company/company.service';
-import { GetCompanySearchGroupsDto } from './dto/get-company-search-groups.dto';
-import { CompanySearchGroupsFilterDto } from './dto/company-search-groups-filter.dto';
-import { Mission } from '../mission/entity/mission.entity';
-import { MissionStatus } from '../mission/enum/mission-status.enum';
-import { StudentUser } from '../student/entity/StudentUser.entity';
-import { StudentDocument } from '../student/entity/StudentDocuments.entity';
-import { DocumentStatus } from '../student/enum/StudentDocument.enum';
-import { HttpStatusCode } from 'axios';
+import { UpdateGroupDto } from './dto/update-group-dto';
+import { Group } from './entity/Group.entity';
+import { GroupInvite } from './entity/GroupInvite.entity';
 
 @Injectable()
 export class GroupService {
@@ -531,7 +537,6 @@ export class GroupService {
     req: any,
     searchOption: CompanySearchGroupsFilterDto,
   ): Promise<GetCompanySearchGroupsDto[]> {
-    const { searchString } = searchOption;
 
     const company = await this.CompanyService.findOne(req.user.email);
     if (!company)
@@ -541,9 +546,15 @@ export class GroupService {
       where: { id: searchOption.missionId },
     });
 
+    if (!mission)
+      throw new HttpException('Mission non trouvée', HttpStatus.NOT_FOUND);
+
     if (mission) {
       if (mission.companyId != company.id) {
-        throw new HttpException('Mission non trouvée', HttpStatus.NOT_FOUND);
+        throw new HttpException(
+          'Vous n\'avez pas accès à cette mission',
+          HttpStatus.NOT_FOUND,
+        );
       }
     }
 
@@ -552,29 +563,7 @@ export class GroupService {
 
     groupsQuery = groupsQuery.andWhere(
       new Brackets((qb) => {
-        if (searchString && searchString.trim().length > 0) {
-          const searchParams = searchString
-            .trim()
-            .split(',')
-            .map((elem) => elem.trim());
 
-          searchParams.forEach((searchParam, index) => {
-            const nameSearch = `nameSearch${index}`;
-            const descriptionSearch = `descriptionSearch${index}`;
-
-            qb.orWhere(`group.name LIKE :${nameSearch}`, {
-              [nameSearch]: `%${searchParam}%`,
-            });
-            qb.orWhere(`group.description LIKE :${descriptionSearch}`, {
-              [descriptionSearch]: `%${searchParam}%`,
-            });
-          });
-        }
-        if (searchOption.groupName) {
-          qb.andWhere('group.name = :groupName', {
-            groupName: searchOption.groupName,
-          });
-        }
         qb.andWhere('group.isActive = true', {
           isActive: true,
         });
@@ -596,6 +585,7 @@ export class GroupService {
         );
         const dto: GetCompanySearchGroupsDto = {
           id: it.id,
+          score: 0,
           name: it.name,
           description: it.description,
           studentsProfiles: studentProfiles,
@@ -606,22 +596,42 @@ export class GroupService {
 
     let filteredGroups = await dtos;
 
-    if (mission.skills) {
-      filteredGroups = filterGroupsBySkills(filteredGroups, mission.skills);
+    filteredGroups = groupMatchingAlgorithm(filteredGroups, mission.skills);
+
+    filteredGroups.sort((a, b) => b.score - a.score);
+
+    if (searchOption.groupName) {
+      filteredGroups = filteredGroups.filter((group) =>
+      group.name.includes(searchOption.groupName),
+      );
+      filteredGroups = filteredGroups.map((group) => {
+        return { ...group, score: group.score + 5 };
+      });
     }
 
-    if (searchOption.skills) {
-      filteredGroups = filterGroupsBySkills(
-        filteredGroups,
-        searchOption.skills,
+    if (searchOption.location) {
+      filteredGroups = filteredGroups.filter((group) =>
+        group.studentsProfiles.some((studentProfile) =>
+          studentProfile.location.includes(searchOption.location),
+        ),
       );
+      filteredGroups = filteredGroups.map((group) => {
+        return { ...group, score: group.score + 5 };
+      });
     }
 
     if (searchOption.size) {
-      filteredGroups = filterGroupBySize(filteredGroups, searchOption.size);
+      filteredGroups = filteredGroups.filter(
+        (group) => group.studentsProfiles.length == searchOption.size,
+      );
+      filteredGroups = filteredGroups.map((group) => {
+        return { ...group, score: group.score + 5 };
+      });
     }
 
-    return filteredGroups;
+
+    return filteredGroups.slice(0, 10);
+
   }
 
   async checkIfStudentIsInGroup(student: any) {
@@ -734,9 +744,52 @@ function filterGroupsBySkills(
   return filteredGroups;
 }
 
-function filterGroupBySize(
-  dto: GetCompanySearchGroupsDto[],
-  size: number,
-): GetCompanySearchGroupsDto[] {
-  return dto.filter((group) => group.studentsProfiles.length >= size);
+
+function assignJobsScore(groups: GetCompanySearchGroupsDto[]): GetCompanySearchGroupsDto[] {
+  return groups.map(group => {
+    const jobs = group.studentsProfiles.map(studentProfile => studentProfile.jobs.length);
+    const score = group.score + jobs.reduce((acc, job) => acc + job, 0) / jobs.length;
+    return { ...group, score };
+  });}
+
+
+function groupMatchingAlgorithm(groups: GetCompanySearchGroupsDto[], missionSkills: string): GetCompanySearchGroupsDto[] {
+  const groupsWithSkillsScore = assignSkillsScore(groups, missionSkills);
+  const groupsWithNotesScore = assignNotesScore(groupsWithSkillsScore);
+  const groupsWithJobsScore = assignJobsScore(groupsWithNotesScore);
+  return groupsWithJobsScore;
+}
+
+function assignSkillsScore(groups: GetCompanySearchGroupsDto[], missionSkills: string): GetCompanySearchGroupsDto[] {
+
+  if (!missionSkills) {
+    return groups;
+  }
+
+  return groups.map(group => {
+    const groupSkills = group.studentsProfiles.map(studentProfile => {
+      return Object.values(studentProfile.skills).flat();
+    }).flat().map(skill => skill.toLowerCase());
+
+    const missionSkillsArray = missionSkills.split(',').map(skill => skill.trim().toLowerCase());
+    let score = 0;
+    groupSkills.forEach(skill => {
+      if (missionSkillsArray.includes(skill)) {
+        score += 5;
+      }
+    });
+
+    return { ...group, score };
+  });
+}
+
+function assignNotesScore(groups: GetCompanySearchGroupsDto[]): GetCompanySearchGroupsDto[] {
+
+  return groups.map(group => {
+    const notes = group.studentsProfiles.map(studentProfile => studentProfile.note);
+    const score = group.score + notes.reduce((acc, note) => acc + note, 0) / notes.length;
+    return { ...group, score };
+  }
+);
+
 }

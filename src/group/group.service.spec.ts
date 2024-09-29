@@ -9,35 +9,34 @@ import { Request } from 'express';
 import { DocumentTransferService } from '../document-transfer/src/services/document-transfer.service';
 import { ConfigService } from '@nestjs/config';
 import { Mission } from '../mission/entity/mission.entity';
-import { CompanyUser } from '../company/entity/CompanyUser.entity';
-import { CompanyProfile } from '../company/entity/CompanyProfile.entity';
-import {
-  Notification,
-  NotificationType,
-} from '../notifications/entity/Notification.entity';
-import { StudentService } from '../student/student.service';
-import { CompanyService } from '../company/company.service';
-import { StudentUser } from '../student/entity/StudentUser.entity';
-import { StudentProfile } from '../student/entity/StudentProfile.entity';
-import { SkillsService } from '../student/skills/skills.service';
-import { JobsService } from '../student/jobs/jobs.service';
-import { StudiesService } from '../student/studies/studies.service';
-import { Skills } from '../student/skills/entity/skills.entity';
-import { Jobs } from '../student/jobs/entity/jobs.entity';
-import { Studies } from '../student/studies/entity/studies.entity';
-import { GroupService } from './group.service';
-import { GroupController } from './group.controller';
-import { Group } from './entity/Group.entity';
-import { NotificationsService } from '../notifications/notifications.service';
-import { GroupInvite } from './entity/GroupInvite.entity';
-import { GetGroupeResponse } from './dto/get-group-response-dto';
-import { GetInvitesResponse } from './dto/get-invites-response-dto';
-import { StudentPreferences } from '../student/entity/StudentPreferences.entity';
-import { StudentDocument } from '../student/entity/StudentDocuments.entity';
-import { CompanyDocument } from '../company/entity/CompanyDocument.entity';
-import { CompanyPreferences } from '../company/entity/CompanyPreferences.entity';
-import { MailService } from '../mail/mail.service';
 import { AiService } from '../ai/ai.service';
+import { CompanyUser } from "../company/entity/CompanyUser.entity";
+import { CompanyProfile } from "../company/entity/CompanyProfile.entity";
+import { Notification, NotificationType } from "../notifications/entity/Notification.entity"
+import { StudentService } from "../student/student.service";
+import { CompanyService } from "../company/company.service";
+import { StudentUser } from "../student/entity/StudentUser.entity";
+import { StudentProfile } from "../student/entity/StudentProfile.entity";
+import { SkillsService } from "../student/skills/skills.service";
+import { JobsService } from "../student/jobs/jobs.service";
+import { StudiesService } from "../student/studies/studies.service";
+import { Skills } from "../student/skills/entity/skills.entity";
+import { Jobs } from "../student/jobs/entity/jobs.entity";
+import { Studies } from "../student/studies/entity/studies.entity";
+import { GroupService } from "./group.service";
+import { GroupController } from "./group.controller";
+import { Group } from "./entity/Group.entity";
+import { NotificationsService } from "../notifications/notifications.service";
+import { GroupInvite } from "./entity/GroupInvite.entity";
+import { GetGroupeResponse } from "./dto/get-group-response-dto";
+import { GetInvitesResponse } from "./dto/get-invites-response-dto";
+import { StudentPreferences } from "../student/entity/StudentPreferences.entity";
+import { StudentDocument } from "../student/entity/StudentDocuments.entity";
+import { CompanyDocument } from "../company/entity/CompanyDocument.entity";
+import { CompanyPreferences } from "../company/entity/CompanyPreferences.entity";
+import { MailService } from "../mail/mail.service";
+import { GetCompanySearchGroupsDto } from "./dto/get-company-search-groups.dto";
+import {CompanySearchGroupsFilterDto} from "./dto/company-search-groups-filter.dto";
 
 describe('NotificationsService', () => {
   let service: GroupService;
@@ -432,6 +431,39 @@ describe('NotificationsService', () => {
 
       expect(service.transferLeadership).toHaveBeenCalledWith(req, 2);
       expect(response).toEqual(null);
+
+    });
+  });
+
+  describe('getAllGroups', () => {
+    it('should get all groups', async () => {
+      const req = {
+        user: {
+          email: "test@gmail.com",
+        }
+      }
+
+      const dto: CompanySearchGroupsFilterDto = {
+        groupName: "Test group",
+      }
+
+      const expectedResponse: GetCompanySearchGroupsDto[] = [
+        {
+          id: 1,
+          name: "Test group",
+          description: "Test group description",
+          studentsProfiles: [],
+          score: 0,
+        }
+      ]
+
+      jest.spyOn(service, 'getAllGroups').mockResolvedValueOnce(expectedResponse);
+
+      const response = await controller.getAllGroups(dto, req);
+
+      expect(service.getAllGroups).toHaveBeenCalledWith(req, dto);
+
+      expect(response).toEqual(expectedResponse);
     });
   });
 
