@@ -7,7 +7,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
-  Query,
+  Query, UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -26,9 +26,11 @@ import { MissionByIdPipe } from './pipes/mission.pipe';
 import { Mission } from '../../mission/entity/mission.entity';
 import { UpdateMission } from './dto/update-mission.dto';
 import { UserAdminService } from '../user-admin/user-admin.service';
+import { AdminGuard } from '../guards/admin/admin.guard';
 
 @ApiBearerAuth()
 @ApiTags('Admin/Missions')
+@UseGuards(AdminGuard)
 @Controller('api/admin/mission')
 export class MissionController {
   constructor(

@@ -35,10 +35,10 @@ import { CompanyUserByIdPipe } from './pipes/company.user.pipe';
 import { UpdateCompanyAdminDto } from './dto/update-company-admin.dto';
 import { RegisterCompanyAdminDto } from './dto/register-company-admin.dto';
 
-//@ApiBearerAuth()
+@ApiBearerAuth()
 @ApiTags('Admin/Users')
 @Controller('api/admin/users')
-//@UseGuards(AdminGuard)
+@UseGuards(AdminGuard)
 //@ApiBearerAuth()
 export class UserAdminController {
   constructor(private readonly userAdminService: UserAdminService) {}

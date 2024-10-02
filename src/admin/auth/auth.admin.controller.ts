@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
 import { AuthAdminService } from './auth.admin.service';
 import {
   ApiBearerAuth,
@@ -10,6 +10,7 @@ import {
 import { LoginAdminResponseDto } from './dto/login-admin-response.dto';
 import { LoginAminDto } from './dto/login-admin.dto';
 import { UserType } from '../../chat/entity/Message.entity';
+import { AdminGuard } from '../guards/admin/admin.guard';
 
 @ApiBearerAuth()
 @ApiTags('Admin/Auth')
@@ -33,6 +34,8 @@ export class AuthAdminController {
   }
 
   @Post('block/:userType/:userId')
+  @ApiBearerAuth()
+  @UseGuards(AdminGuard)
   @ApiOperation({
     description: 'Block user',
     summary: 'Block user',

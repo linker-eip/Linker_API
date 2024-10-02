@@ -10,11 +10,12 @@ import {
   Post,
   Query,
   Req,
-  UploadedFile,
+  UploadedFile, UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { TicketAdminService } from './ticket-admin.service';
 import {
+  ApiBearerAuth,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -24,8 +25,11 @@ import { GetTicketsDto } from '../../ticket/dto/get-ticket.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AnswerTicketDto } from '../../ticket/dto/answer-ticket.dto';
 import { GetTicketReponseDto } from '../../ticket/dto/get-ticket-reponse.dto';
+import { AdminGuard } from '../guards/admin/admin.guard';
 
 @Controller('api/admin/ticket')
+@ApiBearerAuth()
+@UseGuards(AdminGuard)
 @ApiTags('Admin/Ticket')
 export class TicketAdminController {
   constructor(private readonly ticketService: TicketAdminService) {
