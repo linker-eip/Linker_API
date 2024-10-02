@@ -1,21 +1,13 @@
 import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
 import { AuthAdminService } from './auth.admin.service';
-import {
-  ApiBearerAuth,
-  ApiOkResponse,
-  ApiOperation,
-  ApiParam,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { LoginAdminResponseDto } from './dto/login-admin-response.dto';
 import { LoginAminDto } from './dto/login-admin.dto';
 import { UserType } from '../../chat/entity/Message.entity';
 import { AdminGuard } from '../guards/admin/admin.guard';
 
-@ApiBearerAuth()
 @ApiTags('Admin/Auth')
 @Controller('api/admin/auth')
-@ApiBearerAuth()
 export class AuthAdminController {
   constructor(private readonly authAdminService: AuthAdminService) {}
 
@@ -29,8 +21,7 @@ export class AuthAdminController {
     type: LoginAdminResponseDto,
   })
   async loginAdmin(@Body() body: LoginAminDto): Promise<LoginAdminResponseDto> {
-    const admin = await this.authAdminService.loginAdmin(body);
-    return admin;
+    return await this.authAdminService.loginAdmin(body);
   }
 
   @Post('block/:userType/:userId')

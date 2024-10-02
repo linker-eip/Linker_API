@@ -1,3 +1,4 @@
+import * as bcrypt from 'bcrypt';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { LoginAdminResponseDto } from './dto/login-admin-response.dto';
 import { LoginAminDto } from './dto/login-admin.dto';
@@ -31,14 +32,17 @@ export class AuthAdminService {
         HttpStatus.UNAUTHORIZED,
       );
     }
-    if (body.password === adminUser.password) {
+    if (await bcrypt.compare(body.password, adminUser.password)) {
       const token = jwt.sign(
         { email: adminUser.email, userType: 'USER_ADMIN' },
         process.env.JWT_SECRET,
       );
       return { token };
     }
-    return null;
+    throw new HttpException(
+      'Mot de passe incorrect',
+      HttpStatus.UNAUTHORIZED,
+    );
   }
 
   async blockUser(
