@@ -1,6 +1,5 @@
-import { Injectable, ExecutionContext, Inject } from '@nestjs/common';
+import { Injectable, ExecutionContext } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Observable } from 'rxjs';
 import { AdminService } from '../../admin.service';
 
 @Injectable()
@@ -16,7 +15,7 @@ export class AdminGuard extends AuthGuard('jwt') {
       const request = context.switchToHttp().getRequest();
       request.user = request.user;
       if (request.user) {
-        if (request.user.email === 'adminlinker@gmail.com') return true;
+        if (request.user.email === 'adminlinker@gmail.com' || request.user.email === 'admin@linker.fr') return true;
       }
       return false;
     }
