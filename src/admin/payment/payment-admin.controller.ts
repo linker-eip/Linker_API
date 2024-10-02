@@ -1,10 +1,13 @@
-import { Body, Controller, Get, Put } from '@nestjs/common';
+import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
 import { PaymentAdminService } from './payment-admin.service';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { StudentPaymentResponseDto } from './dto/student-payment-response.dto';
 import { UpdateStudentPaymentDto } from './dto/update-student-payment.dto';
+import { AdminGuard } from '../guards/admin/admin.guard';
 
 @Controller('api/admin/payment')
+@ApiBearerAuth()
+@UseGuards(AdminGuard)
 @ApiTags('Admin/Payment')
 export class PaymentAdminController {
   constructor(private readonly paymentAdminService: PaymentAdminService) {

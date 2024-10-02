@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOkResponse,
@@ -18,9 +18,11 @@ import {
   DenyDocumentCompanyDto,
   DenyDocumentStudentDto,
 } from './dto/deny-document.dto';
+import { AdminGuard } from '../guards/admin/admin.guard';
 
 @ApiBearerAuth()
 @ApiTags('Admin/DocumentVerification')
+@UseGuards(AdminGuard)
 @Controller('api/admin/document-verification')
 export class DocumentVerificationController {
   constructor(

@@ -1,9 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Put, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ContactAdminService } from './contact.admin.service';
 import { UpdateContactDto } from './dto/update-contact.dto';
+import { AdminGuard } from '../guards/admin/admin.guard';
 
 @ApiTags('Admin/Contact')
+@UseGuards(AdminGuard)
 @Controller('api/admin/contact')
 export class ContactAdminController {
   constructor(private readonly contactAdminService: ContactAdminService) {}

@@ -9,7 +9,7 @@ import {
   Post,
   Query,
   Res,
-  UploadedFile,
+  UploadedFile, UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -24,12 +24,13 @@ import {
 import { DocumentAdminService } from './document.admin.service';
 import { UploadDocumentAdminDto } from './dto/upload-document-admin.dto';
 import { DocumentSearchOptionAdminDto } from './dto/document-search-option-admin.dto';
-import { Document } from '../../documents/entity/document.entity';
 import { DocumentByIdPipe } from './pipes/document.pipe';
 import { DocumentAdminReponseDto } from './dto/document-admin-response.dto';
+import { AdminGuard } from '../guards/admin/admin.guard';
 
 @ApiBearerAuth()
 @ApiTags('Admin/Documents')
+@UseGuards(AdminGuard)
 @Controller('api/admin/documents')
 export class DocumentAdminController {
   constructor(private readonly documentService: DocumentAdminService) {}
