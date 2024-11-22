@@ -73,7 +73,7 @@ export class GroupController {
     type: GetGroupeResponse,
   })
   @ApiResponse({
-    status: 404,
+    status: 204,
     description: 'Group not found',
   })
   async getGroup(@Req() req): Promise<GetGroupeResponse> {
