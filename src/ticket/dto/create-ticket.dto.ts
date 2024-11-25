@@ -17,6 +17,7 @@ export class CreateTicketDto {
   @ApiProperty({ description: 'Identifiant de l\'entité' })
   @IsOptional()
   @IsNumber()
+  @IsOptional()
   entityId?: number;
 
   @ApiProperty({ description: 'Type de ticket' })

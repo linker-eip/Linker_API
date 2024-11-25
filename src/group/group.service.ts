@@ -203,7 +203,7 @@ export class GroupService {
     if (student.groupId == null) {
       throw new HttpException(
         'Vous n\'avez pas de groupe',
-        HttpStatus.NOT_FOUND,
+        HttpStatus.NO_CONTENT,
       );
     }
     try {
@@ -217,7 +217,7 @@ export class GroupService {
     if (group == null) {
       throw new HttpException(
         'Vous n\'avez pas de groupe',
-        HttpStatus.NOT_FOUND,
+        HttpStatus.NO_CONTENT,
       );
     }
 
