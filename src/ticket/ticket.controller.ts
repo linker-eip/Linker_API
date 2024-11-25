@@ -55,7 +55,7 @@ export class TicketController {
             maxSize: 3_500_000,
           }),
           new FileTypeValidator({
-            fileType: 'image/jpeg',
+            fileType: /(image\/jpeg|image\/png)/,
           }),
         ],
       }),
@@ -95,7 +95,7 @@ export class TicketController {
             maxSize: 3_500_000,
           }),
           new FileTypeValidator({
-            fileType: 'image/jpeg',
+            fileType: /(image\/jpeg|image\/png)/,
           }),
         ],
       }),

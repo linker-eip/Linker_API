@@ -14,9 +14,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
-  ApiBody,
   ApiOperation,
-  ApiProperty,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -26,7 +24,6 @@ import { StudentConversationResponseDto } from './dto/student-conversation-respo
 import { CompanyConversationResponseDto } from './dto/company-conversation-response.dto';
 import { SendFileInChatDto } from './dto/chat-send-file.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { UploadDocumentAdminDto } from '../admin/document/dto/upload-document-admin.dto';
 
 @ApiBearerAuth()
 @UseGuards(VerifiedUserGuard)
@@ -70,7 +67,7 @@ export class ChatController {
             maxSize: 3_500_000,
           }),
           new FileTypeValidator({
-            fileType: 'image/jpeg',
+            fileType: /(image\/jpeg|image\/png)/,
           }),
         ],
       }),

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNumber, IsString, MaxLength } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString, MaxLength } from 'class-validator';
 import { TicketTypeEnum } from '../entity/Ticket.entity';
 
 export class CreateTicketDto {
@@ -16,6 +16,7 @@ export class CreateTicketDto {
 
   @ApiProperty({ description: 'Identifiant de l\'entité' })
   @IsNumber()
+  @IsOptional()
   entityId?: number;
 
   @ApiProperty({ description: 'Type de ticket' })
