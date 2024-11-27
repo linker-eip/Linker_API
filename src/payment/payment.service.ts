@@ -18,6 +18,7 @@ import { StudentPaymentStatus } from './enum/student-payment.status.enum';
 import { InvoiceService } from '../invoice/invoice.service';
 import { CompanyCreateInvoiceDto } from '../company/dto/company-create-invoice.dto';
 import Stripe from 'stripe';
+import { LinkerInvoiceCompanyDto } from '../invoice/dto/linker-invoice-company.dto';
 
 @Injectable()
 export class PaymentService {
@@ -128,6 +129,35 @@ export class PaymentService {
 
       await this.invoiceService.generateInvoice(company.email, invoiceData);
     }
+
+    const companyInvoiceData = new LinkerInvoiceCompanyDto();
+    companyInvoiceData.missionId = mission.id;
+    companyInvoiceData.companyId = company.id;
+    companyInvoiceData.companyEmail = company.email;
+
+    companyInvoiceData.amount = missionDetails.missionTaskArray.reduce(
+      (total, taskItem) => total + taskItem.missionTask.amount,
+      0,
+    );
+
+    companyInvoiceData.headerFields = [
+      'Tache',
+      'Etudiant',
+      'Description',
+      'Montant',
+    ];
+    companyInvoiceData.rows = missionDetails.missionTaskArray.map(
+      (taskItem) => ({
+        Tache: taskItem.missionTask.name,
+        Etudiant: taskItem.studentProfile
+          ? `${taskItem.studentProfile.firstName} ${taskItem.studentProfile.lastName}`
+          : 'Non assigné',
+        Description: taskItem.missionTask.description,
+        Montant: taskItem.missionTask.amount,
+      }),
+    );
+
+    await this.invoiceService.generateInvoiceForCompany(companyInvoiceData);
 
     mission.status = MissionStatus.PROVISIONED;
     payment.status = PaymentStatus.PAID;
