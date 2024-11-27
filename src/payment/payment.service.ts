@@ -83,7 +83,17 @@ export class PaymentService {
       throw new NotFoundException('Mission is not a group mission');
     }
 
-    for (const groupStudent of missionDetails.groupStudents) {
+    const studentIdsWithTasks = new Set(
+      missionDetails.missionTaskArray
+        .filter((taskItem) => taskItem.studentProfile !== null)
+        .map((taskItem) => taskItem.studentProfile.id),
+    );
+
+    const studentsWithTasks = missionDetails.groupStudents.filter(
+      (groupStudent) => studentIdsWithTasks.has(groupStudent.studentProfile.id),
+    );
+
+    for (const groupStudent of studentsWithTasks) {
       const studentProfile = groupStudent.studentProfile;
 
       const studentMissionTasks = missionDetails.missionTaskArray.filter(
@@ -94,14 +104,16 @@ export class PaymentService {
       invoiceData.missionId = mission.id;
       invoiceData.studentId = studentProfile.id;
 
-      const totalTasks = missionDetails.missionTaskArray.length;
-      const studentTaskCount = studentMissionTasks.length;
-      invoiceData.amount = mission.amount * (studentTaskCount / totalTasks);
+      invoiceData.amount = studentMissionTasks.reduce(
+        (total, taskItem) => total + taskItem.missionTask.amount,
+        0,
+      );
 
-      invoiceData.headerFields = ['Tâche', 'Description'];
+      invoiceData.headerFields = ['Tacbe', 'Description', 'Montant'];
       invoiceData.rows = studentMissionTasks.map((taskItem) => ({
-        task: taskItem.missionTask.title,
-        description: taskItem.missionTask.description,
+        Tache: taskItem.missionTask.name,
+        Description: taskItem.missionTask.description,
+        Montant: taskItem.missionTask.amount,
       }));
 
       await this.invoiceService.generateInvoice(company.email, invoiceData);
