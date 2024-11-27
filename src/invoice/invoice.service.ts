@@ -21,6 +21,7 @@ import { DocumentTypeEnum } from '../documents/enum/document-type.enum';
 import { DocumentUserEnum } from '../documents/enum/document-user.enum';
 import { LinkerInvoiceCompanyDto } from './dto/linker-invoice-company.dto';
 import { PaymentService } from '../payment/payment.service';
+import { StudentProfile } from '../student/entity/StudentProfile.entity';
 
 interface Row {
   [key: string]: string | number;
@@ -74,13 +75,13 @@ export class InvoiceService {
       ? studentProfile.location
       : '';
 
-    return this.generatePdf('invoice.pdf', Data, companyProfile);
+    return this.generatePdfForStudent('invoice.pdf', Data, studentProfile);
   }
 
-  async generatePdf(
+  async generatePdfForStudent(
     filePath: string,
     data: CompanyInvoiceDataDto,
-    companyProfile: CompanyProfile,
+    studentProfile: StudentProfile,
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       const pdf = new PDFDocument();
@@ -226,8 +227,8 @@ export class InvoiceService {
             const doc = new Document();
             doc.documentPath = filepath;
             doc.documentType = DocumentTypeEnum.INVOICE;
-            doc.documentUser = DocumentUserEnum.COMPANY;
-            doc.userId = companyProfile.companyId;
+            doc.documentUser = DocumentUserEnum.STUDENT;
+            doc.userId = studentProfile.studentId;
             this.DocumentAdminRepository.save(doc);
           });
 
@@ -346,7 +347,7 @@ export class InvoiceService {
       pdf.pipe(stream);
 
       pdf.rect(0, 0, 612, 60).fill('#005275');
-      pdf.image('assets/linker_logo.png', 0, 10, { width: 150 });
+      //pdf.image('assets/linker_logo.png', 0, 10, { width: 150 });
 
       const headerText = 'Linker';
       const headerWidth = pdf.widthOfString(headerText);
@@ -466,7 +467,7 @@ export class InvoiceService {
             const doc = new Document();
             doc.documentPath = filepath;
             doc.documentType = DocumentTypeEnum.INVOICE;
-            doc.documentUser = DocumentUserEnum.LINKER;
+            doc.documentUser = DocumentUserEnum.COMPANY;
             doc.userId = companyProfile.companyId;
             this.DocumentAdminRepository.save(doc);
           });

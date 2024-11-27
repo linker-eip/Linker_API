@@ -69,6 +69,7 @@ export class PaymentService {
     if (!mission) {
       throw new NotFoundException('Mission not found');
     }
+    console.log('mission', mission);
 
     const company = await this.companyService.findCompanyById(
       mission.companyId,
@@ -83,33 +84,42 @@ export class PaymentService {
       throw new NotFoundException('Mission is not a group mission');
     }
 
+    console.log('missionDetails', missionDetails);
+
     const studentIdsWithTasks = new Set(
       missionDetails.missionTaskArray
         .filter((taskItem) => taskItem.studentProfile !== null)
-        .map((taskItem) => taskItem.studentProfile.id),
+        .map((taskItem) => taskItem.studentProfile.studentId),
     );
 
     const studentsWithTasks = missionDetails.groupStudents.filter(
-      (groupStudent) => studentIdsWithTasks.has(groupStudent.studentProfile.id),
+      (groupStudent) =>
+        studentIdsWithTasks.has(groupStudent.studentProfile.studentId),
     );
+
+    console.log('studentsWithTasks', studentsWithTasks);
 
     for (const groupStudent of studentsWithTasks) {
       const studentProfile = groupStudent.studentProfile;
+      console.log('studentProfile', studentProfile);
 
       const studentMissionTasks = missionDetails.missionTaskArray.filter(
-        (taskItem) => taskItem.studentProfile?.id === studentProfile.id,
+        (taskItem) =>
+          taskItem.studentProfile?.studentId === studentProfile.studentId,
       );
+      console.log('studentMissionTasks', studentMissionTasks);
 
       const invoiceData = new CompanyCreateInvoiceDto();
       invoiceData.missionId = mission.id;
-      invoiceData.studentId = studentProfile.id;
+      invoiceData.studentId = studentProfile.studentId;
 
       invoiceData.amount = studentMissionTasks.reduce(
         (total, taskItem) => total + taskItem.missionTask.amount,
         0,
       );
+      console.log('invoiceData', invoiceData);
 
-      invoiceData.headerFields = ['Tacbe', 'Description', 'Montant'];
+      invoiceData.headerFields = ['Tache', 'Description', 'Montant'];
       invoiceData.rows = studentMissionTasks.map((taskItem) => ({
         Tache: taskItem.missionTask.name,
         Description: taskItem.missionTask.description,
