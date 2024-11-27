@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { createWriteStream } from 'fs';
 import * as PDFDocument from 'pdfkit';
 import { CompanyInvoiceDataDto } from '../company/dto/company-invoice-data.dto';
@@ -15,6 +15,7 @@ import { createReadStream } from 'fs';
 import { DocumentTypeEnum } from '../documents/enum/document-type.enum';
 import { DocumentUserEnum } from '../documents/enum/document-user.enum';
 import { LinkerInvoiceCompanyDto } from './dto/linker-invoice-company.dto';
+import { PaymentService } from '../payment/payment.service';
 
 interface Row {
   [key: string]: string | number;
@@ -24,12 +25,15 @@ interface Row {
 export class InvoiceService {
   constructor(
     @InjectRepository(CompanyProfile)
-    private readonly companyProfileRepository: Repository<CompanyProfile>,
-    private readonly missionService: MissionService,
-    private readonly studentService: StudentService,
+    private companyProfileRepository: Repository<CompanyProfile>,
+    @Inject(forwardRef(() => MissionService))
+    private missionService: MissionService,
+    private studentService: StudentService,
     @InjectRepository(Document)
-    private readonly DocumentAdminRepository: Repository<Document>,
-    private readonly fileService: FileService,
+    private DocumentAdminRepository: Repository<Document>,
+    private fileService: FileService,
+    @Inject(forwardRef(() => PaymentService))
+    private paymentService: PaymentService,
   ) {}
 
   async generateInvoice(email: string, body: CompanyCreateInvoiceDto) {
