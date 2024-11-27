@@ -118,8 +118,7 @@ export class PaymentService {
   }
 
   async createPaymentRow(missionId: number, req: any) {
-    const Stripe = require('stripe');
-    const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
     const mission = await this.missionService.findMissionById(missionId);
 
     if (!mission) {
