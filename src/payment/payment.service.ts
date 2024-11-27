@@ -7,18 +7,17 @@ import {
 import { MissionService } from '../mission/mission.service';
 import { Payment } from './entity/payment.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Not, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { PaymentStatus } from './enum/payment.status.enum';
 import { CompanyService } from '../company/company.service';
 import { MissionStatus } from '../mission/enum/mission-status.enum';
 import { StudentPayment } from './entity/student-payment.entity';
 import { StudentService } from '../student/student.service';
-import { StudentPaymentResponseDto } from '../payment/dto/student-payment-response.dto';
+import { StudentPaymentResponseDto } from './dto/student-payment-response.dto';
 import { StudentPaymentStatus } from './enum/student-payment.status.enum';
 import { InvoiceService } from '../invoice/invoice.service';
-import { CompanyCreateInvoiceDto } from 'src/company/dto/company-create-invoice.dto';
-
-import Stripe from "stripe";
+import { CompanyCreateInvoiceDto } from '../company/dto/company-create-invoice.dto';
+import Stripe from 'stripe';
 
 @Injectable()
 export class PaymentService {
