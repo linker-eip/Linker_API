@@ -1,4 +1,9 @@
-import { forwardRef, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { createWriteStream } from 'fs';
 import * as PDFDocument from 'pdfkit';
 import { CompanyInvoiceDataDto } from '../company/dto/company-invoice-data.dto';
@@ -93,7 +98,7 @@ export class InvoiceService {
       pdf.pipe(stream);
 
       pdf.rect(0, 0, 612, 60).fill('#005275');
-      pdf.image('https://eiplinkerbucket.s3.eu-west-3.amazonaws.com/2YmvVBINQ4pXYCoZud5KWmquGCMXVmiTnDZKBdsuUJLZuico', 0, 10, { width: 150 });
+      // pdf.image('https://eiplinkerbucket.s3.eu-west-3.amazonaws.com/2YmvVBINQ4pXYCoZud5KWmquGCMXVmiTnDZKBdsuUJLZuico', 0, 10, { width: 150 });
 
       const headerText = data.companyName;
       const headerWidth = pdf.widthOfString(headerText);
