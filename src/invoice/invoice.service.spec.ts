@@ -194,7 +194,7 @@ describe('InvoiceService', () => {
         {
           provide: InvoiceService,
           useValue: {
-            getInvoices: jest.fn(),
+            getInvoicesForCompany: jest.fn(),
             generateInvoice: jest.fn(),
             downloadInvoice: jest.fn(),
             deleteInvoice: jest.fn(),
@@ -215,7 +215,7 @@ describe('InvoiceService', () => {
     controller = module.get<InvoiceController>(InvoiceController);
   });
 
-  describe('getInvoices', () => {
+  describe('getInvoicesForCompany', () => {
     it('should return an array of invoices', async () => {
       const req = {
         user: {
@@ -242,11 +242,15 @@ describe('InvoiceService', () => {
         },
       ];
 
-      jest.spyOn(service, 'getInvoices').mockResolvedValueOnce(document);
+      jest
+        .spyOn(service, 'getInvoicesForCompany')
+        .mockResolvedValueOnce(document);
 
-      const response = await controller.getInvoices(req);
+      const response = await controller.getInvoicesForCompany(req);
 
-      expect(service.getInvoices).toHaveBeenCalledWith(req.user.email);
+      expect(service.getInvoicesForCompany).toHaveBeenCalledWith(
+        req.user.email,
+      );
       expect(response).toEqual(document);
     });
   });
