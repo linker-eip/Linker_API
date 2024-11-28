@@ -270,7 +270,7 @@ export class InvoiceService {
     }
   }
 
-  async getInvoices(email: string): Promise<any> {
+  async getInvoicesForCompany(email: string): Promise<any> {
     const companyProfile = await this.companyProfileRepository.findOne({
       where: { email: email },
     });
@@ -282,6 +282,26 @@ export class InvoiceService {
     });
     documentsQuery.andWhere('document.userId = :userId', {
       userId: companyProfile.companyId,
+    });
+    documentsQuery.andWhere('document.documentType = :documentType', {
+      documentType: DocumentTypeEnum.INVOICE,
+    });
+    const documents = await documentsQuery.getMany();
+    return documents;
+  }
+
+  async getInvoicesForStudent(email: string): Promise<any> {
+    const studentProfile = await this.studentService.findStudentProfile(
+      email,
+    );
+    if (!studentProfile) throw new Error(`Could not find student profile`);
+    const documentsQuery =
+      this.DocumentAdminRepository.createQueryBuilder('document');
+    documentsQuery.where('document.documentUser = :documentUser', {
+      documentUser: DocumentUserEnum.STUDENT,
+    });
+    documentsQuery.andWhere('document.userId = :userId', {
+      userId: studentProfile.id,
     });
     documentsQuery.andWhere('document.documentType = :documentType', {
       documentType: DocumentTypeEnum.INVOICE,

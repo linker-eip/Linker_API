@@ -55,9 +55,14 @@ export class InvoiceController {
     this.pdfService.downloadInvoice(id, res);
   }
 
-  @Get('')
-  async getInvoices(@Req() req): Promise<any> {
-    return this.pdfService.getInvoices(req.user.email);
+  @Get('company')
+  async getInvoicesForCompany(@Req() req): Promise<any> {
+    return this.pdfService.getInvoicesForCompany(req.user.email);
+  }
+
+  @Get('student')
+  async getInvoicesForStudent(@Req() req): Promise<any> {
+    return this.pdfService.getInvoicesForStudent(req.user.email);
   }
 
   @Delete(':id')
