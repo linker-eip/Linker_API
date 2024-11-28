@@ -7,12 +7,14 @@ import { StudentPayment } from './entity/student-payment.entity';
 import { CompanyModule } from '../company/company.module';
 import { MissionModule } from '../mission/mission.module';
 import { StudentModule } from '../student/student.module';
+import { InvoiceModule } from '../invoice/invoice.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Payment, StudentPayment]),
     CompanyModule,
     forwardRef(() => MissionModule),
+    forwardRef(() => InvoiceModule),
     StudentModule,
   ],
   controllers: [PaymentController],

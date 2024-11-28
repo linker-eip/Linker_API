@@ -11,6 +11,7 @@ import { MissionInvite } from './entity/mission-invite.entity';
 import { PaymentModule } from '../payment/payment.module';
 import { DocumentTransferModule } from '../document-transfer/src/document-transfer.module';
 import { CompanyDocument } from '../company/entity/CompanyDocument.entity';
+import { InvoiceModule } from '../invoice/invoice.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { CompanyDocument } from '../company/entity/CompanyDocument.entity';
     StudentModule,
     PaymentModule,
     forwardRef(() => PaymentModule),
+    forwardRef(() => InvoiceModule),
     DocumentTransferModule,
   ],
   providers: [MissionService],
