@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { createWriteStream } from 'fs';
 import * as PDFDocument from 'pdfkit';
 import { CompanyInvoiceDataDto } from '../company/dto/company-invoice-data.dto';
@@ -15,6 +20,8 @@ import { createReadStream } from 'fs';
 import { DocumentTypeEnum } from '../documents/enum/document-type.enum';
 import { DocumentUserEnum } from '../documents/enum/document-user.enum';
 import { LinkerInvoiceCompanyDto } from './dto/linker-invoice-company.dto';
+import { PaymentService } from '../payment/payment.service';
+import { StudentProfile } from '../student/entity/StudentProfile.entity';
 
 interface Row {
   [key: string]: string | number;
@@ -24,12 +31,15 @@ interface Row {
 export class InvoiceService {
   constructor(
     @InjectRepository(CompanyProfile)
-    private readonly companyProfileRepository: Repository<CompanyProfile>,
-    private readonly missionService: MissionService,
-    private readonly studentService: StudentService,
+    private companyProfileRepository: Repository<CompanyProfile>,
+    @Inject(forwardRef(() => MissionService))
+    private missionService: MissionService,
+    private studentService: StudentService,
     @InjectRepository(Document)
-    private readonly DocumentAdminRepository: Repository<Document>,
-    private readonly fileService: FileService,
+    private DocumentAdminRepository: Repository<Document>,
+    private fileService: FileService,
+    @Inject(forwardRef(() => PaymentService))
+    private paymentService: PaymentService,
   ) {}
 
   async generateInvoice(email: string, body: CompanyCreateInvoiceDto) {
@@ -65,13 +75,13 @@ export class InvoiceService {
       ? studentProfile.location
       : '';
 
-    return this.generatePdf('invoice.pdf', Data, companyProfile);
+    return this.generatePdfForStudent('invoice.pdf', Data, studentProfile);
   }
 
-  async generatePdf(
+  async generatePdfForStudent(
     filePath: string,
     data: CompanyInvoiceDataDto,
-    companyProfile: CompanyProfile,
+    studentProfile: StudentProfile,
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       const pdf = new PDFDocument();
@@ -89,7 +99,7 @@ export class InvoiceService {
       pdf.pipe(stream);
 
       pdf.rect(0, 0, 612, 60).fill('#005275');
-      pdf.image('assets/linker_logo.png', 0, 10, { width: 150 });
+      // pdf.image('https://eiplinkerbucket.s3.eu-west-3.amazonaws.com/2YmvVBINQ4pXYCoZud5KWmquGCMXVmiTnDZKBdsuUJLZuico', 0, 10, { width: 150 });
 
       const headerText = data.companyName;
       const headerWidth = pdf.widthOfString(headerText);
@@ -217,8 +227,8 @@ export class InvoiceService {
             const doc = new Document();
             doc.documentPath = filepath;
             doc.documentType = DocumentTypeEnum.INVOICE;
-            doc.documentUser = DocumentUserEnum.COMPANY;
-            doc.userId = companyProfile.companyId;
+            doc.documentUser = DocumentUserEnum.STUDENT;
+            doc.userId = studentProfile.studentId;
             this.DocumentAdminRepository.save(doc);
           });
 
@@ -260,7 +270,7 @@ export class InvoiceService {
     }
   }
 
-  async getInvoices(email: string): Promise<any> {
+  async getInvoicesForCompany(email: string): Promise<any> {
     const companyProfile = await this.companyProfileRepository.findOne({
       where: { email: email },
     });
@@ -272,6 +282,26 @@ export class InvoiceService {
     });
     documentsQuery.andWhere('document.userId = :userId', {
       userId: companyProfile.companyId,
+    });
+    documentsQuery.andWhere('document.documentType = :documentType', {
+      documentType: DocumentTypeEnum.INVOICE,
+    });
+    const documents = await documentsQuery.getMany();
+    return documents;
+  }
+
+  async getInvoicesForStudent(email: string): Promise<any> {
+    const studentProfile = await this.studentService.findStudentProfile(
+      email,
+    );
+    if (!studentProfile) throw new Error(`Could not find student profile`);
+    const documentsQuery =
+      this.DocumentAdminRepository.createQueryBuilder('document');
+    documentsQuery.where('document.documentUser = :documentUser', {
+      documentUser: DocumentUserEnum.STUDENT,
+    });
+    documentsQuery.andWhere('document.userId = :userId', {
+      userId: studentProfile.id,
     });
     documentsQuery.andWhere('document.documentType = :documentType', {
       documentType: DocumentTypeEnum.INVOICE,
@@ -337,7 +367,7 @@ export class InvoiceService {
       pdf.pipe(stream);
 
       pdf.rect(0, 0, 612, 60).fill('#005275');
-      pdf.image('assets/linker_logo.png', 0, 10, { width: 150 });
+      //pdf.image('assets/linker_logo.png', 0, 10, { width: 150 });
 
       const headerText = 'Linker';
       const headerWidth = pdf.widthOfString(headerText);
@@ -457,7 +487,7 @@ export class InvoiceService {
             const doc = new Document();
             doc.documentPath = filepath;
             doc.documentType = DocumentTypeEnum.INVOICE;
-            doc.documentUser = DocumentUserEnum.LINKER;
+            doc.documentUser = DocumentUserEnum.COMPANY;
             doc.userId = companyProfile.companyId;
             this.DocumentAdminRepository.save(doc);
           });

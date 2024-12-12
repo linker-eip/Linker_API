@@ -47,10 +47,34 @@ import { PaymentService } from '../payment/payment.service';
 import { Payment } from '../payment/entity/payment.entity';
 import { StudentPayment } from '../payment/entity/student-payment.entity';
 import { AiService } from '../ai/ai.service';
+import { InvoiceService } from '../invoice/invoice.service';
 
 describe('MissionService', () => {
   let service: MissionService;
   let controller: MissionController;
+
+  const missionRepositoryMock = {
+    findOne: jest.fn(),
+    findOneBy: jest.fn().mockImplementation(() => {
+      return {
+        id: 1,
+        name: 'Test Mission',
+      };
+    }),
+    find: jest.fn(),
+    save: jest.fn(),
+    create: jest.fn(),
+    delete: jest.fn(),
+  };
+
+  const mockInvoiceService = {
+    generateInvoice: jest.fn(),
+    generateInvoiceForCompany: jest.fn(),
+    downloadInvoice: jest.fn(),
+    getInvoicesForCompany: jest.fn(),
+    getInvoicesForStudent: jest.fn(),
+    deleteInvoice: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -77,10 +101,26 @@ describe('MissionService', () => {
         DocumentTransferService,
         ConfigService,
         MailService,
-        PaymentService,
+        {
+          provide: PaymentService,
+          useValue: {
+            createStudentPayment: jest.fn(),
+            createProductAndCheckoutSession: jest.fn(),
+            paymentSuccess: jest.fn(),
+            getPayment: jest.fn(),
+            getStudentPayment: jest.fn(),
+            getStudentPaymentById: jest.fn(),
+            receiveStudentPayment: jest.fn(),
+            createPaymentRow: jest.fn(),
+          },
+        },
+        {
+          provide: InvoiceService,
+          useValue: mockInvoiceService,
+        },
         {
           provide: getRepositoryToken(Mission),
-          useClass: Repository,
+          useValue: missionRepositoryMock,
         },
         {
           provide: getRepositoryToken(CompanyUser),
@@ -100,11 +140,26 @@ describe('MissionService', () => {
         },
         {
           provide: getRepositoryToken(MissionTask),
-          useClass: Repository,
+          useValue: {
+            findOne: jest.fn(),
+            findOneBy: jest.fn(),
+            find: jest.fn(),
+            save: jest.fn(),
+            create: jest.fn(),
+            delete: jest.fn(),
+            update: jest.fn(),
+          },
         },
         {
           provide: getRepositoryToken(MissionInvite),
-          useClass: Repository,
+          useValue: {
+            findOne: jest.fn(),
+            findOneBy: jest.fn(),
+            find: jest.fn(),
+            save: jest.fn(),
+            create: jest.fn(),
+            delete: jest.fn(),
+          },
         },
         {
           provide: getRepositoryToken(Group),
@@ -159,6 +214,19 @@ describe('MissionService', () => {
         {
           provide: getRepositoryToken(Studies),
           useClass: Repository,
+        },
+        {
+          provide: InvoiceService,
+          useValue: {
+            generateInvoice: jest.fn(),
+            generateInvoiceForCompany: jest.fn(),
+          },
+        },
+        {
+          provide: PaymentService,
+          useValue: {
+            createStudentPayment: jest.fn(),
+          },
         },
       ],
     })
@@ -609,6 +677,25 @@ describe('MissionService', () => {
       expect(service.getMissionDetailsCompany).toHaveBeenCalledWith(1, req);
 
       expect(response).toEqual(expectedResponse);
+    });
+  });
+
+  describe('getMissionDetailsCompanyV2', () => {
+    it('should get mission details for company', async () => {
+      const mockedResult = {
+        companyProfile: { id: 1, name: 'Test Company' } as CompanyProfile,
+        mission: { id: 1, name: 'Test Mission' } as Mission,
+        missionTaskArray: [],
+        group: null,
+        groupStudents: [],
+      };
+
+      jest
+        .spyOn(service, 'getMissionDetailsCompanyV2')
+        .mockResolvedValue(mockedResult);
+
+      const result = await service.getMissionDetailsCompanyV2(1, 'test@example.com');
+      expect(result).toEqual(mockedResult);
     });
   });
 

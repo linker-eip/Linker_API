@@ -3,7 +3,7 @@ import { InvoiceService } from './invoice.service';
 import { CompanyCreateInvoiceDto } from '../company/dto/company-create-invoice.dto';
 import { CompanyInvoiceDataDto } from '../company/dto/company-invoice-data.dto';
 import { CompanyProfile } from '../company/entity/CompanyProfile.entity';
-import { NotFoundException } from '@nestjs/common';
+import { forwardRef, NotFoundException } from '@nestjs/common';
 import { MissionService } from '../mission/mission.service';
 import { StudentService } from '../student/student.service';
 import { Repository } from 'typeorm';
@@ -57,7 +57,15 @@ describe('InvoiceService', () => {
       controllers: [InvoiceController],
       providers: [
         InvoiceService,
-        MissionService,
+        {
+          provide: MissionService,
+          useValue: {
+            findMissionById: jest.fn(),
+            getMissionDetailsCompanyV2: jest.fn(),
+            saveMission: jest.fn(),
+            getMissionTasks: jest.fn(),
+          },
+        },
         StudentService,
         FileService,
         AiService,
@@ -71,7 +79,18 @@ describe('InvoiceService', () => {
         NotificationsService,
         ConfigService,
         AiService,
-        PaymentService,
+        {
+          provide: PaymentService,
+          useValue: {
+            createStudentPayment: jest.fn(),
+            createProductAndCheckoutSession: jest.fn(),
+            paymentSuccess: jest.fn(),
+            getPayment: jest.fn(),
+            getStudentPayment: jest.fn(),
+            getStudentPaymentById: jest.fn(),
+            receiveStudentPayment: jest.fn(),
+          },
+        },
         MailService,
         {
           provide: getRepositoryToken(Mission),
@@ -79,7 +98,19 @@ describe('InvoiceService', () => {
         },
         {
           provide: getRepositoryToken(CompanyProfile),
-          useClass: Repository,
+          useValue: {
+            findOne: jest.fn(),
+            findOneBy: jest.fn(),
+            find: jest.fn(),
+            save: jest.fn(),
+            create: jest.fn(),
+            delete: jest.fn(),
+            createQueryBuilder: jest.fn(() => ({
+              where: jest.fn().mockReturnThis(),
+              andWhere: jest.fn().mockReturnThis(),
+              getMany: jest.fn().mockResolvedValue([]),
+            })),
+          },
         },
         {
           provide: getRepositoryToken(Payment),
@@ -161,7 +192,19 @@ describe('InvoiceService', () => {
         },
         {
           provide: getRepositoryToken(Document),
-          useClass: Repository,
+          useValue: {
+            findOne: jest.fn(),
+            findOneBy: jest.fn(),
+            find: jest.fn(),
+            save: jest.fn(),
+            create: jest.fn(),
+            delete: jest.fn(),
+            createQueryBuilder: jest.fn(() => ({
+              where: jest.fn().mockReturnThis(),
+              andWhere: jest.fn().mockReturnThis(),
+              getMany: jest.fn().mockResolvedValue([]),
+            })),
+          },
         },
         {
           provide: getRepositoryToken(CompanyProfile),
@@ -192,9 +235,20 @@ describe('InvoiceService', () => {
           useClass: Repository,
         },
         {
+          provide: MissionService,
+          useValue: {
+            findMissionById: jest.fn(),
+          },
+        },
+        {
+          provide: PaymentService,
+          useValue: {},
+        },
+        {
           provide: InvoiceService,
           useValue: {
-            getInvoices: jest.fn(),
+            getInvoicesForCompany: jest.fn(),
+            getInvoicesForStudent: jest.fn(),
             generateInvoice: jest.fn(),
             downloadInvoice: jest.fn(),
             deleteInvoice: jest.fn(),
@@ -215,7 +269,7 @@ describe('InvoiceService', () => {
     controller = module.get<InvoiceController>(InvoiceController);
   });
 
-  describe('getInvoices', () => {
+  describe('getInvoicesForCompany', () => {
     it('should return an array of invoices', async () => {
       const req = {
         user: {
@@ -242,11 +296,55 @@ describe('InvoiceService', () => {
         },
       ];
 
-      jest.spyOn(service, 'getInvoices').mockResolvedValueOnce(document);
+      jest
+        .spyOn(service, 'getInvoicesForCompany')
+        .mockResolvedValueOnce(document);
 
-      const response = await controller.getInvoices(req);
+      const response = await controller.getInvoicesForCompany(req);
 
-      expect(service.getInvoices).toHaveBeenCalledWith(req.user.email);
+      expect(service.getInvoicesForCompany).toHaveBeenCalledWith(
+        req.user.email,
+      );
+      expect(response).toEqual(document);
+    });
+  });
+
+  describe('getInvoicesForStudent', () => {
+    it('should return an array of invoices', async () => {
+      const req = {
+        user: {
+          email: 'test@gmail.com',
+        },
+      };
+
+      const document: Document[] = [
+        {
+          id: 1,
+          documentPath: 'test',
+          documentType: DocumentTypeEnum.INVOICE,
+          documentUser: DocumentUserEnum.STUDENT,
+          userId: 1,
+          createdAt: new Date(),
+        },
+        {
+          id: 2,
+          documentPath: 'test',
+          documentType: DocumentTypeEnum.INVOICE,
+          documentUser: DocumentUserEnum.STUDENT,
+          userId: 1,
+          createdAt: new Date(),
+        },
+      ];
+
+      jest
+        .spyOn(service, 'getInvoicesForCompany')
+        .mockResolvedValueOnce(document);
+
+      const response = await controller.getInvoicesForCompany(req);
+
+      expect(service.getInvoicesForCompany).toHaveBeenCalledWith(
+        req.user.email,
+      );
       expect(response).toEqual(document);
     });
   });

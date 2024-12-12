@@ -31,6 +31,10 @@ import { FileService } from '../filesystem/file.service';
 import { StudentPaymentResponseDto } from './dto/student-payment-response.dto';
 import { StudentPaymentStatus } from './enum/student-payment.status.enum';
 import { AiService } from '../ai/ai.service';
+import { InvoiceService } from '../invoice/invoice.service';
+import { MissionService } from '../mission/mission.service';
+import { Document } from '../documents/entity/document.entity';
+import { StudentPayment } from './entity/student-payment.entity';
 
 describe('PaymentService', () => {
   let service: PaymentService;
@@ -47,7 +51,19 @@ describe('PaymentService', () => {
       ],
       controllers: [PaymentController],
       providers: [
-        PaymentService,
+        {
+          provide: PaymentService,
+          useValue: {
+            createProductAndCheckoutSession: jest.fn(),
+            paymentSuccess: jest.fn(),
+            getPayment: jest.fn(),
+            getStudentPayment: jest.fn(),
+            getStudentPaymentById: jest.fn(),
+            receiveStudentPayment: jest.fn(),
+            createPaymentRow: jest.fn(),
+            createStudentPayment: jest.fn(),
+          },
+        },
         CompanyService,
         StudentService,
         JobsService,
@@ -59,7 +75,14 @@ describe('PaymentService', () => {
         AiService,
         {
           provide: getRepositoryToken(Payment),
-          useClass: Repository,
+          useValue: {
+            findOne: jest.fn(),
+            findOneBy: jest.fn(),
+            find: jest.fn(),
+            save: jest.fn(),
+            create: jest.fn(),
+            delete: jest.fn(),
+          },
         },
         {
           provide: getRepositoryToken(Mission),
@@ -132,6 +155,42 @@ describe('PaymentService', () => {
         {
           provide: getRepositoryToken(Skills),
           useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(Document),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(StudentPayment),
+          useValue: {
+            findOne: jest.fn(),
+            findOneBy: jest.fn(),
+            find: jest.fn(),
+            save: jest.fn(),
+            create: jest.fn(),
+            delete: jest.fn(),
+          },
+        },
+        {
+          provide: InvoiceService,
+          useValue: {
+            generateInvoice: jest.fn(),
+            generateInvoiceForCompany: jest.fn(),
+            downloadInvoice: jest.fn(),
+            getInvoicesForCompany: jest.fn(),
+            getInvoicesForStudent: jest.fn(),
+            deleteInvoice: jest.fn(),
+          },
+        },
+        {
+          provide: MissionService,
+          useValue: {
+            findMissionById: jest.fn(),
+            saveMission: jest.fn(),
+            getMissionDetailsCompanyV2: jest.fn(),
+            getMissionTasks: jest.fn(),
+            findAllByCompanyId: jest.fn(),
+          },
         },
         {
           provide: PaymentService,

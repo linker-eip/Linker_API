@@ -7,14 +7,18 @@ import {
 import { MissionService } from '../mission/mission.service';
 import { Payment } from './entity/payment.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Not, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { PaymentStatus } from './enum/payment.status.enum';
 import { CompanyService } from '../company/company.service';
 import { MissionStatus } from '../mission/enum/mission-status.enum';
 import { StudentPayment } from './entity/student-payment.entity';
 import { StudentService } from '../student/student.service';
-import { StudentPaymentResponseDto } from '../payment/dto/student-payment-response.dto';
+import { StudentPaymentResponseDto } from './dto/student-payment-response.dto';
 import { StudentPaymentStatus } from './enum/student-payment.status.enum';
+import { InvoiceService } from '../invoice/invoice.service';
+import { CompanyCreateInvoiceDto } from '../company/dto/company-create-invoice.dto';
+import Stripe from 'stripe';
+import { LinkerInvoiceCompanyDto } from '../invoice/dto/linker-invoice-company.dto';
 
 @Injectable()
 export class PaymentService {
@@ -27,8 +31,9 @@ export class PaymentService {
     @InjectRepository(StudentPayment)
     private readonly studentPaymentRepository: Repository<StudentPayment>,
     private readonly studentService: StudentService,
-  ) {
-  }
+    @Inject(forwardRef(() => InvoiceService))
+    private readonly invoiceService: InvoiceService,
+  ) {}
 
   async createProductAndCheckoutSession(missionId: string, req: any) {
     if (!missionId) {
@@ -40,8 +45,7 @@ export class PaymentService {
   }
 
   async paymentSuccess(sessionId: string, missionId: string) {
-    const Stripe = require('stripe');
-    const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
@@ -66,6 +70,94 @@ export class PaymentService {
     if (!mission) {
       throw new NotFoundException('Mission not found');
     }
+    console.log('mission', mission);
+
+    const company = await this.companyService.findCompanyById(
+      mission.companyId,
+    );
+
+    const missionDetails = await this.missionService.getMissionDetailsCompanyV2(
+      mission.id,
+      company.email,
+    );
+
+    if (!mission.groupId) {
+      throw new NotFoundException('Mission is not a group mission');
+    }
+
+    console.log('missionDetails', missionDetails);
+
+    const studentIdsWithTasks = new Set(
+      missionDetails.missionTaskArray
+        .filter((taskItem) => taskItem.studentProfile !== null)
+        .map((taskItem) => taskItem.studentProfile.studentId),
+    );
+
+    const studentsWithTasks = missionDetails.groupStudents.filter(
+      (groupStudent) =>
+        studentIdsWithTasks.has(groupStudent.studentProfile.studentId),
+    );
+
+    console.log('studentsWithTasks', studentsWithTasks);
+
+    for (const groupStudent of studentsWithTasks) {
+      const studentProfile = groupStudent.studentProfile;
+      console.log('studentProfile', studentProfile);
+
+      const studentMissionTasks = missionDetails.missionTaskArray.filter(
+        (taskItem) =>
+          taskItem.studentProfile?.studentId === studentProfile.studentId,
+      );
+      console.log('studentMissionTasks', studentMissionTasks);
+
+      const invoiceData = new CompanyCreateInvoiceDto();
+      invoiceData.missionId = mission.id;
+      invoiceData.studentId = studentProfile.studentId;
+
+      invoiceData.amount = studentMissionTasks.reduce(
+        (total, taskItem) => total + taskItem.missionTask.amount,
+        0,
+      );
+      console.log('invoiceData', invoiceData);
+
+      invoiceData.headerFields = ['Tache', 'Description', 'Montant'];
+      invoiceData.rows = studentMissionTasks.map((taskItem) => ({
+        Tache: taskItem.missionTask.name,
+        Description: taskItem.missionTask.description,
+        Montant: taskItem.missionTask.amount,
+      }));
+
+      await this.invoiceService.generateInvoice(company.email, invoiceData);
+    }
+
+    const companyInvoiceData = new LinkerInvoiceCompanyDto();
+    companyInvoiceData.missionId = mission.id;
+    companyInvoiceData.companyId = company.id;
+    companyInvoiceData.companyEmail = company.email;
+
+    companyInvoiceData.amount = missionDetails.missionTaskArray.reduce(
+      (total, taskItem) => total + taskItem.missionTask.amount,
+      0,
+    );
+
+    companyInvoiceData.headerFields = [
+      'Tache',
+      'Etudiant',
+      'Description',
+      'Montant',
+    ];
+    companyInvoiceData.rows = missionDetails.missionTaskArray.map(
+      (taskItem) => ({
+        Tache: taskItem.missionTask.name,
+        Etudiant: taskItem.studentProfile
+          ? `${taskItem.studentProfile.firstName} ${taskItem.studentProfile.lastName}`
+          : 'Non assigné',
+        Description: taskItem.missionTask.description,
+        Montant: taskItem.missionTask.amount,
+      }),
+    );
+
+    await this.invoiceService.generateInvoiceForCompany(companyInvoiceData);
 
     mission.status = MissionStatus.PROVISIONED;
     payment.status = PaymentStatus.PAID;
@@ -74,12 +166,11 @@ export class PaymentService {
     await this.paymentRepository.save(payment);
     await this.missionService.saveMission(mission);
 
-    return 'Payment successful';
+    return 'Payment successful and invoices generated';
   }
 
   async createPaymentRow(missionId: number, req: any) {
-    const Stripe = require('stripe');
-    const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
     const mission = await this.missionService.findMissionById(missionId);
 
     if (!mission) {

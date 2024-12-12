@@ -38,10 +38,20 @@ import { PaymentService } from '../payment/payment.service';
 import { Payment } from '../payment/entity/payment.entity';
 import { StudentPayment } from '../payment/entity/student-payment.entity';
 import { AiService } from '../ai/ai.service';
+import { InvoiceService } from '../invoice/invoice.service';
 
 describe('LinkedinService', () => {
   let service: LinkedinService;
   let controller: LinkedinController;
+
+  const mockInvoiceService = {
+    generateInvoice: jest.fn(),
+    generateInvoiceForCompany: jest.fn(),
+    downloadInvoice: jest.fn(),
+    getInvoicesForCompany: jest.fn(),
+    getInvoicesForStudent: jest.fn(),
+    deleteInvoice: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -69,6 +79,10 @@ describe('LinkedinService', () => {
         StudiesService,
         FileService,
         SkillsService,
+        {
+          provide: InvoiceService,
+          useValue: mockInvoiceService,
+        },
         {
           provide: getRepositoryToken(Mission),
           useClass: Repository,

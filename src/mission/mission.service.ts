@@ -803,6 +803,82 @@ export class MissionService {
     await this.missionRepository.save(mission);
   }
 
+  async getMissionDetailsCompanyV2(missionId: number, email: string){
+    const mission = await this.findMissionById(missionId);
+    if (mission == null) {
+      throw new HttpException('Invalid mission', HttpStatus.NOT_FOUND);
+    }
+    let company = null;
+    try {
+      company = await this.companyService.findOne(email);
+    } catch (err) {
+      throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
+    }
+
+    await this.missionVerification(company);
+
+    if (company == null) {
+      throw new HttpException('Invalid company', HttpStatus.UNAUTHORIZED);
+    }
+
+    const companyProfile = await this.companyService.findCompanyProfile(
+      company.email,
+    );
+
+    if (mission.companyId != company.id) {
+      throw new HttpException(
+        'You can only see details of your own missions',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const missionTasks = await this.missionTaskRepository.find({
+      where: { missionId },
+    });
+
+    const missionTaskArray = [];
+    for (const missionTask of missionTasks) {
+      if (missionTask.studentId == null) {
+        missionTaskArray.push({
+          missionTask,
+          studentProfile: null,
+        });
+        continue;
+      }
+
+      const student = await this.studentService.findOneById(
+        missionTask.studentId,
+      );
+      const studentProfile =
+        await this.studentService.findStudentProfileByStudentId(student.id);
+      missionTaskArray.push({
+        missionTask,
+        studentProfile,
+      });
+    }
+    let group = null;
+    const groupStudents = [];
+
+    if (mission.groupId) {
+      group = await this.groupService.findGroupById(mission.groupId);
+      for (const studentId of group.studentIds) {
+        const student = await this.studentService.findOneById(studentId);
+        const studentProfile =
+          await this.studentService.findStudentProfileByStudentId(student.id);
+        groupStudents.push({
+          studentProfile,
+        });
+      }
+    }
+
+    return {
+      companyProfile,
+      mission,
+      missionTaskArray,
+      group,
+      groupStudents,
+    };
+  }
   async getMissionDetailsCompany(missionId: number, req: any) {
     const mission = await this.findMissionById(missionId);
     if (mission == null) {
