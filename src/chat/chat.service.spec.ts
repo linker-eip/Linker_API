@@ -43,10 +43,20 @@ import { MailService } from '../mail/mail.service';
 import { SendFileInChatDto } from './dto/chat-send-file.dto';
 import { CompanyConversationResponseDto } from './dto/company-conversation-response.dto';
 import { AiService } from '../ai/ai.service';
+import { InvoiceService } from '../invoice/invoice.service';
 
 describe('ChatService', () => {
   let service: ChatService;
   let controller: ChatController;
+
+  const mockInvoiceService = {
+    generateInvoice: jest.fn(),
+    generateInvoiceForCompany: jest.fn(),
+    downloadInvoice: jest.fn(),
+    getInvoicesForCompany: jest.fn(),
+    getInvoicesForStudent: jest.fn(),
+    deleteInvoice: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -75,6 +85,10 @@ describe('ChatService', () => {
         FileService,
         Gateway,
         MailService,
+        {
+          provide: InvoiceService,
+          useValue: mockInvoiceService,
+        },
         {
           provide: getRepositoryToken(Message),
           useClass: Repository,
