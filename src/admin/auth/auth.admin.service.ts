@@ -65,9 +65,13 @@ export class AuthAdminService {
       if (student.isBlocked)
         await this.notificationsService.createNotification(
           'Votre compte a été bloqué',
+          'Your account has been blocked.',
           'Votre compte Linker à été bloqué.\n' +
           body.reason +
           '\n Pour plus d\'informations, veuillez contacter le support',
+          'Your Linker account has been blocked.\n' +
+          body.reason +
+          '\n For more information, please contact support',
           NotificationType.ACCOUNT,
           student.id,
         );
@@ -87,9 +91,13 @@ export class AuthAdminService {
       if (company.isBlocked)
         await this.notificationsService.createNotification(
           'Votre compte a été bloqué',
+          'Your account has been blocked.',
           'Votre compte Linker à été bloqué.\n' +
           body.reason +
           '\n Pour plus d\'informations, veuillez contacter le support',
+          'Your Linker account has been blocked.\n' +
+          body.reason +
+          '\n For more information, please contact support',
           NotificationType.ACCOUNT,
           null,
           company.id,

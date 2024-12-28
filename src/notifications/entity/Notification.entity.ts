@@ -21,6 +21,12 @@ export class Notification {
   text: string;
 
   @Column({ nullable: false })
+  enTitle: string;
+
+  @Column({ nullable: false })
+  enText: string;
+
+  @Column({ nullable: false })
   type: NotificationType;
 
   @Column({ type: 'int', nullable: true })

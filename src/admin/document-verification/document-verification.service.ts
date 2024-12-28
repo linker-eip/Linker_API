@@ -6,17 +6,11 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { StudentDocument } from '../../student/entity/StudentDocuments.entity';
 import { Repository } from 'typeorm';
-import {
-  ValidateDocumentCompanyDto,
-  ValidateDocumentStudentDto,
-} from './dto/validate-document.dto';
+import { ValidateDocumentCompanyDto, ValidateDocumentStudentDto } from './dto/validate-document.dto';
 import { DocumentStatus } from '../../student/enum/StudentDocument.enum';
 import { NotificationsService } from '../../notifications/notifications.service';
 import { NotificationType } from '../../notifications/entity/Notification.entity';
-import {
-  DenyDocumentCompanyDto,
-  DenyDocumentStudentDto,
-} from './dto/deny-document.dto';
+import { DenyDocumentCompanyDto, DenyDocumentStudentDto } from './dto/deny-document.dto';
 import { CompanyDocument } from '../../company/entity/CompanyDocument.entity';
 
 @Injectable()
@@ -82,9 +76,13 @@ export class DocumentVerificationService {
 
     this.notificationService.createNotification(
       'Document validé',
+      'Document validated',
       'Votre document ' +
       document.documentType +
       ' a bien été validé par Linker.',
+      'Your document ' +
+      document.documentType +
+      ' has been validated by Linker.',
       NotificationType.DOCUMENT,
       dto.studentId,
       null,
@@ -108,9 +106,15 @@ export class DocumentVerificationService {
 
     this.notificationService.createNotification(
       'Document refusé',
+      'Document denied',
       'Votre document ' +
       document.documentType +
       ' a été refusé par Linker. (' +
+      dto.comment +
+      ')',
+      'Your document ' +
+      document.documentType +
+      ' has been denied by Linker. (' +
       dto.comment +
       ')',
       NotificationType.DOCUMENT,
@@ -155,9 +159,13 @@ export class DocumentVerificationService {
 
     this.notificationService.createNotification(
       'Document validé',
+      'Document validated',
       'Votre document ' +
       document.documentType +
       ' a bien été validé par Linker.',
+      'Your document ' +
+      document.documentType +
+      ' has been validated by Linker.',
       NotificationType.DOCUMENT,
       null,
       dto.companyId,
@@ -181,9 +189,15 @@ export class DocumentVerificationService {
 
     this.notificationService.createNotification(
       'Document refusé',
+      'Document denied',
       'Votre document ' +
       document.documentType +
       ' a été refusé par Linker. (' +
+      dto.comment +
+      ')',
+      'Your document ' +
+      document.documentType +
+      ' has been denied by Linker. (' +
       dto.comment +
       ')',
       NotificationType.DOCUMENT,

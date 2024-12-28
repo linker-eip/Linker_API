@@ -1,19 +1,12 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { GetTicketsDto } from '../../ticket/dto/get-ticket.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  Ticket,
-  TicketAnswer,
-  TicketStateEnum,
-} from '../../ticket/entity/Ticket.entity';
+import { Ticket, TicketAnswer, TicketStateEnum } from '../../ticket/entity/Ticket.entity';
 import { Repository } from 'typeorm';
 import { AnswerTicketDto } from '../../ticket/dto/answer-ticket.dto';
 import { HttpStatusCode } from 'axios';
 import { DocumentTransferService } from '../../document-transfer/src/services/document-transfer.service';
-import {
-  GetAnswerDto,
-  GetTicketReponseDto,
-} from '../../ticket/dto/get-ticket-reponse.dto';
+import { GetAnswerDto, GetTicketReponseDto } from '../../ticket/dto/get-ticket-reponse.dto';
 import { NotificationsService } from '../../notifications/notifications.service';
 import { NotificationType } from '../../notifications/entity/Notification.entity';
 import { UserType } from '../../chat/entity/Message.entity';
@@ -67,14 +60,18 @@ export class TicketAdminService {
     if (ticket.authorType == UserType.STUDENT_USER) {
       await this.notificationService.createNotification(
         'Réponse à votre ticket',
+        'Ticket received a response',
         `Votre ticket ${ticket.title} a reçu une réponse`,
+        `Your ticket ${ticket.title} has received a response`,
         NotificationType.TICKET,
         ticket.authorId,
       );
     } else {
       await this.notificationService.createNotification(
         'Réponse à votre ticket',
+        'Ticket received a response',
         `Votre ticket ${ticket.title} a reçu une réponse`,
+        `Your ticket ${ticket.title} has received a response`,
         NotificationType.TICKET,
         null,
         ticket.authorId,
