@@ -20,11 +20,11 @@ export class Notification {
   @Column({ nullable: false })
   text: string;
 
-  @Column({ nullable: false })
-  enTitle: string;
+  @Column({ nullable: true })
+  enTitle?: string;
 
-  @Column({ nullable: false })
-  enText: string;
+  @Column({ nullable: true })
+  enText?: string;
 
   @Column({ nullable: false })
   type: NotificationType;
