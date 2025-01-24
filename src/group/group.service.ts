@@ -550,10 +550,10 @@ export class GroupService {
 
     if (mission) {
       if (mission.companyId != company.id) {
-        throw new HttpException(
-          'Vous n\'avez pas accès à cette mission',
-          HttpStatus.NOT_FOUND,
-        );
+        // throw new HttpException(
+        //   'Vous n\'avez pas accès à cette mission',
+        //   HttpStatus.NOT_FOUND,
+        // );
       }
     }
 
