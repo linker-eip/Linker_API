@@ -26,15 +26,19 @@ export class NotificationsService {
   }
 
   async createNotification(
-    title: string,
-    text: string,
+    frtitle: string,
+    entitle: string,
+    frtext: string,
+    entext: string,
     type: NotificationType,
     studentId?: number,
     companyId?: number,
   ) {
     const notification = new Notification();
-    notification.title = title;
-    notification.text = text;
+    notification.title = frtitle;
+    notification.enTitle = entitle;
+    notification.text = frtext;
+    notification.enText = entext;
     notification.type = type;
     if (studentId != null) {
       notification.studentId = studentId;
@@ -51,10 +55,10 @@ export class NotificationsService {
         type == NotificationType.ACCOUNT
       ) {
         const mailDto = new SendMailDto();
-        mailDto.subject = 'Nouvelle notification Linker : ' + title;
+        mailDto.subject = 'Nouvelle notification Linker : ' + frtitle;
         mailDto.text =
           'Vous avez reçu une nouvelle notification sur votre compte Linker. \n\n' +
-          text;
+          frtext;
         mailDto.to = student.email;
         this.mailService.sendMail(mailDto);
       }
@@ -71,10 +75,10 @@ export class NotificationsService {
         (type == NotificationType.MISSION && companypref.mailNotifMission)
       ) {
         const mailDto = new SendMailDto();
-        mailDto.subject = 'Nouvelle notification Linker : ' + title;
+        mailDto.subject = 'Nouvelle notification Linker : ' + frtitle;
         mailDto.text =
           'Vous avez reçu une nouvelle notification sur votre compte Linker. \n\n' +
-          text;
+          frtext;
         mailDto.to = company.email;
         this.mailService.sendMail(mailDto);
       }

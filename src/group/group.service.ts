@@ -1,11 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HttpStatusCode } from 'axios';
-import {
-  Brackets,
-  Repository,
-  SelectQueryBuilder
-} from 'typeorm';
+import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { CompanyService } from '../company/company.service';
 import { Mission } from '../mission/entity/mission.entity';
 import { MissionStatus } from '../mission/enum/mission-status.enum';
@@ -18,13 +14,8 @@ import { StudentService } from '../student/student.service';
 import { CompanySearchGroupsFilterDto } from './dto/company-search-groups-filter.dto';
 import { CreateGroupDto } from './dto/create-group-dto';
 import { GetCompanySearchGroupsDto } from './dto/get-company-search-groups.dto';
-import {
-  GetGroupeResponse
-} from './dto/get-group-response-dto';
-import {
-  GetInvitesResponse,
-  GetPersonnalInvitesResponse,
-} from './dto/get-invites-response-dto';
+import { GetGroupeResponse } from './dto/get-group-response-dto';
+import { GetInvitesResponse, GetPersonnalInvitesResponse } from './dto/get-invites-response-dto';
 import { UpdateGroupDto } from './dto/update-group-dto';
 import { Group } from './entity/Group.entity';
 import { GroupInvite } from './entity/GroupInvite.entity';
@@ -130,7 +121,9 @@ export class GroupService {
 
     this.notificationService.createNotification(
       'Groupe créé',
+      'Group created',
       'Le groupe ' + group.name + ' a bien été créé',
+      'The group ' + group.name + ' has been created',
       NotificationType.GROUP,
       student.id,
     );
@@ -302,7 +295,9 @@ export class GroupService {
     this.groupInviteRepository.save(groupInvite);
     this.notificationService.createNotification(
       'Invitation',
+      'Invitation',
       'Vous avez été invité à rejoindre le groupe ' + group.name,
+      'You have been invited to join the group ' + group.name,
       NotificationType.GROUP,
       invitedStudent.id,
     );
@@ -408,10 +403,12 @@ export class GroupService {
 
     this.notificationService.createNotification(
       'Invitation acceptée',
+      'Invitation accepted',
       student.firstName +
       ' ' +
       student.lastName +
       ' a accepté de rejoindre votre groupe',
+      student.firstName + ' ' + student.lastName + ' has accepted to join your group',
       NotificationType.GROUP,
       group.leaderId,
     );
@@ -436,10 +433,12 @@ export class GroupService {
 
     this.notificationService.createNotification(
       'Invitation refusée',
+      'Invitation refused',
       student.firstName +
       ' ' +
       student.lastName +
       ' a refusé de rejoindre votre groupe',
+      student.firstName + ' ' + student.lastName + ' has refused to join your group',
       NotificationType.GROUP,
       group.leaderId,
     );
@@ -630,7 +629,7 @@ export class GroupService {
     }
 
 
-    return filteredGroups.slice(0, 10);
+    return filteredGroups.slice(0, 30);
 
   }
 
